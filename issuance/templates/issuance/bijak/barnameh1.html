@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>فرم حمل و نقل فارسی</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Tahoma', 'Arial', sans-serif;
+            direction: rtl;
+            text-align: right;
+            background-color: #f9fafb;
+            padding: 0;
+            margin: 0;
+            min-height: 100vh;
+        }
+
+        .form-container {
+            width: 100vw;
+            height: 100vh;
+            padding: 20px;
+            background-color: #8a8888;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .form-wrapper {
+            background-color: white;
+            border: 2px solid #1f2937;
+            width: 842px;
+            height: 595px;
+            padding: 24px;
+            font-size: 11px;
+            line-height: 1.3;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-section {
+            border-bottom: 1px solid #1f2937;
+            padding-bottom: 8px;
+            margin-bottom: 12px;
+        }
+
+        .header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 8px;
+        }
+
+        .header-left {
+            width: 200px;
+            text-align: right;
+        }
+
+        .header-center {
+            width: 350px;
+            text-align: center;
+        }
+
+        .header-right {
+            width: 200px;
+            text-align: left;
+        }
+
+        .field-row {
+            margin-bottom: 4px;
+            font-size: 10px;
+        }
+
+        .field-label {
+            display: inline-block;
+            vertical-align: top;
+        }
+
+        .form-input {
+            border: none;
+            border-bottom: 1px solid #4b5563;
+            background: transparent;
+            padding: 0;
+            height: 16px;
+            font-size: 10px;
+            font-family: 'Tahoma', 'Arial', sans-serif;
+            direction: rtl;
+            text-align: right;
+            outline: none;
+        }
+
+        .form-input:focus {
+            border-bottom-color: #1f2937;
+        }
+
+        .center-title {
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+
+        .center-subtitle {
+            font-size: 10px;
+            margin-bottom: 4px;
+        }
+
+        .center-main-title {
+            margin-top: 8px;
+            font-size: 10px;
+            font-weight: bold;
+        }
+
+        .table-container {
+            margin-bottom: 8px;
+        }
+
+        .form-table {
+            width: 100%;
+            border: 1px solid #1f2937;
+            border-collapse: collapse;
+        }
+
+        .table-header {
+            background-color: #f3f4f6;
+            padding: 4px;
+            border-bottom: 1px solid #1f2937;
+        }
+
+        .table-header-row {
+            display: grid;
+            gap: 4px;
+            font-size: 10px;
+            text-align: center;
+        }
+
+        .table-header-6 {
+            grid-template-columns: repeat(6, 1fr);
+        }
+
+        .table-header-7 {
+            grid-template-columns: repeat(7, 1fr);
+        }
+
+        .table-row {
+            padding: 4px;
+            border-bottom: 1px solid #6b7280;
+        }
+
+        .table-row-grid {
+            display: grid;
+            gap: 4px;
+        }
+
+        .table-row-6 {
+            grid-template-columns: repeat(6, 1fr);
+        }
+
+        .table-row-7 {
+            grid-template-columns: repeat(7, 1fr);
+        }
+
+        .table-input {
+            border: none;
+            border-bottom: 1px solid #9ca3af;
+            background: transparent;
+            padding: 0;
+            height: 20px;
+            font-size: 10px;
+            font-family: 'Tahoma', 'Arial', sans-serif;
+            direction: rtl;
+            text-align: right;
+            outline: none;
+            width: 100%;
+        }
+
+        .color-boxes {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 4px;
+            height: 24px;
+            border-top: 1px solid #1f2937;
+        }
+
+        .color-box {
+            background-color: #bbf7d0;
+            border-right: 1px solid #1f2937;
+        }
+
+        .color-box:last-child {
+            border-right: none;
+        }
+
+        .bottom-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-top: 8px;
+        }
+
+
+        .row {
+            display: grid;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .row:first-child {
+            grid-template-columns: repeat(3, 1fr); /* سطر اول → ۳ ستون مساوی */
+        }
+
+        .row:last-child {
+            grid-template-columns: repeat(2, 1fr); /* سطر دوم → ۲ ستون مساوی */
+        }
+
+
+        .bottom-field {
+            margin-bottom: 8px;
+            font-size: 10px;
+        }
+
+        .signature-section {
+            margin-top: 12px;
+            border-top: 1px solid #1f2937;
+            padding-top: 8px;
+        }
+
+        .signature-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+        }
+
+        .signature-box {
+            text-align: center;
+        }
+
+        .signature-title {
+            margin-bottom: 4px;
+            font-size: 10px;
+        }
+
+        .signature-area {
+            border: 1px solid #6b7280;
+            height: 48px;
+            width: 100%;
+            background-color: #f9fafb;
+        }
+
+        .signature-label {
+            margin-top: 4px;
+            font-size: 10px;
+        }
+
+        .phone-section {
+            margin-top: 12px;
+            text-align: center;
+        }
+
+        .phone-row {
+            margin-bottom: 4px;
+            font-size: 10px;
+        }
+
+        .phone-input {
+            border: none;
+            border-bottom: 1px solid #6b7280;
+            background: transparent;
+            padding: 0;
+            height: 16px;
+            font-size: 10px;
+            font-family: 'Tahoma', 'Arial', sans-serif;
+            direction: rtl;
+            text-align: center;
+            outline: none;
+            width: 80px;
+            margin: 0 4px;
+        }
+
+        .explanation-section {
+            margin-top: 8px;
+            font-size: 10px;
+        }
+
+        .explanation-input {
+            border: none;
+            border-bottom: 1px solid #6b7280;
+            background: transparent;
+            padding: 0;
+            height: 16px;
+            font-size: 10px;
+            font-family: 'Tahoma', 'Arial', sans-serif;
+            direction: rtl;
+            text-align: right;
+            outline: none;
+            width: 500px;
+        }
+
+        .no-print {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .print-button {
+            background-color: #2563eb;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+            margin: 0 8px;
+            font-family: 'Tahoma', 'Arial', sans-serif;
+        }
+
+        .print-button:hover {
+            background-color: #1d4ed8;
+        }
+
+        .print-button.outline {
+            background-color: transparent;
+            color: #374151;
+            border: 1px solid #d1d5db;
+        }
+
+        .print-button.outline:hover {
+            background-color: #f9fafb;
+        }
+
+        /* Print styles */
+        @media print {
+            @page {
+                size: A5 landscape;
+                margin: 0.1cm;
+            }
+
+            label, button {
+                display: none !important; /* همه لیبل‌ها و دکمه‌ها حذف میشن */
+            }
+
+            input {
+                border: none !important; /* کادر input حذف بشه */
+            }
+
+            input::placeholder {
+                color: transparent; /* placeholder هم حذف بشه */
+            }
+
+            input {
+                pointer-events: none; /* دیگه قابل تغییر نباشه */
+            }
+
+            .no-print {
+                display: none !important;
+            }
+
+            body {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+                margin: 0;
+                padding: 0;
+                background: white;
+            }
+
+            .form-container {
+                width: 100% !important;
+                height: 100% !important;
+                padding: 0 !important;
+                background: white !important;
+            }
+
+            .form-wrapper {
+                box-shadow: none !important;
+                border: 2px solid #000 !important;
+                margin: 0 !important;
+                width: 100% !important;
+                height: 100% !important;
+                page-break-inside: avoid;
+            }
+
+            .form-input,
+            .table-input,
+            .phone-input,
+            .explanation-input {
+                border: none !important;
+                border-bottom: 1px solid #000 !important;
+                background: transparent !important;
+                -webkit-appearance: none;
+                appearance: none;
+            }
+
+            .form-table {
+                border: 1px solid #000 !important;
+            }
+
+            .table-header {
+                border-bottom: 1px solid #000 !important;
+            }
+
+            .color-box {
+                border-right: 1px solid #000 !important;
+            }
+
+            .color-boxes {
+                border-top: 1px solid #000 !important;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="form-container">
+    <div class="form-wrapper">
+        <form method="post" action="{% url 'create_new' %}">
+            {% csrf_token %}
+
+            <!-- Header Section -->
+            <div class="header-section">
+                <div class="header-row">
+                    <div class="header-left">
+                        <div class="field-row">
+                            <span class="field-label" style="width: 70px;">شماره بارنامه:</span>
+                            <input type="text" class="form-input" style="width: 100px;" id="tracking_code"
+                                   value="{{ bijak.tracking_code }}">
+                        </div>
+                        <div class="field-row">
+                            <span class="field-label" style="width: 70px;">ارزش محموله:</span>
+                            <input type="text" class="form-input" style="width: 100px;" id="value"
+                                   value="{{ bijak.value }}">
+                        </div>
+                    </div>
+
+
+                    <div class="header-center">
+                        <h2 class="center-title">سازمان راهداری و حمل ونقل جاده ای</h2>
+                        <p class="center-subtitle">اتحادیه وانت بارهای مشهد و حومه</p>
+                        <p class="center-subtitle">بارنامه جاده ای داخلی</p>
+                        <h3 class="center-main-title">موسسه حمل و نقل صدرا بار خراسان شماره ثبت: ۲۵۱</h3>
+                    </div>
+                    <div class="header-right">
+                        <div class="field-row">
+                            <span class="field-label" style="width: 70px;">تاریخ:</span>
+                            <input type="text" class="form-input" style="width: 100px;" id="issuance_date">
+                        </div>
+                        <div class="field-row">
+                            <span class="field-label" style="width: 70px;">ساعت حرکت:</span>
+                            <input type="text" class="form-input" style="width: 100px;" id="movementTime">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Table -->
+            <div class="table-container">
+                <table class="form-table" style="margin-top: 4px;">
+                    <thead>
+                    <tr>
+                        <td class="table-header">
+                            <div class="table-header-row table-header-6">
+                                <div>نام و نام خانوادگی فرستنده</div>
+                                <div>شناسه/کد ملی</div>
+                                <div>کد پستی</div>
+                                <div>آدرس محل بارگیری</div>
+                                <div></div>
+                                <div>تلفن</div>
+                            </div>
+                        </td>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td class="table-row">
+                            <div class="table-row-grid table-row-6">
+                                <input type="text" class="table-input" placeholder="">
+                                <input type="text" class="table-input" placeholder="">
+                                <input type="text" class="table-input" placeholder="">
+                                <input type="text" class="table-input" placeholder="">
+                                <input type="text" class="table-input" placeholder="">
+                                <input type="text" class="table-input" placeholder="">
+                            </div>
+                        </td>
+                    </tr>
+                    </tbody>
+                    <div class="section">
+                        <div class="form-row">
+                            <div class="form-cell">
+                                <input type="text" placeholder=" ">
+                                <label class="cell-label">نام و نام خانوادگی فرستنده</label>
+                            </div>
+                        </div>
+                    </div>
+                </table>
+                <table class="form-table" style="margin-top: 4px;">
+                    <thead>
+                    <tr>
+                        <td class="table-header">
+                            <div class="table-header-row table-header-6">
+                                <div>تلفن</div>
+                                <div>آدرس محل پارکگیری</div>
+                                <div>کد پستی محل پارکگیری</div>
+                                <div>شناسه ملی</div>
+                                <div>نام و نام خانوادگی فرستنده</div>
+                                <div>نام و نام خانوادگی گیرنده</div>
+                            </div>
+                        </td>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td class="table-row">
+                            <div class="table-row-grid table-row-6">
+                                <input type="text" class="table-input" placeholder="تلفن">
+                                <input type="text" class="table-input" placeholder="آدرس">
+                                <input type="text" class="table-input" placeholder="کد پستی">
+                                <input type="text" class="table-input" placeholder="شناسه ملی">
+                                <input type="text" class="table-input" placeholder="نام فرستنده">
+                                <input type="text" class="table-input" placeholder="نام گیرنده">
+                            </div>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+
+                <!-- Second Table Section -->
+                <table class="form-table" style="margin-top: 4px;">
+                    <thead>
+                    <tr>
+                        <td class="table-header">
+                            <div class="table-header-row table-header-7">
+                                <div>شماره کارت هوشمند راننده</div>
+                                <div>تاریخ تولد</div>
+                                <div>نام پدر</div>
+                                <div>ساکن شهر</div>
+                                <div>کد ملی</div>
+                                <div>نام و نام خانوادگی راننده</div>
+                                <div>نوع کامیون</div>
+                            </div>
+                        </td>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td class="table-row">
+                            <div class="table-row-grid table-row-7">
+                                <input type="text" class="table-input" placeholder="شماره کارت">
+                                <input type="text" class="table-input" placeholder="تاریخ تولد">
+                                <input type="text" class="table-input" placeholder="نام پدر">
+                                <input type="text" class="table-input" placeholder="شهر">
+                                <input type="text" class="table-input" placeholder="کد ملی">
+                                <input type="text" class="table-input" placeholder="نام راننده">
+                                <input type="text" class="table-input" placeholder="نوع کامیون">
+                            </div>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+
+                <!-- Third Table Section -->
+                <table class="form-table" style="margin-top: 4px;">
+                    <thead>
+                    <tr>
+                        <td class="table-header">
+                            <div class="table-header-row table-header-6">
+                                <div>مقصد تخلیه</div>
+                                <div>شماره کارت هوشمند ناوگان</div>
+                                <div>مبدا بارگیری</div>
+                                <div>تعداد بسته</div>
+                                <div>نوع بسته بندی</div>
+                                <div>وزن کل بار (تن)</div>
+                            </div>
+                        </td>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td class="table-row">
+                            <div class="table-row-grid table-row-6">
+                                <input type="text" class="table-input" placeholder="مقصد تخلیه">
+                                <input type="text" class="table-input" placeholder="شماره کارت">
+                                <input type="text" class="table-input" placeholder="مبدا">
+                                <input type="text" class="table-input" placeholder="تعداد">
+                                <input type="text" class="table-input" placeholder="نوع بسته">
+                                <input type="text" class="table-input" placeholder="وزن">
+                            </div>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Bottom Section -->
+            <div class="bottom-section">
+                <div class="bottom-field">
+                    <span class="field-label" style="width: 50px;">مبلغ کرایه:</span>
+                    <input type="text" class="form-input" style="width: 190px;" id="totalCargo">
+                </div>
+                <div class="bottom-field">
+                    <span class="field-label" style="width: 120px;">کل کرایه پرداختی در مقصد:</span>
+                    <input type="text" class="form-input" style="width: 120px;" id="totalCargo">
+                </div>
+                <div class="bottom-field">
+                    <span class="field-label" style="width: 80px;">بیمه:</span>
+                    <input type="text" class="form-input" style="width: 120px;" id="totalCargo">
+                </div>
+                <div class="bottom-field">
+                    <span class="field-label" style="width: 60px;">خدمات:</span>
+                    <input type="text" class="form-input" style="width: 200px;" id="services">
+                </div>
+                <div class="bottom-field">
+                    <span class="field-label" style="width: 90px;">مبلغ با حروف:</span>
+                    <input type="text" class="form-input" style="width: 170px;" id="detailedAmount">
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="bottom-section">
+        <div class="row">
+            <div class="explanation-section">
+                <span class="field-label" style="width: 60px;">توضیحات:</span>
+                <input type="text" class="explanation-input" id="explanation">
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Signature Section -->
+    <div class="signature-section">
+        <div class="signature-row">
+            <div class="signature-box">
+                <p class="signature-title">مهر و امضاء</p>
+                {#                <div class="signature-area"></div>#}
+                <p class="signature-label">شرکت حمل و نقل</p>
+                <p class="signature-label">مدیریت: سید سعید حسینی</p>
+            </div>
+
+            <div class="signature-box">
+                <p class="signature-title">امضاء تحویل گیرنده:</p>
+                {#                <div class="signature-area"></div>#}
+            </div>
+
+            <div class="signature-box">
+                <p class="signature-title">امضاء راننده:</p>
+                {#                <div class="signature-area"></div>#}
+            </div>
+        </div>
+
+        <div class="phone-section">
+            <div class="phone-row">
+                <span>تلفن: </span>
+                <input type="text" class="phone-input" placeholder="۰۵۱-۳۵۴۲۰۷۰۳-۲">
+                <input type="text" class="phone-input" placeholder="۰۹۱۵ ۹۱۷ ۵۲۰۳">
+                <input type="text" class="phone-input" placeholder="۰۹۳۰۹۸۳۳۷۰۴">
+            </div>
+        </div>
+
+
+    </div>
+</div>
+
+<!-- Action Buttons -->
+<div class="no-print">
+    <button class="print-button" onclick="window.print()">چاپ فرم</button>
+    <button class="print-button outline" onclick="showData()">نمایش داده‌ها</button>
+    <button type="submit" name="action" class="print-button" rel="{% url 'create_new' %}">صفحه اصلی</button>
+</div>
+</div>
+
+<script>
+    function showData() {
+        const formData = {
+            tracking_code: document.getElementById('tracking_code').value,
+            value: document.getElementById('value').value,
+            issuance_date: document.getElementById('issuance_date').value,
+            movementTime: document.getElementById('movementTime').value,
+            services: document.getElementById('services').value,
+            detailedAmount: document.getElementById('detailedAmount').value,
+            totalCargo: document.getElementById('totalCargo').value,
+            explanation: document.getElementById('explanation').value
+        };
+
+        console.log('Form Data:', formData);
+        alert('اطلاعات فرم در کنسول نمایش داده شد');
+    }
+</script>
+</body>
+</html>

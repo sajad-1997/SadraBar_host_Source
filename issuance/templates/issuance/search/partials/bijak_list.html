@@ -1,0 +1,44 @@
+{% load humanize %}
+
+{% for b in bijaks %}
+    <div class="bijak-card">
+        <div class="bijak-header">
+            کد رهگیری: {{ b.tracking_code }} |
+            تاریخ صدور: {{ b.issuance_datetime }}
+        </div>
+
+        <div class="bijak-row">
+            <span>فرستنده: {{ b.sender.name }}</span>
+            <span>گیرنده: {{ b.receiver.name }}</span>
+        </div>
+
+        <div class="bijak-row">
+            <span>مبدا: {{ b.cargo.origin }}</span>
+            <span>مقصد: {{ b.cargo.destination }}</span>
+        </div>
+
+        <div class="bijak-row">
+            <span>راننده: {{ b.driver.name }}</span>
+            <span>پلاک:
+                {{ b.vehicle.license_plate_two_digit }}
+                {{ b.vehicle.license_plate_alphabet }}
+                {{ b.vehicle.license_plate_three_digit }}
+                | ایران {{ b.vehicle.license_plate_series }}
+            </span>
+        </div>
+
+        <div class="bijak-row">
+            <span>کل کرایه: {{ b.total_fare|intcomma }} ریال</span>
+            <span>ارزش محموله: {{ b.value|intcomma }} ریال</span>
+        </div>
+
+        <div class="btn-group-card">
+            <a href="{% url 'issuance:crud:preview' b.pk %}" class="btn btn-sm btn-info w-100">مشاهده</a>
+            <a href="{% url 'issuance:crud:print' b.pk %}" class="btn btn-sm btn-primary w-100">چاپ</a>
+        </div>
+    </div>
+{% empty %}
+    <p class="text-center text-muted mt-4">
+        نتیجه‌ای یافت نشد
+    </p>
+{% endfor %}

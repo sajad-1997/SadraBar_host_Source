@@ -1,0 +1,24 @@
+body {
+    font-family: "Vazirmatn", "Tahoma", sans-serif;
+}
+
+.navbar-brand {
+    font-size: 1.3rem;
+}
+
+.nav-link {
+    transition: all 0.2s ease-in-out;
+}
+
+.nav-link:hover {
+    color: #ffc107 !important;
+}
+
+footer {
+    font-size: 0.9rem;
+    line-height: 1.7;
+}
+
+main {
+    min-height: 70vh;
+}

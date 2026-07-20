@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>فرم حمل و نقل - A5 افقی</title>
+    <style>
+
+        .form-container {
+            width: 100vw;
+            height: 100vh;
+            padding: 20px;
+            background-color: #8a8888;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .form-wrapper {
+            background-color: white;
+            border: 2px solid #1f2937;
+            width: 842px;
+            height: 595px;
+            padding: 24px;
+            font-size: 11px;
+            line-height: 1.3;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-section {
+            border-bottom: 1px solid #1f2937;
+            padding-bottom: 8px;
+            margin-bottom: 12px;
+        }
+
+        .header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 8px;
+        }
+
+        .header-left {
+            width: 200px;
+            text-align: right;
+        }
+
+        .header-center {
+            width: 350px;
+            text-align: center;
+        }
+
+        .header-right {
+            width: 200px;
+            text-align: left;
+        }
+
+        /* 📌 اندازه برگه A5 */
+        @page {
+            size: A5 landscape;   /* portrait برای عمودی */
+            margin: 10mm;
+        }
+
+        body {
+            font-family: "Vazirmatn", "Tahoma", sans-serif;
+            background: #f5f6fa;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* کانتینر اصلی */
+        .container {
+            width: 210mm; /* افقی A5 */
+            min-height: 148mm;
+            margin: 10px auto;
+            background: #fff;
+            padding: 10mm;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            box-sizing: border-box;
+        }
+
+        /* کنترل‌ها */
+        .controls {
+            margin-bottom: 15px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .controls button {
+            padding: 6px 12px;
+            border: 1px solid #0d6efd;
+            background: #0d6efd;
+            color: #fff;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        .controls button.secondary {
+            background: #6c757d;
+            border-color: #6c757d;
+        }
+
+        /* بخش‌ها */
+        .section {
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 8px;
+            margin-bottom: 10px;
+            background: #fff;
+        }
+
+        /* ردیف‌ها و سلول‌ها */
+        .form-row {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 8px;
+        }
+
+        .form-cell,
+        .form-cell-mini {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            min-width: 120px;
+        }
+
+        .form-cell input,
+        .form-cell-mini input {
+            padding: 6px 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+
+        /* ابعاد سفارشی برای فیلدهای خاص */
+        .form-cell-mini .nid-input {
+            width: 12ch;
+        }
+
+        /* کد ملی 10 رقم */
+        .form-cell-mini .postal-input {
+            width: 12ch;
+        }
+
+        /* کد پستی 10 رقم */
+        .form-cell-mini .phone-input {
+            width: 13ch;
+        }
+
+        /* تلفن 11 رقم */
+
+        /* لیبل‌ها */
+        .cell-label {
+            font-size: 11px;
+            color: #444;
+            margin-top: 3px;
+            white-space: nowrap;
+        }
+
+        /* جدول‌ها */
+        .form-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .form-table th,
+        .form-table td {
+            border: 1px solid #ccc;
+            padding: 4px;
+            font-size: 12px;
+            text-align: center;
+        }
+
+        .table-header {
+            background: #f1f3f5;
+            font-weight: bold;
+        }
+
+        /* بخش امضا */
+        .signature-section {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+        }
+
+        .signature-box {
+            width: 30%;
+            text-align: center;
+        }
+
+        .signature-box .box {
+            border: 1px dashed #888;
+            height: 50px;
+            margin: 5px 0;
+        }
+
+        /* مخصوص چاپ */
+        @media print {
+            body {
+                background: #fff;
+            }
+
+            .container {
+                box-shadow: none;
+                margin: 0;
+                border-radius: 0;
+                width: 100%;
+                min-height: auto;
+            }
+
+            .no-print {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="form-container">
+    <div class="form-wrapper">
+        <form method="post" action="{% url 'create_new' %}">
+            {% csrf_token %}
+
+            <!-- Header Section -->
+            <div class="header-section">
+                <div class="header-row">
+                    <div class="header-left">
+                        <div class="field-row">
+                            <span class="field-label" style="width: 70px;">شماره بارنامه:</span>
+                            <input type="text" class="form-input" style="width: 100px;" id="tracking_code"
+                                   value="{{ bijak.tracking_code }}">
+                        </div>
+                        <div class="field-row">
+                            <span class="field-label" style="width: 70px;">ارزش محموله:</span>
+                            <input type="text" class="form-input" style="width: 100px;" id="value"
+                                   value="{{ bijak.value }}">
+                        </div>
+                    </div>
+
+
+                    <div class="header-center">
+                        <h2 class="center-title">سازمان راهداری و حمل ونقل جاده ای</h2>
+                        <p class="center-subtitle">اتحادیه وانت بارهای مشهد و حومه</p>
+                        <p class="center-subtitle">بارنامه جاده ای داخلی</p>
+                        <h3 class="center-main-title">موسسه حمل و نقل صدرا بار خراسان شماره ثبت: ۲۵۱</h3>
+                    </div>
+                    <div class="header-right">
+                        <div class="field-row">
+                            <span class="field-label" style="width: 70px;">تاریخ:</span>
+                            <input type="text" class="form-input" style="width: 100px;" id="issuance_date">
+                        </div>
+                        <div class="field-row">
+                            <span class="field-label" style="width: 70px;">ساعت حرکت:</span>
+                            <input type="text" class="form-input" style="width: 100px;" id="movementTime">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Table -->
+            <div class="table-container">
+                <table class="form-table" style="margin-top: 4px;">
+                    <thead>
+                    <tr>
+                        <td class="table-header">
+                            <div class="table-header-row table-header-6">
+                                <div>نام و نام خانوادگی فرستنده</div>
+                                <div>شناسه/کد ملی</div>
+                                <div>کد پستی</div>
+                                <div>آدرس محل بارگیری</div>
+                                <div></div>
+                                <div>تلفن</div>
+                            </div>
+                        </td>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td class="table-row">
+                            <div class="table-row-grid table-row-6">
+                                <input type="text" class="table-input" placeholder="">
+                                <input type="text" class="table-input" placeholder="">
+                                <input type="text" class="table-input" placeholder="">
+                                <input type="text" class="table-input" placeholder="">
+                                <input type="text" class="table-input" placeholder="">
+                                <input type="text" class="table-input" placeholder="">
+                            </div>
+                        </td>
+                    </tr>
+                    </tbody>
+                    <div class="section">
+                        <div class="form-row">
+                            <div class="form-cell">
+                                <input type="text" placeholder=" ">
+                                <label class="cell-label">نام و نام خانوادگی فرستنده</label>
+                            </div>
+                        </div>
+                    </div>
+                </table>
+                <table class="form-table" style="margin-top: 4px;">
+                    <thead>
+                    <tr>
+                        <td class="table-header">
+                            <div class="table-header-row table-header-6">
+                                <div>تلفن</div>
+                                <div>آدرس محل پارکگیری</div>
+                                <div>کد پستی محل پارکگیری</div>
+                                <div>شناسه ملی</div>
+                                <div>نام و نام خانوادگی فرستنده</div>
+                                <div>نام و نام خانوادگی گیرنده</div>
+                            </div>
+                        </td>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td class="table-row">
+                            <div class="table-row-grid table-row-6">
+                                <input type="text" class="table-input" placeholder="تلفن">
+                                <input type="text" class="table-input" placeholder="آدرس">
+                                <input type="text" class="table-input" placeholder="کد پستی">
+                                <input type="text" class="table-input" placeholder="شناسه ملی">
+                                <input type="text" class="table-input" placeholder="نام فرستنده">
+                                <input type="text" class="table-input" placeholder="نام گیرنده">
+                            </div>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+
+                <!-- Second Table Section -->
+                <table class="form-table" style="margin-top: 4px;">
+                    <thead>
+                    <tr>
+                        <td class="table-header">
+                            <div class="table-header-row table-header-7">
+                                <div>شماره کارت هوشمند راننده</div>
+                                <div>تاریخ تولد</div>
+                                <div>نام پدر</div>
+                                <div>ساکن شهر</div>
+                                <div>کد ملی</div>
+                                <div>نام و نام خانوادگی راننده</div>
+                                <div>نوع کامیون</div>
+                            </div>
+                        </td>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td class="table-row">
+                            <div class="table-row-grid table-row-7">
+                                <input type="text" class="table-input" placeholder="شماره کارت">
+                                <input type="text" class="table-input" placeholder="تاریخ تولد">
+                                <input type="text" class="table-input" placeholder="نام پدر">
+                                <input type="text" class="table-input" placeholder="شهر">
+                                <input type="text" class="table-input" placeholder="کد ملی">
+                                <input type="text" class="table-input" placeholder="نام راننده">
+                                <input type="text" class="table-input" placeholder="نوع کامیون">
+                            </div>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+
+                <!-- Third Table Section -->
+                <table class="form-table" style="margin-top: 4px;">
+                    <thead>
+                    <tr>
+                        <td class="table-header">
+                            <div class="table-header-row table-header-6">
+                                <div>مقصد تخلیه</div>
+                                <div>شماره کارت هوشمند ناوگان</div>
+                                <div>مبدا بارگیری</div>
+                                <div>تعداد بسته</div>
+                                <div>نوع بسته بندی</div>
+                                <div>وزن کل بار (تن)</div>
+                            </div>
+                        </td>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td class="table-row">
+                            <div class="table-row-grid table-row-6">
+                                <input type="text" class="table-input" placeholder="مقصد تخلیه">
+                                <input type="text" class="table-input" placeholder="شماره کارت">
+                                <input type="text" class="table-input" placeholder="مبدا">
+                                <input type="text" class="table-input" placeholder="تعداد">
+                                <input type="text" class="table-input" placeholder="نوع بسته">
+                                <input type="text" class="table-input" placeholder="وزن">
+                            </div>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Bottom Section -->
+            <div class="bottom-section">
+                <div class="bottom-field">
+                    <span class="field-label" style="width: 50px;">مبلغ کرایه:</span>
+                    <input type="text" class="form-input" style="width: 190px;" id="totalCargo">
+                </div>
+                <div class="bottom-field">
+                    <span class="field-label" style="width: 120px;">کل کرایه پرداختی در مقصد:</span>
+                    <input type="text" class="form-input" style="width: 120px;" id="totalCargo">
+                </div>
+                <div class="bottom-field">
+                    <span class="field-label" style="width: 80px;">بیمه:</span>
+                    <input type="text" class="form-input" style="width: 120px;" id="totalCargo">
+                </div>
+                <div class="bottom-field">
+                    <span class="field-label" style="width: 60px;">خدمات:</span>
+                    <input type="text" class="form-input" style="width: 200px;" id="services">
+                </div>
+                <div class="bottom-field">
+                    <span class="field-label" style="width: 90px;">مبلغ با حروف:</span>
+                    <input type="text" class="form-input" style="width: 170px;" id="detailedAmount">
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="bottom-section">
+        <div class="row">
+            <div class="explanation-section">
+                <span class="field-label" style="width: 60px;">توضیحات:</span>
+                <input type="text" class="explanation-input" id="explanation">
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Signature Section -->
+    <div class="signature-section">
+        <div class="signature-row">
+            <div class="signature-box">
+                <p class="signature-title">مهر و امضاء</p>
+                {#                <div class="signature-area"></div>#}
+                <p class="signature-label">شرکت حمل و نقل</p>
+                <p class="signature-label">مدیریت: سید سعید حسینی</p>
+            </div>
+
+            <div class="signature-box">
+                <p class="signature-title">امضاء تحویل گیرنده:</p>
+                {#                <div class="signature-area"></div>#}
+            </div>
+
+            <div class="signature-box">
+                <p class="signature-title">امضاء راننده:</p>
+                {#                <div class="signature-area"></div>#}
+            </div>
+        </div>
+
+        <div class="phone-section">
+            <div class="phone-row">
+                <span>تلفن: </span>
+                <input type="text" class="phone-input" placeholder="۰۵۱-۳۵۴۲۰۷۰۳-۲">
+                <input type="text" class="phone-input" placeholder="۰۹۱۵ ۹۱۷ ۵۲۰۳">
+                <input type="text" class="phone-input" placeholder="۰۹۳۰۹۸۳۳۷۰۴">
+            </div>
+        </div>
+
+
+    </div>
+</div>
+
+<!-- Action Buttons -->
+<div class="no-print">
+    <button class="print-button" onclick="window.print()">چاپ فرم</button>
+    <button class="print-button outline" onclick="showData()">نمایش داده‌ها</button>
+    <button type="submit" name="action" class="print-button" rel="{% url 'create_new' %}">صفحه اصلی</button>
+</div>
+</div>
+
+<script>
+    let isPreview = false;
+
+    function togglePreview() {
+        const formContent = document.getElementById('formContent');
+        const button = event.target;
+
+        if (!isPreview) {
+            formContent.style.transform = 'scale(0.7)';
+            formContent.style.transformOrigin = 'top center';
+            formContent.style.width = '210mm';
+            formContent.style.maxWidth = '210mm';
+            formContent.style.height = '148mm';
+            formContent.style.border = '2px dashed #007bff';
+            formContent.style.margin = '20px auto';
+            button.textContent = 'نمای عادی';
+            isPreview = true;
+        } else {
+            formContent.style.transform = '';
+            formContent.style.transformOrigin = '';
+            formContent.style.width = '';
+            formContent.style.maxWidth = '';
+            formContent.style.height = '';
+            formContent.style.border = '';
+            formContent.style.margin = '';
+            button.textContent = 'پیش‌نمایش A5 افقی';
+            isPreview = false;
+        }
+    }
+
+    function showFormData() {
+        const formData = {
+            operationValue: document.getElementById('operationValue').value,
+            movementTime: document.getElementById('movementTime').value,
+            formNumber: document.getElementById('formNumber').value,
+            date: document.getElementById('date').value,
+            services: document.getElementById('services').value,
+            detailedAmount: document.getElementById('detailedAmount').value,
+            totalCargo: document.getElementById('totalCargo').value,
+            explanation: document.getElementById('explanation').value
+        };
+
+        console.log('Form Data:', formData);
+        alert('اطلاعات فرم در کنسول مرورگر نمایش داده شد');
+    }
+
+    // Add form validation and data collection for all inputs if needed
+    function collectAllFormData() {
+        const inputs = document.querySelectorAll('input');
+        const data = {};
+        inputs.forEach((input, index) => {
+            if (input.id) {
+                data[input.id] = input.value;
+            } else {
+                data[`field_${index}`] = input.value;
+            }
+        });
+        return data;
+    }
+</script>
+</body>
+</html>

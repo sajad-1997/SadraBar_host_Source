@@ -1,0 +1,119 @@
+"use client";
+import { useEffect } from "react";
+import L from "leaflet";
+import "leaflet/dist/leaflet.css";
+
+export default function LandingPage() {
+  useEffect(() => {
+    const mapEl = document.getElementById("liveMap");
+    if (!mapEl) return;
+
+    try {
+      const map = L.map("liveMap").setView([32.4279, 53.688], 6);
+
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        attribution: "&copy; OpenStreetMap contributors",
+      }).addTo(map);
+
+      const transitRoutes = [
+        {
+          name: "تهران → قم → اصفهان → شیراز",
+          coords: [
+            [35.6892, 51.389],
+            [34.6401, 50.8764],
+            [32.6539, 51.666],
+            [29.5918, 52.5837],
+          ],
+        },
+        {
+          name: "تبریز → زنجان → قزوین → تهران",
+          coords: [
+            [38.0962, 46.2738],
+            [36.6736, 48.4787],
+            [36.2688, 50.0041],
+            [35.6892, 51.389],
+          ],
+        },
+        {
+          name: "مشهد → سبزوار → سمنان → تهران",
+          coords: [
+            [36.2605, 59.6168],
+            [36.2126, 57.6762],
+            [35.575, 53.3949],
+            [35.6892, 51.389],
+          ],
+        },
+      ];
+
+      transitRoutes.forEach((route) => {
+        L.polyline(route.coords, { color: "#3b82f6", weight: 4 })
+          .addTo(map)
+          .bindPopup(route.name);
+      });
+
+      const vehicles = [
+        [35.6892, 51.389, "ناوگان تهران"],
+        [32.6546, 51.668, "ناوگان اصفهان"],
+        [36.2605, 59.6168, "ناوگان مشهد"],
+      ];
+
+      vehicles.forEach((v) =>
+        L.marker([v[0], v[1]]).addTo(map).bindPopup(`<strong>${v[2]}</strong>`)
+      );
+    } catch (e) {
+      console.warn("leaflet error", e);
+    }
+  }, []);
+
+  return (
+    <div className="bg-gray-50 text-gray-800 font-[Vazirmatn]">
+      {/* HERO */}
+      <section
+        className="min-h-screen flex items-center justify-center text-center bg-cover bg-center"
+        style={{
+          backgroundImage:
+            "linear-gradient(180deg, rgba(2,6,23,0.25), rgba(2,6,23,0.55)), url(https://images.unsplash.com/photo-1505852679233-d9fd70aff56d?auto=format&fit=crop&w=1600&q=80)",
+        }}
+      >
+        <div className="max-w-4xl p-6 bg-white/10 backdrop-blur-md rounded-xl">
+          <h1 className="text-4xl md:text-6xl font-extrabold text-blue-400 mb-4">
+            باربری آنلاین و هوشمند
+          </h1>
+          <p className="mb-6 text-lg md:text-xl text-white">
+            استعلام هزینه، ثبت سفارش، ردیابی مرسوله و مدیریت ناوگان.
+          </p>
+          <div className="flex justify-center gap-4 flex-col sm:flex-row">
+            <a className="px-6 py-3 bg-blue-500 text-white rounded-lg" href="#fleet">
+              مشاهده ناوگان
+            </a>
+            <a
+              className="px-6 py-3 bg-white text-blue-500 rounded-lg border border-blue-500"
+              href="#order"
+            >
+              ثبت سفارش
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* FLEET + MAP */}
+      <section id="fleet" className="py-16 bg-blue-50">
+        <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-2 gap-6 items-center">
+          <div className="space-y-4">
+            <h2 className="text-3xl font-bold">ناوگان ما</h2>
+            <p>کامیون‌ها و ناوگان حرفه‌ای ما در سراسر ایران آماده خدمات هستند.</p>
+            <ul className="list-disc list-inside">
+              <li>ناوگان تهران</li>
+              <li>ناوگان اصفهان</li>
+              <li>ناوگان مشهد</li>
+            </ul>
+          </div>
+
+          <div>
+            <div id="liveMap" className="h-[400px] rounded-xl" />
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}

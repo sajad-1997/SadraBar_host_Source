@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+    <div class="container mt-4">
+
+        <h3>تأیید بارنامه شماره {{ bijak.tracking_code }}</h3>
+        <hr>
+
+        <div class="card p-3 mb-4">
+            <h5>اطلاعات بارنامه</h5>
+            <p><strong>ارزش محموله:</strong> {{ bijak.value }}</p>
+            <p><strong>راننده:</strong> {{ bijak.driver }}</p>
+            <p><strong>گیرنده:</strong> {{ bijak.receiver }}</p>
+            <p><strong>مبلغ کرایه:</strong> {{ bijak.total_fare }}</p>
+
+            <p><strong>وضعیت فعلی:</strong>
+                {% if bijak.is_rejected %}
+                    <span class="text-danger">رد شده</span>
+                {% elif bijak.is_approved %}
+                    <span class="text-success">تأیید شده</span>
+                {% else %}
+                    در انتظار تأیید
+                {% endif %}
+            </p>
+        </div>
+
+
+        <!-- فرم تأیید -->
+        <form method="post" action="{% url 'bijak_approve_submit' bijak.id %}">
+            {% csrf_token %}
+            <button type="submit" name="action" value="approve" class="btn btn-success">
+                تأیید نهایی بارنامه
+            </button>
+        </form>
+
+        <hr>
+
+        <!-- فرم رد -->
+        <form method="post" action="{% url 'bijak_approve_submit' bijak.id %}">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label>علت رد بارنامه:</label>
+                <textarea name="reject_reason" class="form-control" rows="3"></textarea>
+            </div>
+            <button type="submit" name="action" value="reject" class="btn btn-danger">
+                رد بارنامه
+            </button>
+        </form>
+
+    </div>
+{% endblock %}

@@ -1,0 +1,92 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+    <meta charset="UTF-8">
+    <title>گزارش بارنامه‌ها</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {font-family: Vazirmatn, sans-serif; direction: rtl; margin: 20px;}
+        table {width: 100%; border-collapse: collapse; margin-top: 15px;}
+        th, td {border: 1px solid #ccc; padding: 8px; text-align: center;}
+        th {background-color: #eee;}
+        .summary {margin-top: 10px; font-weight: bold;}
+        .stats-box {display: flex; gap: 10px; margin: 15px 0;}
+        .card {flex: 1; background: #f8f8f8; padding: 10px; border-radius: 8px; text-align: center;}
+    </style>
+</head>
+<body>
+
+<h2>📊 گزارش بارنامه‌های صادر شده</h2>
+
+<form method="get">
+  {{ form.as_p }}
+  <button type="submit">اعمال فیلتر</button>
+</form>
+
+<div class="stats-box">
+    <div class="card">امروز: {{ stats.daily }}</div>
+    <div class="card">این هفته: {{ stats.weekly }}</div>
+    <div class="card">این ماه: {{ stats.monthly }}</div>
+    <div class="card">امسال: {{ stats.yearly }}</div>
+</div>
+
+<div class="summary">
+    تعداد کل: {{ total_count }} | مجموع کرایه: {{ total_fare }}
+</div>
+
+<canvas id="chart" width="400" height="150"></canvas>
+
+<table>
+    <thead>
+        <tr>
+            <th>شماره</th>
+            <th>راننده</th>
+            <th>مبدأ</th>
+            <th>مقصد</th>
+            <th>تاریخ صدور</th>
+            <th>کرایه</th>
+            <th>وضعیت</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for b in reports %}
+        <tr>
+            <td>{{ b.number }}</td>
+            <td>{{ b.driver.name }}</td>
+            <td>{{ b.origin }}</td>
+            <td>{{ b.destination }}</td>
+            <td>{{ b.date_issued }}</td>
+            <td>{{ b.fare }}</td>
+            <td>{{ b.get_status_display }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="7">هیچ موردی یافت نشد.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<script>
+const ctx = document.getElementById('chart').getContext('2d');
+const chartData = {
+    labels: {{ daily_data|safe|json_script:"labels" }},
+    datasets: [{
+        label: 'تعداد بارنامه در ۷ روز گذشته',
+        data: {{ daily_data|json_script:"values" }},
+    }]
+};
+new Chart(ctx, {
+    type: 'bar',
+    data: {
+        labels: {{ daily_data|map(attribute='date')|list|safe }},
+        datasets: [{
+            label: 'تعداد بارنامه',
+            data: {{ daily_data|map(attribute='count')|list|safe }},
+            borderWidth: 1
+        }]
+    },
+});
+</script>
+
+</body>
+</html>

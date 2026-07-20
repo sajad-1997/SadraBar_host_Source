@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>آژانس باربری</title>
+    <!-- Link to your local IRANSansWeb font -->
+    <link rel="stylesheet" href="{{ STATIC_URL }}fonts/IRANSansWeb/style.css">
+
+    <style>
+        /* --- Global Styles & Variables (from previous steps) --- */
+        :root {
+            --primary-color: #007bff; /* Example primary color */
+            --secondary-color: #6c757d; /* Example secondary color */
+            --header-footer-bg: #f8f9fa;
+            --input-border-color: #ccc;
+            --input-focus-border-color: var(--primary-color);
+            --font-family: 'IRANSansWeb', sans-serif;
+        }
+
+        body {
+            font-family: var(--font-family);
+            margin: 0;
+            padding: 0;
+            background-color: #f4f7f6; /* Light background for the page */
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* --- Header Styles --- */
+        header {
+            background-color: var(--header-footer-bg);
+            padding: 15px 0;
+            border-bottom: 1px solid #e0e0e0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        header .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        nav ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+        }
+
+        nav ul li {
+            margin-left: 30px; /* Spacing between nav items */
+        }
+
+        nav ul li:last-child {
+            margin-left: 0;
+        }
+
+        nav ul li a {
+            text-decoration: none;
+            color: #555;
+            font-weight: 500;
+            transition: color 0.3s ease;
+            position: relative;
+            padding-bottom: 5px;
+        }
+
+        nav ul li a:hover,
+        nav ul li a.active {
+            color: var(--primary-color);
+        }
+
+        /* Underline effect on hover */
+        nav ul li a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            display: block;
+            margin-top: 5px;
+            right: 0;
+            background: var(--primary-color);
+            transition: width 0.3s ease;
+        }
+
+        nav ul li a:hover::after,
+        nav ul li a.active::after {
+            width: 100%;
+            left: 0;
+            bottom: 0;
+        }
+
+        /* --- Hero Section (Example for index.html, can be adapted) --- */
+        .hero {
+            background-color: #e9ecef; /* Slightly different background */
+            text-align: center;
+            padding: 80px 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero h1 {
+            font-size: 48px;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .hero p {
+            font-size: 20px;
+            color: #555;
+            margin-bottom: 30px;
+        }
+
+        .cta-button {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 15px 30px;
+            text-decoration: none;
+            font-size: 18px;
+            border-radius: 5px;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+            display: inline-block; /* Allows transformation */
+            box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3);
+        }
+
+        .cta-button:hover {
+            background-color: #0056b3; /* Darker shade on hover */
+            transform: translateY(-2px); /* Slight lift effect */
+        }
+
+        /* --- Footer Styles --- */
+        footer {
+            background-color: var(--header-footer-bg);
+            color: #555;
+            text-align: center;
+            padding: 30px 0;
+            margin-top: 50px; /* Space above footer */
+            border-top: 1px solid #e0e0e0;
+            font-size: 14px;
+        }
+
+        footer p {
+            margin: 0;
+        }
+
+        /* --- Form Styles (Multi-step Booking Form) --- */
+        .booking-form-container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            max-width: 700px;
+            margin: 50px auto; /* Center the form and add space */
+            overflow: hidden; /* Contain floats and ensure proper layout */
+        }
+
+        .form-step {
+            display: none; /* Hide all steps by default */
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        .form-step.active {
+            display: block; /* Show the active step */
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .form-header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 15px;
+        }
+
+        .form-header h3 {
+            font-size: 26px;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        .form-header p {
+            font-size: 15px;
+            color: #666;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+            position: relative; /* For positioning labels or icons */
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #444;
+            font-size: 14px;
+        }
+
+        /* Enhanced Input Styles */
+        .form-group input[type="text"],
+        .form-group input[type="email"],
+        .form-group input[type="tel"],
+        .form-group input[type="date"],
+        .form-group input[type="time"],
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 14px 18px; /* More padding */
+            border: 1px solid var(--input-border-color);
+            border-radius: 6px; /* Slightly more rounded */
+            box-sizing: border-box; /* Include padding and border in the element's total width and height */
+            font-family: var(--font-family);
+            font-size: 15px;
+            color: #333;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            background-color: #fdfdfd; /* Slightly off-white background */
+        }
+
+        /* Transparent border on focus, with shadow */
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--input-focus-border-color);
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.2); /* Subtle glow */
+            background-color: white;
+        }
+
+        /* Placeholder styling */
+        .form-group input::placeholder,
+        .form-group textarea::placeholder {
+            color: #aaa;
+            opacity: 1; /* Firefox requires this to override the default opacity */
+        }
+
+        .form-group textarea {
+            resize: vertical; /* Allow vertical resizing */
+        }
+
+        /* --- Navigation Buttons --- */
+        .form-navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+
+        .nav-button {
+            background-color: #6c757d; /* Secondary color for prev/cancel */
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: var(--font-family);
+            font-size: 15px;
+            font-weight: 500;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            text-decoration: none; /* For links used as buttons */
+            display: inline-block;
+        }
+
+        .nav-button:hover {
+            background-color: #5a6268;
+            transform: translateY(-1px);
+        }
+
+        .nav-button.primary {
+            background-color: var(--primary-color);
+        }
+
+        .nav-button.primary:hover {
+            background-color: #0056b3;
+        }
+
+        .nav-button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Specific styles for the submit button within the form */
+        .booking-form-container .nav-button[type="submit"] {
+             /* Inherits styles from .nav-button.primary */
+        }
+
+        /* --- Responsive Adjustments --- */
+        @media (max-width: 768px) {
+            .booking-form-container {
+                margin: 30px 15px;
+                padding: 25px;
+            }
+
+            .hero h1 {
+                font-size: 36px;
+            }
+
+            .hero p {
+                font-size: 18px;
+            }
+
+            nav ul {
+                flex-direction: column;
+                align-items: center;
+                margin-top: 15px;
+            }
+
+            nav ul li {
+                margin-left: 0;
+                margin-bottom: 15px;
+            }
+            nav ul li:last-child {
+                margin-bottom: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="container">
+            <a href="{% url 'home' %}" class="logo">آژانس باربری</a>
+            <nav>
+                <ul>
+                    <li><a href="{% url 'home' %}" class="{% if request.resolver_match.url_name == 'index' %}active{% endif %}">صفحه اصلی</a></li>
+                    <li><a href="{% url 'services' %}" class="{% if request.resolver_match.url_name == 'services' %}active{% endif %}">خدمات</a></li>
+                    <li><a href="{% url 'tracking' %}" class="{% if request.resolver_match.url_name == 'tracking' %}active{% endif %}">رهگیری بار</a></li>
+                    <li><a href="{% url 'contact' %}" class="{% if request.resolver_match.url_name == 'contact' %}active{% endif %}">تماس با ما</a></li>
+                    <li><a href="#booking-form" class="cta-button" style="padding: 10px 20px; font-size: 14px;">رزرو بار</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        {% block content %}
+        <!-- Content for specific pages like index, services, etc. will go here -->
+        <!-- For example, a hero section for the homepage -->
+        <section class="hero">
+            <div class="container">
+                <h1>بهترین خدمات باربری را با ما تجربه کنید</h1>
+                <p>جابجایی آسان و مطمئن بار شما در سراسر کشور.</p>
+                <a href="#booking-form" class="cta-button">همین الان رزرو کنید</a>
+            </div>
+        </section>
+        {% endblock %}
+
+        <!-- Multi-step Booking Form -->
+        <section id="booking-form" class="booking-form-container">
+            <div class="form-header">
+                <h3>فرم رزرو بار</h3>
+                <p>لطفاً اطلاعات زیر را با دقت تکمیل نمایید.</p>
+            </div>
+
+            <!-- IMPORTANT: Action should point to your Django view for handling the form submission -->
+            <!-- Replace 'your_booking_submit_view' with the actual URL name you defined in urls.py -->
+            <form id="multiStepForm" action="#" method="post">
+{#            <form id="multiStepForm" action="{% url 'your_booking_submit_view' %}" method="post">#}
+                {% csrf_token %}
+
+                <!-- Step 1: Contact Information -->
+                <div class="form-step active" id="step-1">
+                    <h4>مرحله ۱: اطلاعات تماس</h4>
+                    <p>برای هماهنگی‌های بعدی، لطفاً اطلاعات تماس خود را وارد کنید.</p>
+                    <div class="form-group">
+                        <label for="step1-name">نام و نام خانوادگی:</label>
+                        <input type="text" id="step1-name" name="customer_name" placeholder="نام خود را وارد کنید" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="step1-phone">شماره تماس:</label>
+                        <input type="tel" id="step1-phone" name="customer_phone" placeholder="مثال: 09121234567" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="step1-email">ایمیل (اختیاری):</label>
+                        <input type="email" id="step1-email" name="customer_email" placeholder="example@domain.com">
+                    </div>
+                </div>
+
+                <!-- Step 2: Pickup & Delivery Details -->
+                <div class="form-step" id="step-2">
+                    <h4>مرحله ۲: جزئیات بار و آدرس‌ها</h4>
+                    <p>مبدا و مقصد بار خود را مشخص کنید.</p>
+                    <div class="form-group">
+                        <label for="step2-pickup-address">آدرس مبدا:</label>
+                        <textarea id="step2-pickup-address" name="pickup_address" rows="3" placeholder="آدرس دقیق مبدا بار" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="step2-delivery-address">آدرس مقصد:</label>
+                        <textarea id="step2-delivery-address" name="delivery_address" rows="3" placeholder="آدرس دقیق مقصد بار" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="step2-pickup-date">تاریخ بارگیری:</label>
+                        <input type="date" id="step2-pickup-date" name="pickup_date" required>
+                    </div>
+                     <div class="form-group">
+                        <label for="step2-pickup-time">زمان تقریبی بارگیری:</label>
+                        <input type="time" id="step2-pickup-time" name="pickup_time">
+                    </div>
+                </div>
+
+                <!-- Step 3: Cargo Details & Services -->
+                <div class="form-step" id="step-3">
+                    <h4>مرحله ۳: مشخصات بار و خدمات</h4>
+                    <p>نوع و حجم بار و خدمات مورد نیاز خود را انتخاب کنید.</p>
+                    <div class="form-group">
+                        <label for="step3-cargo-type">نوع بار:</label>
+                        <select id="step3-cargo-type" name="cargo_type" required>
+                            <option value="">-- انتخاب کنید --</option>
+                            <option value="household">اثاثیه منزل</option>
+                            <option value="office">تجهیزات اداری</option>
+                            <option value="commercial">کالای تجاری</option>
+                            <option value="other">سایر</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="step3-cargo-weight">حجم/وزن تقریبی بار (کیلوگرم یا متر مکعب):</label>
+                        <input type="text" id="step3-cargo-weight" name="cargo_weight" placeholder="مثال: ۵۰۰ کیلوگرم یا ۱۰ متر مکعب">
+                    </div>
+                    <div class="form-group">
+                        <label>خدمات مورد نیاز:</label>
+                        <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+                            <label style="display: inline-flex; align-items: center; margin-right: 15px;">
+                                <input type="checkbox" name="services" value="packing"> بسته بندی
+                            </label>
+                            <label style="display: inline-flex; align-items: center; margin-right: 15px;">
+                                <input type="checkbox" name="services" value="loading_unloading"> بارگیری و تخلیه
+                            </label>
+                             <label style="display: inline-flex; align-items: center; margin-right: 15px;">
+                                <input type="checkbox" name="services" value="insurance"> بیمه باربری
+                            </label>
+                             <label style="display: inline-flex; align-items: center; margin-right: 15px;">
+                                <input type="checkbox" name="services" value="assembly_disassembly"> باز و بستن تجهیزات
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                 <!-- Step 4: Confirmation (Optional but recommended) -->
+                <div class="form-step" id="step-4">
+                    <h4>مرحله ۴: تایید نهایی</h4>
+                    <p>لطفاً اطلاعات وارد شده را مرور کنید و در صورت تایید، رزرو را نهایی کنید.</p>
+                    <div id="confirmation-summary">
+                        <!-- Summary will be populated by JavaScript -->
+                    </div>
+                    <div class="form-group" style="margin-top: 20px;">
+                         <label style="display: inline-flex; align-items: center;">
+                            <input type="checkbox" id="step4-agree" name="agreement" required>
+                            <span style="margin-right: 10px;">قوانین و مقررات را خوانده‌ام و می‌پذیرم.</span>
+                        </label>
+                    </div>
+                </div>
+
+
+                <!-- Navigation Buttons -->
+                <div class="form-navigation">
+                    <button type="button" id="prevBtn" onclick="nextPrev(-1)" class="nav-button">مرحله قبلی</button>
+                    <button type="button" id="nextBtn" onclick="nextPrev(1)" class="nav-button primary">مرحله بعدی</button>
+                    <button type="submit" id="submitBtn" class="nav-button primary" style="display: none;">ثبت نهایی رزرو</button>
+                    <button type="button" id="cancelBtn" class="nav-button" onclick="window.location.href='/'">لغو</button>
+                </div>
+            </form>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; ۲۰۲۴ آژانس باربری. تمامی حقوق محفوظ است.</p>
+            <p>طراحی شده با عشق</p>
+        </div>
+    </footer>
+
+    <script>
+        let currentStep = 0;
+        const form = document.getElementById("multiStepForm");
+        const steps = document.getElementsByClassName("form-step");
+        const totalSteps = steps.length;
+
+        // Show the current active step
+        function showStep(n) {
+            steps[n].classList.add("active");
+            // Update navigation buttons
+            if (n === 0) {
+                document.getElementById("prevBtn").style.display = "none"; // Hide previous button on first step
+            } else {
+                document.getElementById("prevBtn").style.display = "inline-block";
+            }
+
+            if (n === totalSteps - 1) {
+                document.getElementById("nextBtn").style.display = "none"; // Hide next button on last step
+                document.getElementById("submitBtn").style.display = "inline-block"; // Show submit button
+                document.getElementById("cancelBtn").style.display = "inline-block"; // Show cancel button
+                // Populate confirmation summary
+                populateConfirmationSummary();
+            } else {
+                document.getElementById("nextBtn").style.display = "inline-block";
+                document.getElementById("submitBtn").style.display = "none"; // Hide submit button
+                document.getElementById("cancelBtn").style.display = "inline-block"; // Keep cancel button
+            }
+             // Adjust button text/visibility for the last step if needed
+            if (n === totalSteps - 2) { // If currently on the step before the last one
+                 document.getElementById("nextBtn").innerHTML = "مرحله بعد"; // Or "ادامه"
+            } else if (n === totalSteps - 1) {
+                 document.getElementById("nextBtn").innerHTML = "مرحله بعد"; // Should be hidden anyway
+            } else {
+                 document.getElementById("nextBtn").innerHTML = "مرحله بعدی";
+            }
+        }
+
+        // Function to populate the confirmation summary on the last step
+        function populateConfirmationSummary() {
+            const summaryDiv = document.getElementById("confirmation-summary");
+            summaryDiv.innerHTML = ''; // Clear previous summary
+
+            // Get values from previous steps
+            const customerName = form.elements["customer_name"].value;
+            const customerPhone = form.elements["customer_phone"].value;
+            const customerEmail = form.elements["customer_email"] ? form.elements["customer_email"].value : 'وارد نشده';
+            const pickupAddress = form.elements["pickup_address"].value;
+            const deliveryAddress = form.elements["delivery_address"].value;
+            const pickupDate = form.elements["pickup_date"].value;
+            const pickupTime = form.elements["pickup_time"].value || 'نامشخص';
+            const cargoType = form.elements["cargo_type"].value;
+            const cargoWeight = form.elements["cargo_weight"].value || 'نامشخص';
+
+            // Get selected services
+            const selectedServices = [];
+            const serviceCheckboxes = form.querySelectorAll('input[name="services"]:checked');
+            serviceCheckboxes.forEach(checkbox => {
+                // Map values to more readable text if possible, or just use the value
+                let serviceText = checkbox.value;
+                if (serviceText === 'packing') serviceText = 'بسته بندی';
+                else if (serviceText === 'loading_unloading') serviceText = 'بارگیری و تخلیه';
+                else if (serviceText === 'insurance') serviceText = 'بیمه باربری';
+                else if (serviceText === 'assembly_disassembly') serviceText = 'باز و بستن تجهیزات';
+                selectedServices.push(serviceText);
+            });
+
+            // Build HTML for the summary
+            let summaryHTML = `
+                <h4>خلاصه رزرو:</h4>
+                <ul>
+                    <li><strong>نام:</strong> ${customerName}</li>
+                    <li><strong>شماره تماس:</strong> ${customerPhone}</li>
+                    ${customerEmail ? `<li><strong>ایمیل:</strong> ${customerEmail}</li>` : ''}
+                    <li><strong>مبدا:</strong> ${pickupAddress}</li>
+                    <li><strong>مقصد:</strong> ${deliveryAddress}</li>
+                    <li><strong>تاریخ بارگیری:</strong> ${pickupDate}</li>
+                    <li><strong>زمان بارگیری:</strong> ${pickupTime}</li>
+                    <li><strong>نوع بار:</strong> ${cargoType}</li>
+                    <li><strong>حجم/وزن بار:</strong> ${cargoWeight}</li>
+                    <li><strong>خدمات انتخابی:</strong> ${selectedServices.length > 0 ? selectedServices.join(', ') : 'بدون خدمات اضافی'}</li>
+                </ul>
+            `;
+            summaryDiv.innerHTML = summaryHTML;
+        }
+
+
+        // Function to handle navigation between steps
+        function nextPrev(n) {
+            // Exit function if n is invalid
+            if (n === 1 && !validateForm()) return false;
+
+            // Hide the current step and show the next one
+            steps[currentStep].classList.remove("active");
+
+            // Increment or decrement the current step counter
+            currentStep = currentStep + n;
+
+            // If you have reached the end of the form, display the confirmation step
+             if (currentStep >= totalSteps) {
+                // This should ideally not be reached if submit button handles the final action
+                // but as a safeguard, we can re-show the last step or process submission here
+                // For now, let's ensure submit button logic handles it.
+                 currentStep = totalSteps - 1; // Stay on the last step for confirmation view
+            }
+
+            // Display the correct step indicator and buttons
+            showStep(currentStep);
+        }
+
+        // Function to validate the current form step
+        function validateForm() {
+            let valid = true;
+            const currentStepElement = steps[currentStep];
+
+            // Get all required input fields within the current step
+            const requiredInputs = currentStepElement.querySelectorAll('input[required], select[required], textarea[required]');
+            const checkboxes = currentStepElement.querySelectorAll('input[type="checkbox"][required]');
+            const agreementCheckbox = currentStepElement.querySelector('#step4-agree'); // Specific check for agreement
+
+            // Resetting previous error styles (optional, but good practice)
+             requiredInputs.forEach(input => input.style.borderColor = '#ccc'); // Reset border color
+
+
+            requiredInputs.forEach(input => {
+                // Basic check for empty values
+                if (input.value.trim() === "") {
+                    // Apply error style (e.g., red border)
+                    input.style.borderColor = 'red';
+                    valid = false;
+                    // You could also add an error message span here
+                }
+                 // Specific validation for email format
+                 if (input.type === "email" && input.value.trim() !== "" && !input.value.includes('@')) {
+                    input.style.borderColor = 'red';
+                    valid = false;
+                 }
+                  // Specific validation for phone number (basic check)
+                 if (input.type === "tel" && input.value.trim() !== "" && !/^\d{10,11}$/.test(input.value.replace(/\s/g, ''))) {
+                    input.style.borderColor = 'red';
+                    valid = false;
+                 }
+                  // Specific validation for date
+                 if (input.type === "date" && input.value.trim() !== "") {
+                     const today = new Date();
+                     const selectedDate = new Date(input.value);
+                     // Allow today's date or future dates
+                     if (selectedDate < today.setHours(0,0,0,0)) { // Compare dates ignoring time
+                         input.style.borderColor = 'red';
+                         valid = false;
+                         alert("تاریخ بارگیری باید تاریخ امروز یا آینده باشد.");
+                     }
+                 }
+            });
+
+             // Validate checkboxes for services if on the relevant step
+            if (currentStepElement.id === "step-3") {
+                const serviceCheckboxes = currentStepElement.querySelectorAll('input[name="services"]');
+                let servicesSelected = false;
+                serviceCheckboxes.forEach(checkbox => {
+                    if (checkbox.checked) {
+                        servicesSelected = true;
+                    }
+                });
+                 // If 'services' is required and none are checked
+                if (currentStepElement.querySelector('input[name="services"][required]') && !servicesSelected) {
+                    valid = false;
+                     // Highlight a message or the checkboxes group if possible
+                     alert("لطفاً حداقل یکی از خدمات مورد نیاز را انتخاب کنید.");
+                }
+            }
+
+            // Validate agreement checkbox on the last step before submission
+            if (currentStepElement.id === "step-4") {
+                if (!agreementCheckbox || !agreementCheckbox.checked) {
+                    valid = false;
+                    agreementCheckbox.style.outline = '1px solid red'; // Highlight the checkbox itself
+                     alert("لطفاً قوانین و مقررات را تایید کنید.");
+                } else {
+                     agreementCheckbox.style.outline = ''; // Reset outline
+                }
+            }
+
+
+            // If the form is valid, the next button is enabled, otherwise disabled
+            // (This is handled by nextPrev logic, but good to know)
+
+            return valid; // Return true if all required fields are filled
+        }
+
+        // Initialize the first step when the page loads
+        document.addEventListener("DOMContentLoaded", () => {
+            // Hide all steps initially, then show the first one
+            Array.from(steps).forEach(step => step.classList.remove("active"));
+            currentStep = 0;
+            showStep(currentStep);
+        });
+    </script>
+
+</body>
+</html>

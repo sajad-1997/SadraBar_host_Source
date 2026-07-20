@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>لندینگ باربری آنلاین</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;600;800&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Vazirmatn', sans-serif; }
+    .hero-bg {
+      background: url('https://images.unsplash.com/photo-1603072388747-bf03b8e3e5c8?auto=format&fit=crop&w=1500&q=80') center/cover no-repeat;
+    }
+    .glass {
+      backdrop-filter: blur(10px);
+      background-color: rgba(255,255,255,0.15);
+    }
+  </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+<!-- HEADER -->
+<header class="fixed top-0 w-full z-50 bg-white/80 backdrop-blur shadow-sm">
+  <div class="max-w-7xl mx-auto flex items-center justify-between py-4 px-6">
+    <h1 class="text-2xl font-extrabold text-blue-600">باربری آنلاین</h1>
+
+    <nav class="hidden md:flex space-x-6 space-x-reverse text-lg">
+      <a href="#services" class="hover:text-blue-600">خدمات</a>
+      <a href="#pricing" class="hover:text-blue-600">تعرفه‌ها</a>
+      <a href="#steps" class="hover:text-blue-600">مراحل ارسال</a>
+      <a href="#contact" class="hover:text-blue-600">تماس با ما</a>
+    </nav>
+
+    <button class="hidden md:block bg-blue-600 text-white px-5 py-2 rounded-xl shadow hover:bg-blue-700 transition">
+      ثبت سفارش
+    </button>
+  </div>
+</header>
+
+<!-- HERO SECTION -->
+<section class="hero-bg h-screen flex items-center justify-center relative px-6">
+  <div class="absolute inset-0 bg-black/50"></div>
+
+  <div class="relative text-center text-white max-w-2xl">
+    <h2 class="text-5xl md:text-6xl font-extrabold mb-6 drop-shadow-xl">ارسال سریع، ایمن و مقرون‌به‌صرفه</h2>
+    <p class="text-xl md:text-2xl mb-10">بار خود را در سریع‌ترین زمان و با ردیابی لحظه‌ای ارسال کنید</p>
+
+    <div class="glass rounded-2xl p-6 md:p-8 max-w-xl mx-auto shadow-xl">
+      <h3 class="text-2xl font-semibold mb-4">ثبت سفارش سریع</h3>
+      <form class="grid md:grid-cols-2 gap-4 text-black">
+        <input type="text" placeholder="مبدا" class="p-3 rounded-md">
+        <input type="text" placeholder="مقصد" class="p-3 rounded-md">
+        <input type="text" placeholder="نوع بار" class="p-3 rounded-md md:col-span-2">
+        <button class="bg-blue-600 text-white w-full p-3 rounded-md md:col-span-2 hover:bg-blue-700">محاسبه هزینه</button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- SERVICES -->
+<section id="services" class="py-24 bg-white">
+  <h2 class="text-4xl font-bold text-center mb-16">خدمات ما</h2>
+  <div class="max-w-7xl mx-auto grid md:grid-cols-3 gap-10 px-6">
+
+    <div class="bg-gray-100 p-8 rounded-2xl text-center shadow hover:shadow-xl transition">
+      <div class="text-6xl mb-4">🚚</div>
+      <h3 class="text-2xl font-bold mb-3">حمل زمینی</h3>
+      <p>ارسال بار با ناوگان مجهز و ردیابی لحظه‌ای</p>
+    </div>
+
+    <div class="bg-gray-100 p-8 rounded-2xl text-center shadow hover:shadow-xl transition">
+      <div class="text-6xl mb-4">📦</div>
+      <h3 class="text-2xl font-bold mb-3">ارسال ویژه</h3>
+      <p>بارهای حساس با بیمه کامل و بسته‌بندی استاندارد</p>
+    </div>
+
+    <div class="bg-gray-100 p-8 rounded-2xl text-center shadow hover:shadow-xl transition">
+      <div class="text-6xl mb-4">🛣️</div>
+      <h3 class="text-2xl font-bold mb-3">بین‌شهری</h3>
+      <p>ارسال سریع به تمام استان‌های کشور</p>
+    </div>
+
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section id="steps" class="py-24 bg-blue-50">
+  <h2 class="text-4xl font-bold text-center mb-16">مراحل ارسال بار</h2>
+  <div class="max-w-6xl mx-auto grid md:grid-cols-4 gap-10 px-6 text-center">
+
+    <div>
+      <div class="text-5xl mb-4">📝</div>
+      <h3 class="text-xl font-bold mb-2">1. ثبت سفارش</h3>
+      <p>فرم سریع را پر کنید و سفارش خود را ثبت کنید</p>
+    </div>
+
+    <div>
+      <div class="text-5xl mb-4">🎁</div>
+      <h3 class="text-xl font-bold mb-2">2. بسته‌بندی</h3>
+      <p>بسته‌بندی حرفه‌ای برای امنیت کالا</p>
+    </div>
+
+    <div>
+      <div class="text-5xl mb-4">🚚</div>
+      <h3 class="text-xl font-bold mb-2">3. ارسال</h3>
+      <p>ارسال با رانندگان مجرب و ناوگان مجهز</p>
+    </div>
+
+    <div>
+      <div class="text-5xl mb-4">📍</div>
+      <h3 class="text-xl font-bold mb-2">4. تحویل</h3>
+      <p>تحویل در مقصد با تأیید نهایی</p>
+    </div>
+
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="py-24">
+  <h2 class="text-4xl font-bold text-center mb-16">نظرات مشتریان</h2>
+  <div class="max-w-6xl mx-auto grid md:grid-cols-3 gap-8 px-6">
+
+    <div class="bg-white p-8 shadow rounded-2xl">
+      <p class="text-lg mb-6">«بسیار سریع و مطمئن، برخورد راننده عالی بود!»</p>
+      <h4 class="font-bold">حسین محمدی</h4>
+    </div>
+
+    <div class="bg-white p-8 shadow rounded-2xl">
+      <p class="text-lg mb-6">«بار ما کاملاً سالم و سر وقت به مقصد رسید.»</p>
+      <h4 class="font-bold">مریم کریمی</h4>
+    </div>
+
+    <div class="bg-white p-8 shadow rounded-2xl">
+      <p class="text-lg mb-6">«پشتیبانی حرفه‌ای و قیمت مناسب. پیشنهاد می‌کنم.»</p>
+      <h4 class="font-bold">احمد رضایی</h4>
+    </div>
+
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer id="contact" class="bg-gray-900 text-white py-10 mt-12">
+  <div class="max-w-7xl mx-auto px-6 grid md:grid-cols-3 gap-8">
+    <div>
+      <h3 class="text-xl font-bold mb-4">باربری آنلاین</h3>
+      <p>ارسال سریع و مطمئن بار به سراسر کشور</p>
+    </div>
+
+    <div>
+      <h3 class="text-lg font-bold mb-4">تماس با ما</h3>
+      <p>تلفن: 021-12345678</p>
+      <p>ایمیل: support@example.com</p>
+    </div>
+
+    <div>
+      <h3 class="text-lg font-bold mb-4">شبکه‌های اجتماعی</h3>
+      <div class="space-x-4 space-x-reverse">
+        <a href="#" class="hover:text-blue-400">اینستاگرام</a>
+        <a href="#" class="hover:text-blue-400">تلگرام</a>
+        <a href="#" class="hover:text-blue-400">واتساپ</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

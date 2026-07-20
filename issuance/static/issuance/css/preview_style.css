@@ -1,0 +1,483 @@
+/*!* ========================================*/
+/*   Reset & Base*/
+/*   ======================================== *!*/
+/**,*/
+/**::before,*/
+/**::after {*/
+/*    box-sizing: border-box;*/
+/*    margin: 0;*/
+/*    padding: 0;*/
+/*}*/
+
+/*body {*/
+/*    font-family: "Segoe UI", Tahoma, sans-serif;*/
+/*    background-color: #f4f6f9;*/
+/*    color: #2c3e50;*/
+/*    line-height: 1.6;*/
+/*    padding: 1rem;*/
+/*}*/
+
+/*!* ========================================*/
+/*   Container*/
+/*   ======================================== *!*/
+/*.container {*/
+/*    max-width: 960px;*/
+/*    margin: 0 auto;*/
+/*    background: #ffffff;*/
+/*    border-radius: 12px;*/
+/*    padding: 2rem;*/
+/*    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);*/
+/*}*/
+
+/*.my-4 {*/
+/*    margin-top: 1.5rem !important;*/
+/*    margin-bottom: 1.5rem !important;*/
+/*}*/
+
+/*.mt-3 {*/
+/*    margin-top: 1rem !important;*/
+/*}*/
+
+/*.mb-4 {*/
+/*    margin-bottom: 1.5rem !important;*/
+/*}*/
+
+/*.text-center {*/
+/*    text-align: center !important;*/
+/*}*/
+
+/*!* ========================================*/
+/*   Alert messages*/
+/*   ======================================== *!*/
+/*.alert {*/
+/*    padding: 0.75rem 1.25rem;*/
+/*    border-radius: 8px;*/
+/*    margin-bottom: 1rem;*/
+/*    font-weight: 500;*/
+/*    border: 1px solid transparent;*/
+/*}*/
+
+/*.alert-success {*/
+/*    background-color: #d4edda;*/
+/*    border-color: #c3e6cb;*/
+/*    color: #155724;*/
+/*}*/
+
+/*.alert-danger {*/
+/*    background-color: #f8d7da;*/
+/*    border-color: #f5c6cb;*/
+/*    color: #721c24;*/
+/*}*/
+
+/*.alert-warning {*/
+/*    background-color: #fff3cd;*/
+/*    border-color: #ffeaa7;*/
+/*    color: #856404;*/
+/*}*/
+
+/*hr {*/
+/*    border: none;*/
+/*    border-top: 1px solid #e9ecef;*/
+/*    margin: 1.5rem 0;*/
+/*}*/
+
+/*!* ========================================*/
+/*   Buttons*/
+/*   ======================================== *!*/
+/*.btn {*/
+/*    display: inline-block;*/
+/*    padding: 0.6rem 1.5rem;*/
+/*    font-size: 0.95rem;*/
+/*    font-weight: 500;*/
+/*    border-radius: 8px;*/
+/*    text-decoration: none;*/
+/*    border: 1px solid transparent;*/
+/*    cursor: pointer;*/
+/*    transition: background 0.2s, border-color 0.2s;*/
+/*}*/
+
+/*.btn-secondary {*/
+/*    background-color: #e9ecef;*/
+/*    border-color: #ced4da;*/
+/*    color: #495057;*/
+/*}*/
+
+/*.btn-secondary:hover {*/
+/*    background-color: #dee2e6;*/
+/*}*/
+
+/*!* ========================================*/
+/*   Bijak Card*/
+/*   ======================================== *!*/
+/*.bijak-card {*/
+/*    border: 1px solid #e9ecef;*/
+/*    border-radius: 12px;*/
+/*    overflow: hidden;*/
+/*    background: #ffffff;*/
+/*    margin-top: 1.5rem;*/
+/*}*/
+
+/*.bijak-header {*/
+/*    background-color: #f8f9fa;*/
+/*    padding: 1rem 1.5rem;*/
+/*    font-weight: 600;*/
+/*    font-size: 1.05rem;*/
+/*    border-bottom: 1px solid #e9ecef;*/
+/*}*/
+
+/*.bijak-header span:first-child {*/
+/*    color: #0d6efd; !* tracking code color *!*/
+/*}*/
+
+/*!* Flex utilities used in header *!*/
+/*.d-flex {*/
+/*    display: flex;*/
+/*}*/
+
+/*.justify-content-between {*/
+/*    justify-content: space-between;*/
+/*}*/
+
+/*.p-4 {*/
+/*    padding: 1.5rem !important;*/
+/*}*/
+
+/*!* ========================================*/
+/*   Section titles*/
+/*   ======================================== *!*/
+/*.section-title {*/
+/*    font-size: 1.1rem;*/
+/*    font-weight: 600;*/
+/*    margin: 1.5rem 0 0.75rem;*/
+/*    color: #2c3e50;*/
+/*    border-bottom: 2px solid #e9ecef;*/
+/*    padding-bottom: 0.3rem;*/
+/*}*/
+
+/*!* ========================================*/
+/*   Tables*/
+/*   ======================================== *!*/
+/*.table {*/
+/*    width: 100%;*/
+/*    border-collapse: collapse;*/
+/*    margin-bottom: 1.5rem;*/
+/*}*/
+
+/*.table-bordered th,*/
+/*.table-bordered td {*/
+/*    border: 1px solid #dee2e6;*/
+/*    padding: 0.6rem 0.8rem;*/
+/*    vertical-align: middle;*/
+/*}*/
+
+/*.table-bordered th {*/
+/*    background-color: #f8f9fa;*/
+/*    font-weight: 600;*/
+/*    color: #495057;*/
+/*}*/
+
+/*.text-center th,*/
+/*.text-center td {*/
+/*    text-align: center;*/
+/*}*/
+
+/*!* ========================================*/
+/*   Row & Col (responsive two-column layout)*/
+/*   ======================================== *!*/
+/*.row {*/
+/*    display: flex;*/
+/*    flex-wrap: wrap;*/
+/*    margin: 0 -0.75rem;*/
+/*}*/
+
+/*.col-md-6 {*/
+/*    flex: 0 0 100%;*/
+/*    max-width: 100%;*/
+/*    padding: 0 0.75rem;*/
+/*}*/
+
+/*@media (min-width: 768px) {*/
+/*    .col-md-6 {*/
+/*        flex: 0 0 50%;*/
+/*        max-width: 50%;*/
+/*    }*/
+/*}*/
+
+/*!* ========================================*/
+/*   Border box for description*/
+/*   ======================================== *!*/
+/*.border {*/
+/*    border: 1px solid #dee2e6 !important;*/
+/*}*/
+
+/*.rounded {*/
+/*    border-radius: 8px !important;*/
+/*}*/
+
+/*.p-3 {*/
+/*    padding: 1rem !important;*/
+/*}*/
+
+/*!* ========================================*/
+/*   Timeline (approval logs)*/
+/*   ======================================== *!*/
+/*.timeline {*/
+/*    list-style: none;*/
+/*    padding: 0;*/
+/*    margin-top: 1rem;*/
+/*}*/
+
+/*.list-group-item {*/
+/*    position: relative;*/
+/*    padding: 0.75rem 1.25rem;*/
+/*    background: #ffffff;*/
+/*    border: 1px solid #e9ecef;*/
+/*    border-radius: 6px;*/
+/*    margin-bottom: 0.5rem;*/
+/*    font-size: 0.95rem;*/
+/*}*/
+
+/*.list-group-item:last-child {*/
+/*    margin-bottom: 0;*/
+/*}*/
+
+/*.text-muted {*/
+/*    color: #6c757d !important;*/
+/*}*/
+
+/*.small {*/
+/*    font-size: 0.85rem;*/
+/*}*/
+
+/*!* Optional: add a subtle left accent for each log *!*/
+/*.list-group-item::before {*/
+/*    content: "";*/
+/*    position: absolute;*/
+/*    left: 0;*/
+/*    top: 0;*/
+/*    bottom: 0;*/
+/*    width: 4px;*/
+/*    background: #0d6efd;*/
+/*    border-top-left-radius: 6px;*/
+/*    border-bottom-left-radius: 6px;*/
+/*}*/
+
+
+/* ---------------------------
+   استایل کلی و بهبود خوانایی
+--------------------------- */
+body {
+    background-color: #f4f6f9;
+    font-family: 'Vazirmatn', 'Tahoma', sans-serif;
+}
+
+.container {
+    max-width: 960px;
+}
+
+/* کارت اصلی بارنامه */
+.bijak-card {
+    background: #ffffff;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+    transition: transform 0.2s ease;
+}
+
+.bijak-card:hover {
+    transform: translateY(-2px);
+}
+
+.bijak-header {
+    background: linear-gradient(135deg, #2c3e50, #3498db);
+    color: #fff;
+    padding: 1.2rem 2rem;
+    font-size: 1.1rem;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+    border-bottom: 3px solid rgba(255, 255, 255, 0.2);
+}
+
+/* عناوین بخش‌ها */
+.section-title {
+    position: relative;
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.5rem;
+}
+
+.section-title::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 50px;
+    height: 3px;
+    background: #3498db;
+    border-radius: 2px;
+}
+
+/* جداول */
+.table {
+    background-color: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+    margin-bottom: 2rem;
+}
+
+.table th {
+    background-color: #f8fafc;
+    color: #4a5568;
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+.table td {
+    vertical-align: middle;
+    padding: 1rem;
+    color: #1a202c;
+}
+
+.table-bordered th,
+.table-bordered td {
+    border: 1px solid #edf2f7;
+}
+
+/* تایم‌لاین سوابق بررسی */
+.timeline {
+    list-style: none;
+    padding-left: 0;
+    position: relative;
+}
+
+.timeline .list-group-item {
+    border: none;
+    background: transparent;
+    padding: 1rem 1rem 1rem 2.5rem;
+    position: relative;
+    border-left: 3px solid #e2e8f0;
+    margin-bottom: 0;
+}
+
+.timeline .list-group-item:last-child {
+    border-left-color: transparent;
+}
+
+.timeline .list-group-item::before {
+    content: '';
+    position: absolute;
+    left: -8px;
+    top: 1.4rem;
+    width: 13px;
+    height: 13px;
+    background: #3498db;
+    border-radius: 50%;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+}
+
+.timeline .list-group-item strong {
+    color: #2d3748;
+}
+
+/* ---------------------------
+   استایل فرم تأیید OTP
+--------------------------- */
+.otp-container {
+    background: #ffffff;
+    border-radius: 20px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
+    max-width: 440px;
+    margin: 3rem auto;
+    padding: 2.5rem;
+    text-align: center;
+}
+
+.otp-container h2 {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #2d3748;
+    margin-bottom: 1.5rem;
+}
+
+.otp-container form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+}
+
+.otp-container input[type="number"] {
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 14px 18px;
+    font-size: 1.2rem;
+    text-align: center;
+    letter-spacing: 4px;
+    background: #f8fafc;
+    transition: all 0.3s ease;
+    outline: none;
+}
+
+.otp-container input[type="number"]:focus {
+    border-color: #3498db;
+    box-shadow: 0 0 0 4px rgba(52, 152, 219, 0.15);
+    background: #fff;
+}
+
+.otp-container button[type="submit"] {
+    background: linear-gradient(135deg, #3498db, #2c3e50);
+    border: none;
+    color: #fff;
+    font-weight: 600;
+    font-size: 1.1rem;
+    padding: 14px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+}
+
+.otp-container button[type="submit"]:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(52, 152, 219, 0.4);
+}
+
+/* پیام‌های هشدار در قالب OTP (اختیاری) */
+.otp-messages .message {
+    margin-top: 1rem;
+    padding: 0.7rem;
+    border-radius: 10px;
+    font-size: 0.95rem;
+}
+
+/* تنظیمات واکنش‌گرا برای موبایل */
+@media (max-width: 768px) {
+    .bijak-header {
+        flex-direction: column;
+        text-align: center;
+        gap: 0.5rem;
+        padding: 1rem;
+    }
+
+    .section-title {
+        font-size: 1.1rem;
+    }
+
+    .table {
+        font-size: 0.85rem;
+    }
+
+    .col-md-6 {
+        margin-bottom: 1.5rem;
+    }
+
+    .otp-container {
+        margin: 2rem 1rem;
+        padding: 2rem 1.5rem;
+    }
+}

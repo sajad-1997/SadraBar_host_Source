@@ -1,0 +1,260 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>پیش‌نمایش بارنامه - مدیر</title>
+    <link  rel="stylesheet" href="{% static 'issuance/css/bootstrap.rtl.min.css' %}">
+    <link rel="stylesheet" href="{% static 'issuance/css/manager_preview_style.css' %}">
+
+</head>
+<body>
+
+<div class="container my-4">
+
+    <h2>🗂️ پیش‌نمایش بارنامه</h2>
+
+    <!-- پیام‌ها -->
+    {% if messages %}
+        <div class="mb-3">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <!-- کارت موبایل -->
+    <div class="bijak-card-mobile mb-3">
+        <h6>بارنامه شماره: {{ bijak.id }} | کد رهگیری: {{ bijak.tracking_code }}</h6>
+        <p>وضعیت فعلی:
+            {% if bijak.approval_status == 'approved' %}
+                <span class="badge bg-success">تأیید شده</span>
+            {% elif bijak.approval_status == 'rejected' %}
+                <span class="badge bg-danger">رد شده</span>
+            {% else %}
+                <span class="badge bg-warning text-dark">در انتظار بررسی</span>
+            {% endif %}
+        </p>
+        <p>ثبت‌کننده: {{ bijak.created_by }}</p>
+        <p>زمان ثبت: {{ bijak.created_at }}</p>
+    </div>
+
+    <!-- دکمه‌ها -->
+    <div class="mb-4 text-center">
+        {% if bijak.approval_status == 'approved' %}
+            <a href="{% url 'issuance:crud:print' bijak.pk %}" class="btn btn-primary" target="_blank">
+                چاپ بارنامه
+            </a>
+        {% endif %}
+        <a href="{% url 'issuance:manager:waiting_list' %}" class="btn btn-secondary">
+            بازگشت به لیست
+        </a>
+    </div>
+
+    <!-- جدول دسکتاپ -->
+    <div class="bijak-card">
+        <div class="bijak-header">
+            <span>بارنامه شماره {{ bijak.id }}</span>
+            <span>کد رهگیری: {{ bijak.tracking_code }}</span>
+        </div>
+
+        <div class="p-5">
+
+            <!-- اطلاعات سیستمی -->
+            <h5 class="section-title">اطلاعات سیستمی</h5>
+            <table class="table table-bordered text-center">
+                <tr>
+                    <th>ثبت‌کننده</th>
+                    <th>زمان ثبت</th>
+                    <th>تأییدکننده</th>
+                    <th>زمان تأیید</th>
+                    <th>علت رد</th>
+                </tr>
+                <tr>
+                    <td>{{ bijak.created_by }}</td>
+                    <td>{{ bijak.created_at }}</td>
+                    <td>{{ bijak.approved_by|default:"-" }}</td>
+                    <td>{{ bijak.approved_at|default:"-" }}</td>
+                    <td>{{ bijak.reject_reason|default:"—" }}</td>
+                </tr>
+            </table>
+
+            <!-- اطلاعات بارنامه -->
+            <div class="row">
+                <div class="col-md-12">
+                    <h5 class="section-title">اطلاعات بارنامه</h5>
+                    <table class="table table-bordered">
+                        <tr>
+                            <th>مبدأ</th>
+                            <td>{{ bijak.cargo.origin }}</td>
+                        </tr>
+                        <tr>
+                            <th>مقصد</th>
+                            <td>{{ bijak.cargo.destination }}</td>
+                        </tr>
+                        <tr>
+                            <th>وزن محموله</th>
+                            <td>{{ bijak.cargo.weight }}</td>
+                        </tr>
+                        <tr>
+                            <th>کرایه</th>
+                            <td>{{ bijak.total_fare }} ریال</td>
+                        </tr>
+                        <tr>
+                            <th>ارزش محموله</th>
+                            <td>{{ bijak.value }} ریال</td>
+                        </tr>
+                        <tr>
+                            <th>توضیحات</th>
+                            <td>{{ bijak.custom_caption|default:"-" }} </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+
+            <!-- فرستنده و گیرنده -->
+            <div class="row">
+                <div class="col-md-12">
+                    <h5 class="section-title">فرستنده</h5>
+                    <table class="table table-bordered">
+                        <tr>
+                            <th>نام</th>
+                            <td>{{ bijak.sender.name }}</td>
+                        </tr>
+                        <tr>
+                            <th>کد ملی</th>
+                            <td>{{ bijak.sender.national_id|default:"-" }}</td>
+                        </tr>
+                        <tr>
+                            <th>کد پستی</th>
+                            <td>{{ bijak.sender.postal|default:"—" }}</td>
+                        </tr>
+                        <tr>
+                            <th>تلفن</th>
+                            <td>{{ bijak.sender.phone|default:"-" }}</td>
+                        </tr>
+                        <tr>
+                            <th>آدرس</th>
+                            <td>{{ bijak.sender.address }}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            <div class="row">
+
+                <div class="col-md-12">
+                    <h5 class="section-title">گیرنده</h5>
+                    <table class="table table-bordered">
+                        <tr>
+                            <th>نام</th>
+                            <td>{{ bijak.receiver.name }}</td>
+                        </tr>
+                        <tr>
+                            <th>کد ملی</th>
+                            <td>{{ bijak.receiver.national_id|default:"-" }}</td>
+                        </tr>
+                        <tr>
+                            <th>کد پستی</th>
+                            <td>{{ bijak.receiver.postal|default:"—" }}</td>
+                        </tr>
+                        <tr>
+                            <th>تلفن</th>
+                            <td>{{ bijak.receiver.phone|default:"-" }}</td>
+                        </tr>
+                        <tr>
+                            <th>آدرس</th>
+                            <td>{{ bijak.receiver.address }}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+
+            <!-- راننده و خودرو -->
+            <div class="row">
+                <div class="col-md-12">
+                    <h5 class="section-title">راننده و خودرو</h5>
+                    <table class="table table-bordered">
+                        <tr>
+                            <th>نام و نام خانوادگی راننده</th>
+                            <td>{{ bijak.driver.name }}</td>
+                        </tr>
+                        <tr>
+                            <th>کد ملی راننده</th>
+                            <td>{{ bijak.driver.national_id }}</td>
+                        </tr>
+                        <tr>
+                            <th>موبایل</th>
+                            <td>{{ bijak.driver.phone }}</td>
+                        </tr>
+                        <tr>
+                            <th>ساکن شهر</th>
+                            <td>{{ bijak.driver.residence }}</td>
+                        </tr>
+                        <tr>
+                            <th>نوع خودرو</th>
+                            <td>{{ bijak.vehicle.get_type_display }}</td>
+                        </tr>
+                        <tr>
+                            <th>پلاک خودرو</th>
+                            <td>
+                                {{ bijak.vehicle.license_plate_three_digit }}
+                                {{ bijak.vehicle.license_plate_alphabet }}
+                                {{ bijak.vehicle.license_plate_two_digit }}
+                                || ایران {{ bijak.vehicle.license_plate_series }}
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+
+            <!-- تایم‌لاین تأیید -->
+            <h5 class="section-title">سوابق بررسی</h5>
+            <ul class="list-group timeline">
+                {% for log in logs %}
+                    <li class="list-group-item">
+                        <strong>{{ log.user }}</strong> —
+                        {{ log.get_action_display }} —
+                        {{ log.created_at }}
+                        {% if log.description %}
+                            <div class="text-muted small mt-1">{{ log.description }}</div>
+                        {% endif %}
+                    </li>
+                {% empty %}
+                    <li class="list-group-item text-muted">سابقه‌ای ثبت نشده است</li>
+                {% endfor %}
+            </ul>
+
+            <!-- فرم تصمیم مدیریت -->
+            {% if bijak.approval_status == "pending" %}
+                <div class="form-section">
+                    <h5 class="section-title text-danger">تصمیم مدیریت</h5>
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="action" value="approve" required>
+                            <label class="form-check-label">تأیید بارنامه</label>
+                        </div>
+                        <div class="form-check mt-2">
+                            <input class="form-check-input" type="radio" name="action" value="reject">
+                            <label class="form-check-label text-danger">رد بارنامه</label>
+                        </div>
+                        <textarea name="reject_reason" class="form-control mt-3" rows="3"
+                                  placeholder="در صورت رد، توضیح الزامی است"></textarea>
+                        <div class="text-center mt-3">
+                            <button type="submit" class="btn btn-success px-4">ثبت تصمیم</button>
+                        </div>
+                    </form>
+                </div>
+            {% endif %}
+
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>

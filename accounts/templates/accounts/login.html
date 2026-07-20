@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>ورود</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        /*@import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;600&display=swap');*/
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Vazirmatn', sans-serif;
+        }
+
+        body {
+            background: radial-gradient(circle at top left, #0f172a, #020617);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* نورهای پس‌زمینه */
+        body::before, body::after {
+            content: '';
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(120px);
+            opacity: 0.4;
+        }
+        body::before {
+            width: 400px;
+            height: 400px;
+            top: -100px;
+            left: -100px;
+            background: #0ea5e9;
+        }
+        body::after {
+            width: 300px;
+            height: 300px;
+            bottom: -100px;
+            right: -100px;
+            background: #38bdf8;
+        }
+
+        .login-container {
+            position: relative;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.37);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            width: 95%;
+            max-width: 420px;
+            padding: 50px 35px;
+            color: #e2e8f0;
+            text-align: center;
+            z-index: 1;
+            animation: fadeIn 1s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(25px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .logo {
+            width: 90px;
+            height: 90px;
+            margin: 0 auto 20px;
+            /*background: url('https://cdn-icons-png.flaticon.com/512/3135/3135715.png') no-repeat center;*/
+            background-size: cover;
+            border-radius: 50%;
+            box-shadow: 0 0 15px rgba(56, 189, 248, 0.6);
+        }
+
+        h2 {
+            font-weight: 600;
+            font-size: 1.6rem;
+            margin-bottom: 30px;
+            color: #38bdf8;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            background-color: rgba(255, 255, 255, 0.08);
+            color: #f8fafc;
+            font-size: 1rem;
+            transition: 0.3s;
+        }
+
+        input::placeholder {
+            color: #94a3b8;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #38bdf8;
+            box-shadow: 0 0 8px #38bdf8;
+            background-color: rgba(255, 255, 255, 0.15);
+        }
+
+        button {
+            background: linear-gradient(90deg, #0ea5e9, #38bdf8);
+            border: none;
+            padding: 12px;
+            border-radius: 12px;
+            color: white;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            background: linear-gradient(90deg, #38bdf8, #0ea5e9);
+            transform: scale(1.03);
+        }
+
+        .forgot-password {
+            display: block;
+            margin-top: 10px;
+            font-size: 0.9rem;
+            color: #60a5fa;
+            text-decoration: none;
+            transition: 0.3s;
+        }
+
+        .forgot-password:hover {
+            color: #93c5fd;
+            text-decoration: underline;
+        }
+
+        .footer-text {
+            margin-top: 25px;
+            font-size: 0.85rem;
+            color: #94a3b8;
+        }
+
+        @media (max-width: 480px) {
+            .login-container { padding: 35px 20px; }
+            h2 { font-size: 1.3rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="logo"></div>
+        <h2>ورود کاربران محترم</h2>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.non_field_errors }}
+            <input type="text" name="username" placeholder="نام کاربری" required>
+            <input type="password" name="password" placeholder="رمز عبور" required>
+            <button type="submit">ورود به پنل عملیاتی</button>
+        </form>
+        <a href="#" class="forgot-password">فراموشی رمز عبور؟</a>
+        <p class="footer-text">© سامانه مدیریت بارنامه صدرا بار خراسان | نسخه 1.0</p>
+    </div>
+</body>
+</html>

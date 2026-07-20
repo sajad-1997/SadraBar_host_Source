@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html dir="rtl">
+<head><meta charset="UTF-8"><title>تأیید کد</title></head>
+<body>
+    <h2>کد تأیید برای بارنامه {{ bijak.waybill_number }} ارسال شد</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">تأیید و چاپ</button>
+    </form>
+    {% if messages %}
+        <ul>{% for msg in messages %}<li>{{ msg }}</li>{% endfor %}</ul>
+    {% endif %}
+</body>
+</html>

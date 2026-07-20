@@ -1,0 +1,14 @@
+<h2>بارنامه {{ bijak.tracking_code }}</h2>
+
+<p>فرستنده: {{ bijak.sender }}</p>
+<p>گیرنده: {{ bijak.receiver }}</p>
+<p>مبلغ کرایه: {{ bijak.total_fare }}</p>
+<p>وضعیت: {{ bijak.get_status_display }}</p>
+<p>وضعیت تأیید: {{ bijak.get_approval_status_display }}</p>
+
+{% if user.is_staff %}
+    <h3>عملیات مدیریتی</h3>
+    {% include 'issuance/partials/approval_buttons.html' %}
+{% elif bijak.can_print %}
+    <a href="{% url 'issuance:bijak:final_bijak' bijak.id %}" class="btn btn-primary">چاپ بارنامه</a>
+{% endif %}

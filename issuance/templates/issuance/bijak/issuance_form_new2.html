@@ -1,0 +1,141 @@
+{% extends 'issuance/base.html' %}
+{% load static %}
+{% block content %}
+    <form method="post" id="bijakForm">
+        <div class="container">
+            <h2>فرم ثبت بارنامه جدید</h2>
+            <hr>
+
+            <!-- نمایش پیام‌ها -->
+            {% if messages %}
+                <div class="mt-3">
+                    {% for message in messages %}
+                        <div class="alert
+                {% if message.tags == 'error' %}alert-danger
+                {% elif message.tags == 'success' %}alert-success
+                {% else %}alert-info{% endif %}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+            <hr>
+            {% csrf_token %}
+
+            <!-- بخش فرستنده و گیرنده -->
+            <div class="row">
+                <div class="col-md-6">
+                    <h3>انتخاب فرستنده</h3>
+                    <input type="text" id="sender-input" class="form-control" placeholder="جستجوی فرستنده...">
+                    <input type="hidden" id="sender-id" name="sender">
+                    <div id="sender-results" class="list-group"></div>
+                </div>
+                <div class="col-md-6">
+                    <h3>انتخاب گیرنده</h3>
+                    <input type="text" id="receiver-input" class="form-control" placeholder="جستجوی گیرنده...">
+                    <input type="hidden" id="receiver-id" name="receiver">
+                    <div id="receiver-results" class="list-group"></div>
+                </div>
+            </div>
+
+            <!-- بخش راننده و خودرو -->
+            <div class="row mt-3">
+                <div class="col-md-6">
+                    <h3>اطلاعات راننده</h3>
+                    <input type="text" id="driver-input" class="form-control" placeholder="جستجوی راننده...">
+                    <input type="hidden" id="driver-id" name="driver">
+                    <div id="driver-results" class="list-group"></div>
+                </div>
+                <div class="col-md-6">
+                    <h3>اطلاعات خودروی راننده</h3>
+                    <input type="hidden" id="vehicle-id" name="vehicle">
+                    {% if vehicle %}
+                        <p>پلاک: {{ vehicle.full_plate }}</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- بخش بارنامه و محموله -->
+            <div class="row mt-3">
+                <div class="col-md-6">
+                    <h3>اطلاعات بارنامه</h3>
+                    {{ shipment_form.as_p }}
+                </div>
+                <div class="col-md-6">
+                    <h3>اطلاعات محموله</h3>
+                    {{ cargo_form.as_p }}
+                </div>
+            </div>
+
+            <!-- بخش توضیحات -->
+            <div class="row mt-3">
+                <div class="col-md-12">
+                    <h3>توضیحات</h3>
+                    <div class="alert alert-info">
+                        توضیح پیش‌فرض: هرگونه آب خوردگی و خیس شدن بار به مسئولیت راننده میباشد.
+                    </div>
+                    <div class="form-group">
+                        <label for="caption-select">انتخاب توضیح آماده (اختیاری)</label>
+                        <select id="caption-select" name="selected_caption" class="form-select">
+                            <option value="">-- انتخاب کنید --</option>
+                            {% for caption in captions %}
+                                <option value="{{ caption.id }}">{{ caption.content|truncatechars:100 }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group mt-2">
+                        <label for="manual_description">توضیح دستی (اختیاری)</label>
+                        <textarea id="manual_description" name="manual_description" rows="3" class="form-control"
+                                  placeholder="اگر توضیح خاصی دارید، اینجا بنویسید..."></textarea>
+                    </div>
+                    <div class="mt-2 text-center">
+                        <a href="{% url 'issuance:crud:add_caption' %}" class="btn btn-secondary btn-sm">
+                            افزودن توضیح همیشگی
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- دکمه‌ها -->
+            <div class="mt-4 text-center">
+                {% if bijak.id %}
+                    {% if bijak.approval_status == 'approved' %}
+                        <a href="{% url 'bijak_print' bijak.id %}" class="btn btn-success">چاپ بارنامه</a>
+                    {% elif bijak.approval_status == 'pending' %}
+                        <button type="submit" name="action" value="send_for_approval" class="btn btn-primary">
+                            ارسال برای تایید مدیر
+                        </button>
+                    {% elif bijak.approval_status == 'rejected' %}
+                        <button type="submit" name="action" value="save" class="btn btn-warning">
+                            اصلاح و ارسال مجدد
+                        </button>
+                    {% else %}
+                        <button type="submit" name="action" value="save" class="btn btn-secondary" disabled>
+                            در انتظار ذخیره
+                        </button>
+                    {% endif %}
+                {% else %}
+                    <button type="submit" name="action" value="save" class="btn btn-success">ثبت بارنامه</button>
+                {% endif %}
+            </div>
+
+        </div>
+    </form>
+
+    <!-- اسکریپت‌ها -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="{% static 'issuance/persian-date.js' %}"></script>
+    <script src="{% static 'issuance/persian-datepicker.js' %}"></script>
+    <script src="{% static 'issuance/datetime-init.js' %}"></script>
+    <script src="{% static 'issuance/shipment_form.js' %}"></script>
+
+    <script>
+        const urls = {
+            searchCustomer: "{% url 'issuance:search:search_customer' %}",
+            searchDriver: "{% url 'issuance:search:search_driver' %}",
+            getVehicleByDriver: "{% url 'issuance:search:get_vehicle_by_driver' %}",
+            searchVehicle: "{% url 'issuance:search:search_vehicle' %}"
+        };
+    </script>
+
+{% endblock %}

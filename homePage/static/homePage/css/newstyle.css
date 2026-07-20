@@ -1,0 +1,298 @@
+/* ======== تنظیمات پایه ======== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    direction: rtl;
+    font-family: "Vazirmatn", sans-serif;
+}
+
+body {
+    background: url('../images/2365.jpg') no-repeat center center / cover;
+    background‑attachment: fixed;
+    position: relative;
+    color: #fff; /* اگر متن روی عکس خواهد بود */
+}
+
+body::before {
+    content: "";
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.4); /* مقدار overlay جهت خوانایی بهتر */
+    z-index: -1;
+}
+
+/* ======== هدر و منو ======== */
+header {
+    background: linear-gradient(135deg, #3f4d61, #2e3a4c);
+    color: #fff;
+    border-radius: 20px;
+    margin: 15px;
+    padding: 20px 0 60px 0;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+    position: relative;
+}
+
+header h1 {
+    float: right;
+    margin: 0 25px;
+    font-size: 1.8rem;
+    font-weight: bold;
+}
+
+nav ul {
+    float: left;
+    list-style: none;
+    margin-left: 20px;
+}
+
+nav ul li {
+    display: inline-block;
+    margin-left: 15px;
+}
+
+nav ul li a {
+    color: #fff;
+    text-decoration: none;
+    padding: 8px 14px;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+}
+
+nav ul li a:hover {
+    background: #ff9800;
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(255, 152, 0, 0.4);
+}
+
+/* ======== بخش قهرمان صفحه اصلی ======== */
+.hero {
+    height: 400px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: #fff;
+    background: rgba(0, 0, 0, 0.45);
+    border-radius: 12px;
+    margin: 20px;
+}
+
+.hero-content {
+    background: rgba(0, 0, 0, 0.55);
+    padding: 25px;
+    border-radius: 12px;
+    max-width: 700px;
+}
+
+.hero-content h2 {
+    font-size: 2rem;
+    margin-bottom: 15px;
+}
+
+.hero-content button {
+    margin-top: 10px;
+    padding: 12px 24px;
+    background: #ff9800;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: 0.3s ease;
+}
+
+.hero-content button:hover {
+    background: #e68900;
+}
+
+/* ======== بخش‌ها و کارتها ======== */
+section {
+    padding: 60px 20px;
+}
+
+.cards {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+}
+
+.card {
+    flex: 1 1 30%;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+}
+
+/* ======== جدول‌ها ======== */
+table {
+    width: 100%;
+    background: #fff;
+    border-collapse: collapse;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+th, td {
+    padding: 15px;
+    border-bottom: 1px solid #eee;
+    text-align: right;
+}
+
+th {
+    background: #3f4d61;
+    color: #fff;
+}
+
+/* ======== فرم‌ها ======== */
+form input,
+form textarea,
+form select {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    transition: border-color 0.2s ease;
+}
+
+form input:focus,
+form textarea:focus,
+form select:focus {
+    border-color: #3f4d61;
+    outline: none;
+    box-shadow: 0 0 4px rgba(63, 77, 97, 0.4);
+}
+
+form button {
+    padding: 10px 20px;
+    background: #0d47a1;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    margin: 10px auto;
+    width: 120px;
+    transition: 0.3s ease;
+}
+
+form button:hover {
+    background: #1565c0;
+}
+
+/* ======== فوتر ======== */
+footer {
+    background: #2e3a4c;
+    color: #fff;
+    text-align: center;
+    padding: 25px 10px;
+    margin-top: 50px;
+    border-top: 3px solid #ff9800;
+    font-size: 0.9rem;
+    line-height: 1.8;
+}
+
+footer a {
+    color: #ffb84d;
+    text-decoration: none;
+}
+
+footer a:hover {
+    color: #ffd27f;
+}
+
+/* ======== استمپ ======== */
+.stamp {
+    text-align: center;
+    margin: 40px auto 20px;
+    border: 2px solid #e74c3c;
+    padding: 10px;
+    display: inline-block;
+    color: #e74c3c;
+    font-weight: bold;
+    border-radius: 8px;
+}
+
+/* ======== کانتینر اصلی ======== */
+.container {
+    color: white;
+    padding: 20px;
+    max-width: 900px;
+    margin: 15px auto;
+    border-radius: 10px;
+    background: rgba(0, 0, 0, 0.55);
+}
+
+/* ======== تیترها ======== */
+h2 {
+    text-align: center;
+    margin-bottom: 25px;
+    font-size: 1.6rem;
+    color: #ffb74d;
+}
+
+h3 {
+    text-align: center;
+    color: #fff;
+}
+
+/* ======== المان‌های فرم عمومی ======== */
+label {
+    display: block;
+    margin-top: 10px;
+    font-weight: bold;
+    color: #fff;
+}
+
+input, select {
+    width: 95%;
+    padding: 8px;
+    margin: 5px;
+    border-radius: 6px;
+}
+
+/* ======== دکمه عمومی ======== */
+button {
+    padding: 10px 20px;
+    background: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    margin-top: 20px;
+    cursor: pointer;
+    transition: 0.3s ease;
+}
+
+button:hover {
+    background: #45a049;
+}
+
+/* ======== واکنش‌گرایی ======== */
+@media (max-width: 992px) {
+    .cards {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    header h1, nav ul {
+        float: none;
+        text-align: center;
+    }
+
+    nav ul {
+        margin: 20px 0;
+    }
+
+    .container {
+        width: 95%;
+    }
+}

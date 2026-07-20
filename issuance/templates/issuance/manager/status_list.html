@@ -1,0 +1,186 @@
+{% extends "issuance/search/base.html" %}
+{% load filters %}
+
+{% block content %}
+    <h2>🗂️ مدیریت وضعیت نهایی بارنامه‌ها</h2>
+
+    {% if messages %}
+        <div class="mb-3">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <hr>
+
+    <div class="accordion" id="shipmentAccordion">
+
+        {# دسته‌های معمولی #}
+        {% for type_value, type_label in status_groups %}
+            {% with shipments_filtered=shipments|get_by_type:type_value %}
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="heading-{{ forloop.counter }}">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#collapse-{{ forloop.counter }}" aria-expanded="false"
+                                aria-controls="collapse-{{ forloop.counter }}">
+                            {{ type_label }} ({{ shipments_filtered.count }})
+                        </button>
+                    </h2>
+                    <div id="collapse-{{ forloop.counter }}" class="accordion-collapse collapse"
+                         aria-labelledby="heading-{{ forloop.counter }}" data-bs-parent="#shipmentAccordion">
+                        <div class="accordion-body p-0">
+                            {% if shipments_filtered %}
+                                <div class="d-none d-md-block">
+                                    {# نسخه دسکتاپ: جدول #}
+                                    <table class="table table-bordered table-striped mb-0">
+                                        <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>کد رهگیری</th>
+                                            <th>زمان صدور</th>
+                                            <th>فرستنده</th>
+                                            <th>گیرنده</th>
+                                            <th>راننده</th>
+                                            <th>نوع خودرو</th>
+                                            <th>ثبت‌کننده</th>
+                                            <th>وضعیت نهایی</th>
+                                            <th>عملیات</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        {% for s in shipments_filtered %}
+                                            <tr>
+                                                <td>{{ s.id }}</td>
+                                                <td>{{ s.tracking_code }}</td>
+                                                <td>{{ s.issuance_datetime|date:"Y/m/d H:i" }}</td>
+                                                <td>{{ s.sender }}</td>
+                                                <td>{{ s.receiver }}</td>
+                                                <td>{{ s.driver }}</td>
+                                                <td>{{ s.vehicle.get_type_display }}</td>
+                                                <td>{{ s.created_by }}</td>
+                                                <td>{{ s.get_type_display }}</td>
+                                                <td>
+                                                    <a href="{% url 'issuance:manager:manager_status' s.id %}"
+                                                       class="btn btn-sm btn-primary">تعیین وضعیت نهایی</a>
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <div class="d-block d-md-none">
+                                    {# نسخه موبایل: کارت #}
+                                    {% for s in shipments_filtered %}
+                                        <div class="card mb-2">
+                                            <div class="card-body">
+                                                <h6 class="card-title">بارنامه #{{ s.id }}</h6>
+                                                <p class="mb-1"><strong>کد رهگیری</strong> {{ s.tracking_code }}</p>
+                                                <p class="mb-1"><strong>زمان
+                                                    صدور:</strong> {{ s.issuance_datetime|date:"Y/m/d H:i" }}</p>
+                                                <p class="mb-1"><strong>فرستنده:</strong> {{ s.sender }}</p>
+                                                <p class="mb-1"><strong>گیرنده:</strong> {{ s.receiver }}</p>
+                                                <p class="mb-1"><strong>راننده:</strong> {{ s.driver }}</p>
+                                                <p class="mb-1"><strong>نوع خودرو:</strong> {{ s.vehicle.get_type_display }}</p>
+                                                <p class="mb-1"><strong>ثبت‌کننده:</strong> {{ s.created_by }}</p>
+                                                <p class="mb-1"><strong>وضعیت نهایی:</strong> {{ s.get_type_display }}
+                                                </p>
+                                                <a href="{% url 'issuance:manager:manager_status' s.id %}"
+                                                   class="btn btn-sm btn-primary mt-2">تعیین وضعیت نهایی</a>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                <p class="text-center text-muted m-3">بارنامه‌ای در این وضعیت وجود ندارد.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endwith %}
+        {% endfor %}
+
+        {# بارنامه‌های تعیین نشده #}
+        {% with unassigned_shipments=shipments|get_by_type:'unassigned' %}
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="heading-unassigned">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#collapse-unassigned" aria-expanded="false"
+                            aria-controls="collapse-unassigned">
+                        تعیین نشده ({{ unassigned_shipments.count }})
+                    </button>
+                </h2>
+                <div id="collapse-unassigned" class="accordion-collapse collapse"
+                     aria-labelledby="heading-unassigned" data-bs-parent="#shipmentAccordion">
+                    <div class="accordion-body p-0">
+                        {% if unassigned_shipments %}
+                            <div class="d-none d-md-block">
+                                <table class="table table-bordered table-striped mb-0">
+                                    <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>کد رهگیری</th>
+                                        <th>تاریخ صدور</th>
+                                        <th>فرستنده</th>
+                                        <th>گیرنده</th>
+                                        <th>راننده</th>
+                                        <th>نوع خودرو</th>
+                                        <th>ثبت‌کننده</th>
+                                        <th>وضعیت نهایی</th>
+                                        <th>عملیات</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% for s in unassigned_shipments %}
+                                        <tr>
+                                            <td>{{ s.id }}</td>
+                                            <td>{{ s.tracking_code }}</td>
+                                            <td>{{ s.issuance_datetime|date:"Y/m/d H:i" }}</td>
+                                            <td>{{ s.sender }}</td>
+                                            <td>{{ s.receiver }}</td>
+                                            <td>{{ s.driver }}</td>
+                                            <td>{{ s.vehicle.get_type_display }}</td>
+                                            <td>{{ s.created_by }}</td>
+                                            <td>تعیین نشده</td>
+                                            <td>
+                                                <a href="{% url 'issuance:manager:manager_status' s.id %}"
+                                                   class="btn btn-sm btn-primary">تعیین وضعیت نهایی</a>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="d-block d-md-none">
+                                {% for s in unassigned_shipments %}
+                                    <div class="card mb-2">
+                                        <div class="card-body">
+                                            <h6 class="card-title">بارنامه #{{ s.id }}</h6>
+                                            <p class="mb-1"><strong>کد رهگیری</strong> {{ s.tracking_code }}</p>
+                                            <p class="mb-1"><strong>تاریخ
+                                                صدور:</strong> {{ s.issuance_datetime|date:"Y/m/d H:i" }}</p>
+                                            <p class="mb-1"><strong>فرستنده:</strong> {{ s.sender }}</p>
+                                            <p class="mb-1"><strong>گیرنده:</strong> {{ s.receiver }}</p>
+                                            <p class="mb-1"><strong>راننده:</strong> {{ s.driver }}</p>
+                                            <p class="mb-1"><strong>نوع خودرو:</strong> {{ s.vehicle.get_type_display }}</p>
+                                            <p class="mb-1"><strong>ثبت‌کننده:</strong> {{ s.created_by }}</p>
+                                            <p class="mb-1"><strong>وضعیت نهایی:</strong> تعیین نشده</p>
+                                            <a href="{% url 'issuance:manager:manager_status' s.id %}"
+                                               class="btn btn-sm btn-primary mt-2">تعیین وضعیت نهایی</a>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <p class="text-center text-muted m-3">بارنامه‌ای با وضعیت تعیین نشده وجود ندارد.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% endwith %}
+
+    </div> {# end accordion #}
+
+{% endblock %}

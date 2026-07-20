@@ -1,0 +1,338 @@
+{% extends 'issuance/base.html' %}
+{% load static %}
+{% block content %}
+    <form method="post" id="bijakForm">
+        <div class="container">
+            <h2>{% block title %}📋 فرم ثبت بارنامه جدید{% endblock %}</h2>
+            <hr>
+
+            <!-- پیام‌ها -->
+            {% if messages %}
+                <div class="mt-3">
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+                <hr>
+            {% endif %}
+            {% csrf_token %}
+
+            <!-- فرستنده و گیرنده -->
+            <div class="row">
+                <div class="col-md-6">
+                    <h3>انتخاب فرستنده</h3>
+                    <hr>
+                    <div class="row">
+                        <div class="col-md-10 text-center">
+                            <input type="text" id="sender-input" class="form-control" placeholder="جستجوی فرستنده...">
+                            <input type="hidden" id="sender-id" name="sender">
+                            <div id="sender-results" class="list-group"></div>
+                        </div>
+                        <div class="col-md-1 text-center">
+                            <!-- دکمه افزودن مشتری -->
+                            <a href="{% url 'issuance:crud:add_customer' %}" class="btn btn-secondary btn-lg">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                     class="bi bi-plus" viewBox="0 0 16 16">
+                                    <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"/>
+                                </svg>
+                            </a>
+                            <!-- دکمه ویرایش مشتری -->
+                            <a href="#" id="edit-sender-btn" class="btn btn-primary btn-lg" style="margin-top:5px;">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                     class="bi bi-pencil" viewBox="0 0 16 16">
+                                    <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-9.793 9.793-3.5.5a.5.5 0 0 1-.571-.571l.5-3.5L12.146.146zM11.207 2L3 10.207V12h1.793L14 3.793 11.207 2z"/>
+                                </svg>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <h3>انتخاب گیرنده</h3>
+                    <hr>
+                    <div class="row">
+                        <div class="col-md-10 text-center">
+                            <input type="text" id="receiver-input" class="form-control" placeholder="جستجوی گیرنده...">
+                            <input type="hidden" id="receiver-id" name="receiver">
+                            <div id="receiver-results" class="list-group"></div>
+                        </div>
+                        <div class="col-md-1 text-center">
+                            <!-- دکمه افزودن مشتری -->
+                            <a href="{% url 'issuance:crud:add_customer' %}" class="btn btn-secondary btn-lg">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                     class="bi bi-plus" viewBox="0 0 16 16">
+                                    <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"/>
+                                </svg>
+                            </a>
+                            <!-- دکمه ویرایش مشتری -->
+                            <a href="#" id="edit-receiver-btn" class="btn btn-primary btn-lg" style="margin-top:5px;">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                     class="bi bi-pencil" viewBox="0 0 16 16">
+                                    <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-9.793 9.793-3.5.5a.5.5 0 0 1-.571-.571l.5-3.5L12.146.146zM11.207 2L3 10.207V12h1.793L14 3.793 11.207 2z"/>
+                                </svg>
+                            </a>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- راننده و خودرو -->
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <h3>اطلاعات راننده</h3>
+                    <hr>
+                    <div class="row">
+                        <div class="col-md-10 text-center">
+                            <input type="text" id="driver-input" class="form-control" placeholder="جستجوی راننده...">
+                            <input type="hidden" id="driver-id" name="driver">
+                            <input type="hidden" id="vehicle-plate" name="vehicle_plate">
+                            <div id="driver-results" class="list-group"></div>
+                        </div>
+                        <div class="col-md-1 text-center">
+                            <!-- دکمه افزودن راننده -->
+                            <a href="{% url 'issuance:crud:add_driver' %}" class="btn btn-secondary btn-lg"
+                               style="margin-top:5px;">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                     class="bi bi-plus" viewBox="0 0 16 16">
+                                    <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"/>
+                                </svg>
+                            </a>
+                            <!-- دکمه ویرایش راننده -->
+                            <a href="#" id="edit-driver-btn" class="btn btn-primary btn-lg" style="margin-top:5px;">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                     class="bi bi-pencil" viewBox="0 0 16 16">
+                                    <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-9.793 9.793-3.5.5a.5.5 0 0 1-.571-.571l.5-3.5L12.146.146zM11.207 2L3 10.207V12h1.793L14 3.793 11.207 2z"/>
+                                </svg>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <h3>شماره پلاک خودرو</h3>
+                    <hr>
+                    <div class="row">
+                        <div class="col-md-10 text-center">
+                            <div class="plate">
+                                <div class="province">
+                                    <span>ایران</span>
+                                    <span id="province">{{ vehicle.license_plate_series }}</span>
+                                </div>
+                                <div class="number-box">
+                                    <span id="second-number">{{ vehicle.license_plate_three_digit }}</span>
+                                    <span class="letter" id="letter">{{ vehicle.license_plate_alphabet }}</span>
+                                    <span id="first-number">{{ vehicle.license_plate_two_digit }}</span>
+                                </div>
+                                <div class="flag-box">
+                                    <img src="{% static 'issuance/images/icons8-iran-100.png' %}">
+                                    <span>I.R. IRAN</span>
+                                </div>
+                                <input type="hidden" id="vehicle-id" name="vehicle">
+                            </div>
+                        </div>
+                        <div class="col-md-1 text-center">
+                            <a href="{% url 'issuance:crud:add_vehicle' %}" class="btn btn-secondary btn-lg"
+                               style="margin-top:5px;">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                     class="bi bi-plus" viewBox="0 0 16 16">
+                                    <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"/>
+                                </svg>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- بارنامه و محموله -->
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <h3>اطلاعات بارنامه</h3>
+                    <hr>
+                    {{ shipment_form.as_p }}
+                </div>
+                <div class="col-md-6">
+                    <h3>اطلاعات محموله</h3>
+                    <hr>
+                    {{ cargo_form.as_p }}
+                </div>
+            </div>
+
+            <!-- توضیحات -->
+            <div class="row mt-4">
+                <div class="col-md-12">
+                    <h3>توضیحات</h3>
+                    <hr>
+                    <div class="alert alert-info text-center mb-3">
+                        <strong>توضیح پیش‌فرض:</strong> هر گونه آب خوردگی و خیس شدن بار به مسئولیت راننده میباشد.
+                    </div>
+                    <div class="mb-3">
+                        <label for="selected_caption" class="fw-bold mb-2">انتخاب توضیح آماده (اختیاری)</label>
+                        <select id="selected_caption" name="shipment-selected_caption" class="form-select">
+                            <option value="">-- انتخاب کنید --</option>
+                                {% for caption in captions %}
+                                    <option value="{{ caption.id }}"
+                                    {% if selected_caption_id == caption.id|stringformat:"s" %}
+                                    selected
+                                    {% endif %}>
+                                        {{ caption.content|truncatechars:180 }}
+                                    </option>
+                                {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="custom_caption" class="fw-bold">توضیح دستی (اختیاری)</label>
+                        <textarea id="custom_caption" name="shipment-custom_caption" rows="3" class="form-control"
+                                    placeholder="اگر توضیح خاصی دارید، اینجا بنویسید..."
+                                    >{{ custom_caption }}</textarea>
+                    </div>
+                    <div class="text-center mt-3">
+                        <a href="{% url 'issuance:crud:add_caption' %}" class="btn btn-secondary btn-lg">افزودن توضیح
+                            همیشگی</a>
+                    </div>
+                </div>
+            </div>
+
+            <hr>
+            <!-- دکمه‌ها -->
+            <div class="text-center mt-4">
+
+                {# مدیر #}
+                {% if user.is_staff %}
+                    {% if bijak.approval_status == 'waiting_approval' %}
+                        <button class="btn btn-secondary" disabled>
+                            در انتظار اقدام مدیریتی
+                        </button>
+                    {% elif bijak.approval_status == 'approved' %}
+                        <a href="{% url 'bijak_print' bijak.id %}" class="btn btn-success">
+                            چاپ بارنامه
+                        </a>
+                    {% endif %}
+
+                    {# کارمند #}
+                {% else %}
+
+                    {# بارنامه تازه ایجاد نشده #}
+                    {% if not bijak %}
+                        <button type="submit"
+                                name="action"
+                                value="send_for_approval"
+                                class="btn btn-primary">
+                            ثبت و ارسال برای تأیید مدیریت
+                        </button>
+
+                        {# رد شده #}
+                    {% elif bijak.status == 'rejected' %}
+                        <button type="submit"
+                                name="action"
+                                value="send_for_approval"
+                                class="btn btn-warning">
+                            اصلاح و ارسال مجدد
+                        </button>
+
+                        {# در انتظار تأیید #}
+                    {% elif bijak.status == 'waiting_approval' %}
+                        <button class="btn btn-secondary" disabled>
+                            در انتظار بررسی مدیریت
+                        </button>
+
+                        {# تأیید شده #}
+                    {% elif bijak.status == 'approved' %}
+                        <a href="{% url 'bijak_print' bijak.id %}" class="btn btn-success">
+                            چاپ بارنامه
+                        </a>
+                    {% endif %}
+
+                {% endif %}
+
+            </div>
+        </div>
+    </form>
+
+{% endblock %}
+{% block extra_scripts %}
+ <script>
+        $(document).ready(function () {
+
+            /* ===== انتخاب تاریخ شمسی ===== */
+            $('.date-picker').persianDatepicker({
+                format: 'YYYY/MM/DD',
+                autoClose: true,
+                initialValue: false,
+                initialValueType: 'persian',
+                observer: true,
+                calendar: {
+                    persian: {
+                        locale: 'fa',
+                        leapYearMode: 'algorithmic'
+                    }
+                },
+                toolbox: {
+                    todayButton: {
+                        enabled: true,
+                        text: {fa: 'امروز'}
+                    }
+                },
+                timePicker: {
+                    enabled: false
+                }
+            });
+
+            /* ===== انتخاب ساعت (HH:MM:SS با اعداد فارسی) ===== */
+            $('.time-picker').persianDatepicker({
+                format: 'HH:mm:ss',
+                autoClose: true,
+                initialValue: false,
+                onlyTimePicker: true,
+                timePicker: {
+                    enabled: true,
+                    second: {
+                        enabled: true
+                    },
+                    meridiem: {
+                        enabled: false
+                    }
+                }
+            });
+
+        });
+    </script>
+    <script>
+        const editBtn = document.getElementById('edit-driver-btn');
+        const driverIdInput = document.getElementById('driver-id'); // input hidden که ID راننده را نگه می‌دارد
+
+        editBtn.addEventListener('click', function (e) {
+            e.preventDefault();
+            const driverId = driverIdInput.value;
+            if (driverId) {
+                // هدایت به ویو ویرایش راننده با driverId
+                window.location.href = "{% url 'issuance:crud:edit_driver' 0 %}".replace('0', driverId);
+            } else {
+                alert('لطفاً ابتدا یک راننده انتخاب کنید.');
+            }
+        });
+    </script>
+    <script>
+        const editSenderBtn = document.getElementById('edit-sender-btn');
+        const senderIdInput = document.getElementById('sender-id');
+
+        editSenderBtn.addEventListener('click', function (e) {
+            e.preventDefault();
+            const senderId = senderIdInput.value;
+
+            if (senderId) {
+                window.location.href = "{% url 'issuance:crud:edit_customer' 0 %}".replace('0', senderId);
+            } else {
+                alert('لطفاً ابتدا فرستنده را انتخاب کنید.');
+            }
+        });
+    </script>
+    <script>
+        const urls = {
+            searchCustomer: "{% url 'issuance:search:search_customer' %}",
+            searchDriver: "{% url 'issuance:search:search_driver' %}",
+            getVehicleByDriver: "{% url 'issuance:search:get_vehicle_by_driver' %}",
+            searchVehicle: "{% url 'issuance:search:search_vehicle' %}"
+        };
+    </script>
+{% endblock %}

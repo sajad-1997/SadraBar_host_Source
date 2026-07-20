@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block content %}
+    <h2>بارنامه‌های رد شده</h2>
+
+    <table border="1" cellpadding="8" cellspacing="0" width="100%">
+        <thead>
+        <tr>
+            <th>شماره</th>
+            <th>صادرکننده</th>
+            <th>علت رد</th>
+            <th>تاریخ رد</th>
+            <th>عملیات</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        {% for wb in waybills %}
+            <tr>
+                <td>{{ wb.id }}</td>
+                <td>{{ wb.created_by.username }}</td>
+                <td>{{ wb.reject_reason }}</td>
+                <td>{{ wb.updated_at|date:"Y-m-d H:i" }}</td>
+                <td>
+                    <a href="{% url 'issuance:review_waybill' wb.id %}">بررسی مجدد</a>
+                </td>
+            </tr>
+        {% empty %}
+            <tr>
+                <td colspan="5" style="text-align:center;">بارنامه‌ی رد شده‌ای وجود ندارد.</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+{% endblock %}

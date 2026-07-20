@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block content %}
+
+    <h2>بررسی بارنامه شماره {{ waybill.id }}</h2>
+
+
+    <hr>
+
+    <form method="post">
+        {% csrf_token %}
+
+        <label>وضعیت جدید:</label><br><br>
+
+        <label>
+            <input type="radio" name="action" value="approve"> تأیید بارنامه
+        </label>
+        <br><br>
+
+        <label>
+            <input type="radio" name="action" value="reject"> رد بارنامه
+        </label>
+
+        <br><br>
+        <label>علت رد (در صورت انتخاب رد):</label><br>
+        <textarea name="reject_reason" rows="4" cols="50"></textarea>
+
+        <br><br>
+        <button type="submit">ثبت تصمیم</button>
+    </form>
+
+{% endblock %}

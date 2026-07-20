@@ -1,0 +1,196 @@
+{% extends 'homePage/base.html' %}
+{% block title %}ورود / ثبت‌نام{% endblock %}
+
+{% block content %}
+
+<div class="container">
+    <div class="auth-card">
+        <div class="auth-header">
+            <h2 id="login-header">ورود</h2>
+            <h2 id="register-header" style="display: none;">ثبت‌نام</h2>
+        </div>
+
+        <!-- فرم ورود -->
+        <form id="login-form" method="post" action="{% url 'login' %}">
+            {% csrf_token %}
+            <div class="form-group">
+                <label>نام کاربری یا ایمیل</label>
+                <input type="text" name="username" placeholder="نام کاربری یا ایمیل خود را وارد کنید" required>
+            </div>
+            <div class="form-group">
+                <label>رمز عبور</label>
+                <input type="password" name="password" placeholder="رمز عبور شما" required>
+            </div>
+            <button class="btn" type="submit" style="width: 100%;">ورود به حساب</button>
+            <p class="toggle-auth" onclick="showRegister()">حساب کاربری ندارید؟ ثبت‌نام کنید</p>
+        </form>
+
+        <!-- فرم ثبت‌نام -->
+        <form id="register-form" method="post" action="{% url 'register' %}" style="display: none;">
+            {% csrf_token %}
+            <div class="form-group">
+                <label>نام کامل</label>
+                <input type="text" name="full_name" placeholder="نام و نام خانوادگی" required>
+            </div>
+            <div class="form-group">
+                <label>نام کاربری</label>
+                <input type="text" name="username" placeholder="نام کاربری دلخواه" required>
+            </div>
+            <div class="form-group">
+                <label>ایمیل</label>
+                <input type="email" name="email" placeholder="your.email@example.com" required>
+            </div>
+            <div class="form-group">
+                <label>رمز عبور</label>
+                <input type="password" name="password" placeholder="حداقل ۸ کاراکتر" required>
+            </div>
+            <div class="form-group">
+                <label>تکرار رمز عبور</label>
+                <input type="password" name="password_confirm" placeholder="تکرار رمز عبور" required>
+            </div>
+            <button class="btn" type="submit" style="width: 100%;">ایجاد حساب کاربری</button>
+            <p class="toggle-auth" onclick="showLogin()">قبلاً ثبت‌نام کرده‌اید؟ وارد شوید</p>
+        </form>
+
+    </div>
+</div>
+
+<style>
+    .auth-card {
+        background: var(--glass-bg);
+        border: 1px solid var(--glass-border);
+        backdrop-filter: blur(15px);
+        padding: 30px 40px;
+        border-radius: 16px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        max-width: 450px;
+        width: 100%;
+        margin: 40px auto;
+        text-align: center;
+    }
+    .auth-header {
+        margin-bottom: 25px;
+    }
+    .auth-header h2 {
+        color: #fff;
+        font-size: 26px;
+        margin: 0;
+        transition: .3s;
+    }
+    .form-group {
+        margin-bottom: 20px;
+        text-align: right; /* برای تراز کردن لیبل‌ها */
+    }
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        color: #eee;
+        font-weight: bold;
+        font-size: 13px;
+    }
+    .form-group input {
+        width: 100%;
+        padding: 12px 15px;
+        background: rgba(255,255,255,0.2);
+        border: 1px solid rgba(255,255,255,0.3);
+        border-radius: 10px;
+        color: #fff;
+        transition: .2s;
+    }
+    .form-group input::placeholder {
+        color: rgba(255,255,255,0.7);
+    }
+    .form-group input:focus {
+        border-color: #fff;
+        background: rgba(255,255,255,0.3);
+        outline: none;
+    }
+    .auth-card .btn {
+        padding: 12px 20px;
+        border-radius: 10px;
+        font-size: 16px;
+        font-weight: bold;
+    }
+    .toggle-auth {
+        margin-top: 20px;
+        color: rgba(255,255,255,0.8);
+        cursor: pointer;
+        transition: .2s;
+        font-size: 14px;
+    }
+    .toggle-auth:hover {
+        color: #fff;
+    }
+
+    /* استایل‌های انیمیشن */
+    @keyframes slideLeft {
+        from { transform: translateX(0); opacity: 1; }
+        to { transform: translateX(-100%); opacity: 0; }
+    }
+    @keyframes slideRight {
+        from { transform: translateX(-100%); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+    }
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+    @keyframes fadeOut {
+        from { opacity: 1; }
+        to { opacity: 0; }
+    }
+
+    /* کلاس‌های انیمیشن */
+    .slide-out-left { animation: slideLeft .5s ease forwards; }
+    .slide-in-right { animation: slideRight .5s ease forwards; }
+    .fade-out { animation: fadeOut .5s ease forwards; }
+    .fade-in { animation: fadeIn .5s ease forwards; }
+
+</style>
+
+<script>
+    const loginForm = document.getElementById('login-form');
+    const registerForm = document.getElementById('register-form');
+    const loginHeader = document.getElementById('login-header');
+    const registerHeader = document.getElementById('register-header');
+
+    function showRegister() {
+        // انیمیشن خروج فرم ورود
+        loginForm.classList.add('slide-out-left', 'fade-out');
+        loginHeader.classList.add('fade-out');
+
+        // نمایش فرم ثبت‌نام بعد از اتمام انیمیشن
+        setTimeout(() => {
+            loginForm.style.display = 'none';
+            loginForm.classList.remove('slide-out-left', 'fade-out'); // پاک کردن کلاس‌ها برای استفاده مجدد
+            loginHeader.style.display = 'none';
+            loginHeader.classList.remove('fade-out');
+
+            registerForm.style.display = 'block';
+            registerForm.classList.add('slide-in-right', 'fade-in');
+            registerHeader.style.display = 'block';
+            registerHeader.classList.add('fade-in');
+        }, 500); // مدت زمان انیمیشن
+    }
+
+    function showLogin() {
+        // انیمیشن خروج فرم ثبت‌نام
+        registerForm.classList.add('slide-out-left', 'fade-out');
+        registerHeader.classList.add('fade-out');
+
+        // نمایش فرم ورود بعد از اتمام انیمیشن
+        setTimeout(() => {
+            registerForm.style.display = 'none';
+            registerForm.classList.remove('slide-out-left', 'fade-out');
+            registerHeader.style.display = 'none';
+            registerHeader.classList.remove('fade-out');
+
+            loginForm.style.display = 'block';
+            loginForm.classList.add('slide-in-right', 'fade-in');
+            loginHeader.style.display = 'block';
+            loginHeader.classList.add('fade-in');
+        }, 500); // مدت زمان انیمیشن
+    }
+</script>
+
+{% endblock %}

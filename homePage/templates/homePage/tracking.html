@@ -1,0 +1,59 @@
+{% extends 'homePage/base.html' %}
+{% block title %}پیگیری مرسوله{% endblock %}
+
+{% block content %}
+
+<div class="container">
+    <h1 style="text-align:center;">پیگیری وضعیت مرسوله</h1>
+    <p style="text-align:center; margin-bottom: 40px;">کد رهگیری مرسوله خود را وارد کنید.</p>
+
+    <form method="get" action="{% url 'tracking' %}" style="max-width: 500px; margin: 0 auto 50px auto;">
+        {% csrf_token %}
+        <label for="tracking_code">کد رهگیری:</label>
+        <div style="display: flex; gap: 10px;">
+            <input type="text" id="tracking_code" name="tracking_code" required placeholder="مثال: XYZ123456789" style="flex-grow: 1;">
+            <button class="btn" type="submit">جستجو</button>
+        </div>
+    </form>
+
+    {% if tracking_info %}
+    <div class="tracking-container" style="background: var(--glass-bg); padding: 30px; border-radius: 15px; border: 1px solid var(--glass-border);">
+        <h2>وضعیت فعلی مرسوله: {{ tracking_info.status }}</h2>
+        <p><strong>کد رهگیری:</strong> {{ tracking_info.code }}</p>
+        <p><strong>مبدا:</strong> {{ tracking_info.origin }}</p>
+        <p><strong>مقصد:</strong> {{ tracking_info.destination }}</p>
+        <p><strong>تاریخ ثبت:</strong> {{ tracking_info.creation_date }}</p>
+
+        <div class="timeline" style="position: relative; margin-top: 30px; padding-top: 20px;">
+            {% for update in tracking_info.updates %}
+            <div class="timeline-item" style="position: relative; margin-left: 30px; padding-bottom: 25px;">
+                <div style="position: absolute; left: -40px; top: 0; width: 15px; height: 15px; background: var(--primary); border-radius: 50%; border: 4px solid white; box-shadow: 0 0 10px rgba(0,102,255,0.5);"></div>
+                <p style="margin: 0; font-weight: bold;">{{ update.date }} - {{ update.time }}</p>
+                <p style="margin: 5px 0 0 0;">{{ update.description }}</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% elif tracking_code_searched %}
+        <p style="text-align:center; color: red;">مرسوله‌ای با این کد یافت نشد.</p>
+    {% endif %}
+</div>
+
+<style>
+    /* استایل‌های اضافه برای تایم‌لاین */
+    .tracking-container .timeline::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -30px; /* تنظیم فاصله از چپ */
+        width: 3px;
+        height: 100%;
+        background: linear-gradient(to bottom, var(--primary), rgba(0,102,255,0.2));
+        border-radius: 2px;
+    }
+    .tracking-container .timeline-item:last-child {
+        padding-bottom: 0;
+    }
+</style>
+
+{% endblock %}

@@ -1,0 +1,204 @@
+{% extends "issuance/search/base.html" %}
+
+{% block content %}
+<h2>🗂️ مدیریت بارنامه‌های تکراری</h2>
+
+{% if messages %}
+    <div class="mb-3">
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+    </div>
+{% endif %}
+
+<hr>
+
+{#{% if user.groups.filter(name__in=["admin","manager"]).exists %}#}
+<form method="post" action="{% url 'duplicate_audit:scan_duplicates_ui' %}">
+    {% csrf_token %}
+    <button class="btn btn-success mb-3">اسکن بارنامه‌های تکراری</button>
+</form>
+{#{% endif %}#}
+
+{# ---------------- جدول 1: بارنامه‌هایی که اطلاعات محموله متفاوت دارد ---------------- #}
+<h4>📌 بارنامه‌هایی با محموله یکسان</h4>
+{% if duplicates_cargo %}
+<table class="table table-bordered table-striped mb-4">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>کد رهگیری</th>
+            <th>تاریخ صدور</th>
+            <th>صادرکننده</th>
+            <th>فرستنده</th>
+            <th>گیرنده</th>
+            <th>راننده</th>
+            <th>نام محموله</th>
+            <th>وزن</th>
+            <th>عملیات</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for s in duplicates_cargo %}
+        <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ s.tracking_code }}</td>
+            <td>{{ s.issuance_datetime|date:"Y/m/d H:i" }}</td>
+            <td>{{ s.create }}</td>
+            <td>{{ s.sender_name }}</td>
+            <td>{{ s.receiver_name }}</td>
+            <td>{{ s.driver_name }}</td>
+            <td>{{ s.cargo_name }}</td>
+            <td>{{ s.cargo_weight }}</td>
+            <td>
+{#                <a href="{% url 'duplicate_audit:preview_snapshot' s.id %}" class="btn btn-sm btn-primary mb-1">مشاهده</a>#}
+                <a href="{% url 'issuance:manager:manager_preview' s.id %}" class="btn btn-sm btn-primary mb-1">مشاهده</a>
+{#                {% if user.groups.filter(name__in=["admin","manager"]).exists %}#}
+                <form method="post" action="{% url 'duplicate_audit:update_snapshot_status' s.id  'inactive_duplicate'%}" style="display:inline;">
+                    {% csrf_token %}
+                    <select name="final_decision" class="form-select form-select-sm mb-1">
+                        <option value="">انتخاب وضعیت</option>
+                        {% for key, value in s.TYPE_CHOICES %}
+                            <option value="{{ key }}">{{ value }}</option>
+                        {% endfor %}
+                    </select>
+                    <button type="submit" class="btn btn-sm btn-success">اعمال</button>
+                </form>
+{#                {% endif %}#}
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p class="text-muted">بارنامه‌ای با محموله متفاوت وجود ندارد.</p>
+{% endif %}
+
+{# ---------------- جدول 2: بارنامه‌های تایید شده با هزینه یا ارزش متفاوت ---------------- #}
+<h4>📌 بارنامه‌هایی با هزینه / ارزش متفاوت</h4>
+{% if duplicates_fare %}
+<table class="table table-bordered table-striped mb-4">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>کد رهگیری</th>
+            <th>تاریخ صدور</th>
+            <th>صادرکننده</th>
+            <th>فرستنده</th>
+            <th>گیرنده</th>
+            <th>راننده</th>
+            <th>کرایه</th>
+            <th>ارزش محموله</th>
+            <th>هزینه بارگیری</th>
+            <th>هزینه تخلیه</th>
+            <th>هزینه باسکول</th>
+            <th>توضیحات</th>
+            <th>وضعیت نهایی</th>
+            <th>عملیات</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for s in duplicates_fare %}
+        <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ s.tracking_code }}</td>
+            <td>{{ s.original_waybill.issuance_datetime|date:"Y/m/d H:i" }}</td>
+            <td>{{ s.issuer_name }}</td>
+            <td>{{ s.sender_name }}</td>
+            <td>{{ s.receiver_name }}</td>
+            <td>{{ s.driver_name }}</td>
+            <td>{{ s.freight_amount }}</td>
+            <td>{{ s.cargo_value }}</td>
+            <td>{{ s.loading_cost }}</td>
+            <td>{{ s.unloading_cost }}</td>
+            <td>{{ s.scale_cost }}</td>
+            <td>{{ s.description }}</td>
+            <td>{{ s.get_final_decision_display }}</td>
+            <td>
+                <a href="{% url 'issuance:manager:manager_preview' s.id %}" class="btn btn-sm btn-primary mb-1">مشاهده</a>
+{#                {% if user.groups.filter(name__in:["admin","manager"]).exists %}#}
+                <form method="post" action="{% url 'duplicate_audit:update_snapshot_status' s.id 'inactive_duplicate' %}" style="display:inline;">
+                    {% csrf_token %}
+                    <select name="final_decision" class="form-select form-select-sm mb-1">
+                        <option value="">انتخاب وضعیت</option>
+                        <option value="sent">ارسال شده</option>
+                        <option value="duplicate_inactive">تکراری - غیرفعال</option>
+                    </select>
+                    <button type="submit" class="btn btn-sm btn-success">اعمال</button>
+                </form>
+{#                {% endif %}#}
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p class="text-muted">بارنامه‌ای با هزینه / ارزش متفاوت وجود ندارد.</p>
+{% endif %}
+
+{# ---------------- جدول 3: بارنامه‌هایی با فرستنده/گیرنده/راننده متفاوت ---------------- #}
+<h4>📌 بارنامه‌هایی با اطلاعات فرستنده / گیرنده / راننده متفاوت</h4>
+{% if duplicates_info %}
+<table class="table table-bordered table-striped mb-4">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>کد رهگیری</th>
+            <th>تاریخ صدور</th>
+            <th>صادرکننده</th>
+            <th>فرستنده</th>
+            <th>گیرنده</th>
+            <th>راننده</th>
+            <th>نام محموله</th>
+            <th>کرایه</th>
+            <th>ارزش محموله</th>
+            <th>هزینه بارگیری</th>
+            <th>هزینه تخلیه</th>
+            <th>هزینه باسکول</th>
+            <th>توضیحات</th>
+            <th>وضعیت نهایی</th>
+            <th>عملیات</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for s in duplicates_info %}
+        <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ s.tracking_code }}</td>
+            <td>{{ s.original_waybill.issuance_datetime|date:"Y/m/d H:i" }}</td>
+            <td>{{ s.issuer_name }}</td>
+            <td>{{ s.sender_name }}</td>
+            <td>{{ s.receiver_name }}</td>
+            <td>{{ s.driver_name }}</td>
+            <td>{{ s.cargo_name }}</td>
+            <td>{{ s.freight_amount }}</td>
+            <td>{{ s.cargo_value }}</td>
+            <td>{{ s.loading_cost }}</td>
+            <td>{{ s.unloading_cost }}</td>
+            <td>{{ s.scale_cost }}</td>
+            <td>{{ s.description }}</td>
+            <td>{{ s.get_final_decision_display }}</td>
+            <td>
+                <a href="{% url 'duplicate_audit:preview_snapshot' s.id %}" class="btn btn-sm btn-primary mb-1">مشاهده</a>
+{#                {% if user.groups.filter(name__in:["admin","manager"]).exists %}#}
+                <form method="post" action="{% url 'duplicate_audit:update_snapshot_status' s.id %}" style="display:inline;">
+                    {% csrf_token %}
+                    <select name="final_decision" class="form-select form-select-sm mb-1">
+                        <option value="">انتخاب وضعیت</option>
+                        <option value="customer_edited">اصلاح شده - مشتری</option>
+                        <option value="canceled">لغو شده</option>
+                        <option value="sent">ارسال شده</option>
+                    </select>
+                    <button type="submit" class="btn btn-sm btn-success">اعمال</button>
+                </form>
+{#                {% endif %}#}
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p class="text-muted">بارنامه‌ای با اطلاعات متفاوت وجود ندارد.</p>
+{% endif %}
+
+{% endblock %}

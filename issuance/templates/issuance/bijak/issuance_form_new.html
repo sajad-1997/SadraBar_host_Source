@@ -1,0 +1,221 @@
+{% extends 'issuance/base.html' %}
+{% load static %}
+{% block content %}
+    <form method="post" action="{% url 'create_new' %}" id="bijakForm">
+        <div class="container">
+            <h2>فرم ثبت بارنامه جدید</h2>
+
+            {% csrf_token %}
+            <!-- بخش نمایش پیام ها  -->
+            <hr>
+            {% if messages %}
+                <div class="mt-3">
+                    {% for message in messages %}
+                        <div class="alert
+                        {% if message.tags == 'error' %}alert-danger
+                        {% elif message.tags == 'success' %}alert-success
+                        {% else %}alert-info{% endif %}">
+                            {{ message }}
+                        </div>
+                        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+            <hr>
+
+            <!-- === ROW: فرستنده و گیرنده (بازطراحی شده) === -->
+            <div class="row">
+                <!-- فرستنده -->
+                <div class="col-md-6">
+                    <div class="section sender">
+                        <h3>انتخاب فرستنده</h3>
+                        <hr>
+                        <div class="search-wrapper">
+                            <div class="input-with-add">
+                                <input type="text" id="sender-input" class="form-control"
+                                       placeholder="جستجوی فرستنده...">
+                                <a href="{% url 'add_customer' %}" class="add-btn" title="افزودن فرستنده">
+                                    <!-- آیکون + -->
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor"
+                                         aria-hidden="true">
+                                        <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+                                    </svg>
+                                </a>
+                            </div>
+                            <input type="hidden" id="sender-id" name="sender">
+                            <div id="sender-results" class="results-box" aria-live="polite"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- گیرنده -->
+                <div class="col-md-6">
+                    <div class="section receiver">
+                        <h3>انتخاب گیرنده</h3>
+                        <hr>
+                        <div class="search-wrapper">
+                            <div class="input-with-add">
+                                <input type="text" id="receiver-input" class="form-control"
+                                       placeholder="جستجوی گیرنده...">
+                                <a href="{% url 'add_customer' %}" class="add-btn" title="افزودن گیرنده">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor"
+                                         aria-hidden="true">
+                                        <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+                                    </svg>
+                                </a>
+                            </div>
+                            <input type="hidden" id="receiver-id" name="receiver">
+                            <div id="receiver-results" class="results-box" aria-live="polite"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- === ROW: راننده و خودرو === -->
+            <div class="row">
+                <!-- راننده -->
+                <div class="col-md-6">
+                    <div class="section driver">
+                        <h3>اطلاعات راننده</h3>
+                        <hr>
+                        <div class="search-wrapper">
+                            <div class="input-with-add">
+                                <input type="text" id="driver-input" class="form-control"
+                                       placeholder="جستجوی راننده...">
+                                <a href="{% url 'add_driver' %}" class="add-btn" title="افزودن راننده">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor"
+                                         aria-hidden="true">
+                                        <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+                                    </svg>
+                                </a>
+                            </div>
+                            <input type="hidden" id="driver-id" name="driver">
+                            <div id="driver-results" class="results-box" aria-live="polite"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- خودروی راننده (پلاک) -->
+                <div class="col-md-6">
+                    <div class="section vehicle">
+                        <h3>اطلاعات خودروی راننده</h3>
+                        <hr>
+                        <!-- نمایش پلاک بصورت کارت -->
+                        <div class="plate" style="display:flex; flex-direction:column; gap:8px; align-items:center;">
+                            <div class="province" style="font-weight:700;">ایران <span
+                                    id="province">{{ vehicle.license_plate_series }}</span></div>
+
+                            <div class="number-box"
+                                 style="display:flex; gap:8px; align-items:center; justify-content:center;">
+                                <span id="second-number">{{ vehicle.license_plate_three_digit }}</span>
+                                <span class="letter" id="letter">{{ vehicle.license_plate_alphabet }}</span>
+                                <span id="first-number">{{ vehicle.license_plate_two_digit }}</span>
+                            </div>
+
+                            <div class="flag-box" style="display:flex; gap:8px; align-items:center;">
+                                <img src="{% static 'issuance/images/icons8-iran-100.png' %}" alt="Iran"
+                                     style="width:40px;height:auto;">
+                                <span style="font-weight:600;">I.R. IRAN</span>
+                            </div>
+
+                            <div style="width:100%; display:flex; gap:10px; align-items:center; justify-content:center;">
+                                <input type="hidden" id="vehicle-id" name="vehicle">
+                                <a href="{% url 'add_vehicle' %}" class="add-btn" title="افزودن خودرو">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor"
+                                         aria-hidden="true">
+                                        <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+                                    </svg>
+                                </a>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- === بخش‌های بارنامه و محموله/توضیحات (همان قالب قبلی) === -->
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="section shipment">
+                        <h3>اطلاعات بارنامه</h3>
+                        <hr>
+                        {{ shipment_form.as_p }}
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="section cargo">
+                        <h3>اطلاعات محموله</h3>
+                        <hr>
+                        {{ cargo_form.as_p }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- توضیحات و دکمه‌ها -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="section notes">
+                        <h3>توضیحات</h3>
+                        <hr>
+                        <div class="alert alert-info text-center mb-3">
+                            <strong>توضیح پیش‌فرض:</strong>
+                            <span>هر گونه آب خوردگی و خیس شدن بار به مسئولیت راننده میباشد.</span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="caption-select" class="form-label fw-bold">انتخاب توضیح آماده</label>
+                            <select id="caption-select" name="selected_caption" class="form-select">
+                                <option value="">-- انتخاب کنید --</option>
+                                {% for caption in captions %}
+                                    <option value="{{ caption.id }}">{{ caption.content|truncatechars:100 }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="customExplanation" class="form-label fw-bold">توضیح دستی</label>
+                            <textarea id="customExplanation" name="manual_description" rows="3" class="form-control"
+                                      placeholder="اگر توضیح خاصی دارید، اینجا بنویسید..."></textarea>
+                        </div>
+
+                        <div style="text-align:center; margin-top:16px;">
+                            {% if bijak.pk %}
+                                <button type="submit" name="action" value="save_print" class="btn btn-success">ثبت و
+                                    چاپ
+                                </button>
+                            {% else %}
+                                <button class="btn btn-secondary" disabled>پیش‌نمایش</button>
+                            {% endif %}
+
+                            <button type="submit" name="action" value="save" class="btn btn-success">ثبت</button>
+                            <button type="submit" name="action" value="print" class="btn btn-primary">ثبت و چاپ</button>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </form>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/persian-date@1.0.6/dist/persian-date.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/persian-datepicker@1.2.0/dist/js/persian-datepicker.min.js"></script>
+
+    <script>
+        const urls = {
+            searchCustomer: "{% url 'search_customer' %}",
+            searchDriver: "{% url 'search_driver' %}",
+            getVehicleByDriver: "{% url 'get_vehicle_by_driver' %}",
+            searchVehicle: "{% url 'search_vehicle' %}"
+        };
+    </script>
+
+    <script src="{% static 'issuance/shipment_form.js' %}">
+
+    </script>
+
+    {##}
+    {#    </body>#}
+    {#    </html>#}
+{% endblock %}

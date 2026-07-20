@@ -1,0 +1,287 @@
+/* ===================================
+   استایل اصلی قالب مدیریت بارنامه
+   مدرن، شیک و کاملاً ریسپانسیو
+   =================================== */
+
+/* تنظیمات کلی و فونت */
+body {
+    background-color: #f4f6f9;
+    font-family: 'Vazirmatn', 'Tahoma', sans-serif;
+}
+
+.container {
+    max-width: 960px;
+}
+
+/* -----------------------------------
+   کارت اصلی بارنامه
+----------------------------------- */
+.bijak-card {
+    background: #ffffff;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+    transition: transform 0.2s ease;
+}
+
+.bijak-card:hover {
+    transform: translateY(-2px);
+}
+
+.bijak-header {
+    background: linear-gradient(135deg, #2c3e50, #3498db);
+    color: #fff;
+    padding: 1.2rem 2rem;
+    font-size: 1.1rem;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+    border-bottom: 3px solid rgba(255, 255, 255, 0.2);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* -----------------------------------
+   عنوان بخش‌ها
+----------------------------------- */
+.section-title {
+    position: relative;
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.5rem;
+}
+
+.section-title::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 50px;
+    height: 3px;
+    background: #3498db;
+    border-radius: 2px;
+}
+
+/* -----------------------------------
+   جداول
+----------------------------------- */
+.table {
+    background-color: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+    margin-bottom: 2rem;
+}
+
+.table th {
+    background-color: #f8fafc;
+    color: #4a5568;
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+.table td {
+    vertical-align: middle;
+    padding: 1rem;
+    color: #1a202c;
+}
+
+.table-bordered th,
+.table-bordered td {
+    border: 1px solid #edf2f7;
+}
+
+/* -----------------------------------
+   تایم‌لاین سوابق بررسی
+----------------------------------- */
+.timeline {
+    list-style: none;
+    padding-left: 0;
+    position: relative;
+}
+
+.timeline .list-group-item {
+    border: none;
+    background: transparent;
+    padding: 1rem 1rem 1rem 2.5rem;
+    position: relative;
+    border-left: 3px solid #e2e8f0;
+    margin-bottom: 0;
+}
+
+.timeline .list-group-item:last-child {
+    border-left-color: transparent;
+}
+
+.timeline .list-group-item::before {
+    content: '';
+    position: absolute;
+    left: -8px;
+    top: 1.4rem;
+    width: 13px;
+    height: 13px;
+    background: #3498db;
+    border-radius: 50%;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+}
+
+.timeline .list-group-item strong {
+    color: #2d3748;
+}
+
+/* -----------------------------------
+   فرم تصمیم‌گیری مدیر
+----------------------------------- */
+.manager-decision-form {
+    background: #f8fafc;
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-top: 2rem;
+    border: 1px solid #e2e8f0;
+}
+
+.manager-decision-form .form-check {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.manager-decision-form .form-check-input {
+    width: 1.2rem;
+    height: 1.2rem;
+    margin-top: 0;
+    border: 2px solid #cbd5e0;
+    cursor: pointer;
+    accent-color: #3498db; /* رنگ پیش‌فرض برای رادیو باتن */
+}
+
+.manager-decision-form .form-check-label {
+    font-size: 1rem;
+    color: #4a5568;
+    cursor: pointer;
+}
+
+.manager-decision-form textarea {
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 1rem;
+    font-size: 0.95rem;
+    background: #fff;
+    resize: vertical;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.manager-decision-form textarea:focus {
+    border-color: #3498db;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.15);
+}
+
+.manager-decision-form .btn-success {
+    background: linear-gradient(135deg, #27ae60, #2ecc71);
+    border: none;
+    padding: 0.75rem 2rem;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 12px;
+    box-shadow: 0 5px 15px rgba(46, 204, 113, 0.3);
+    transition: all 0.3s ease;
+}
+
+.manager-decision-form .btn-success:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(46, 204, 113, 0.4);
+}
+
+/* دکمه‌های عمومی برای هماهنگی (چاپ/بازگشت) */
+.btn {
+    border-radius: 10px;
+    padding: 0.6rem 1.5rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn-primary {
+    background: #3498db;
+    border-color: #3498db;
+    box-shadow: 0 3px 8px rgba(52, 152, 219, 0.2);
+}
+
+.btn-primary:hover {
+    background: #2980b9;
+    border-color: #2980b9;
+    box-shadow: 0 5px 12px rgba(52, 152, 219, 0.3);
+}
+
+.btn-secondary {
+    background: #a0aec0;
+    border-color: #a0aec0;
+    color: #fff;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+}
+
+.btn-secondary:hover {
+    background: #718096;
+    border-color: #718096;
+}
+
+/* -----------------------------------
+   نشان وضعیت (Badge)
+----------------------------------- */
+.badge {
+    font-size: 0.9rem;
+    padding: 0.4em 0.9em;
+    border-radius: 50px;
+    font-weight: 500;
+}
+
+.bg-success {
+    background: #27ae60 !important;
+}
+
+.bg-danger {
+    background: #e74c3c !important;
+}
+
+.bg-warning {
+    background: #f39c12 !important;
+    color: #1a202c;
+}
+
+/* -----------------------------------
+   واکنش‌گرایی (موبایل)
+----------------------------------- */
+@media (max-width: 768px) {
+    .bijak-header {
+        flex-direction: column;
+        text-align: center;
+        gap: 0.5rem;
+        padding: 1rem;
+    }
+
+    .section-title {
+        font-size: 1.1rem;
+    }
+
+    .table {
+        font-size: 0.85rem;
+    }
+
+    .col-md-6 {
+        margin-bottom: 1.5rem;
+    }
+
+    .manager-decision-form {
+        padding: 1rem;
+    }
+
+    .btn {
+        width: 100%;
+        margin-bottom: 0.5rem;
+    }
+}

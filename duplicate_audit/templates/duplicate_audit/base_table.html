@@ -1,0 +1,35 @@
+<table class="table table-striped table-bordered">
+<thead>
+<tr>
+<th>ردیف</th>
+<th>کد رهگیری</th>
+<th>زمان صدور</th>
+<th>صادرکننده</th>
+<th>فرستنده</th>
+<th>گیرنده</th>
+<th>راننده</th>
+<th>محصول</th>
+<th>وزن</th>
+<th>عملیات</th>
+</tr>
+</thead>
+<tbody>
+{% for s in snapshots %}
+<tr>
+<td>{{ forloop.counter }}</td>
+<td>{{ s.tracking_code }}</td>
+<td>{{ s.original_waybill_id }}</td>
+<td>{{ s.issuer_name }}</td>
+<td>{{ s.sender_name }}</td>
+<td>{{ s.receiver_name }}</td>
+<td>{{ s.driver_name }}</td>
+<td>{{ s.cargo_name }}</td>
+<td>{{ s.cargo_weight }}</td>
+<td>
+<a href="{% url 'waybill_preview' s.original_waybill_id %}" class="btn btn-info btn-sm">مشاهده</a>
+<!-- دکمه های تغییر final_decision را می توان در cluster_detail اضافه کرد -->
+</td>
+</tr>
+{% endfor %}
+</tbody>
+</table>

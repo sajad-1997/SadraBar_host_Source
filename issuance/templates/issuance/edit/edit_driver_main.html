@@ -1,0 +1,131 @@
+{% extends "issuance/base.html" %}
+
+{% block content %}
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} mt-2">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="container">
+        <h3>ویرایش راننده: {{ driver.name }}</h3>
+        <hr>
+        <form method="POST" novalidate>
+            {% csrf_token %}
+            <div class="row">
+                <hr>
+                <small>اطلاعات شخصی</small>
+                <div class="col-md-6">
+                    <label>نام و نام خانوادگی</label>
+                    {{ form.name }}
+                </div>
+                <div class="col-md-6">
+                    <label>کد ملی</label>
+                    {{ form.national_id }}
+                </div>
+                <div class="col-md-6">
+                    <label>نام پدر</label>
+                    {{ form.father_name }}
+                </div>
+                <div class="col-md-6">
+                    <label>تاریخ تولد</label>
+                    {{ form.birth_date }}
+                </div>
+                <hr>
+                <small>اطلاعات ارتباطی و سکونت</small>
+                <div class="col-md-6">
+                    <label>شماره تلفن</label>
+                    {{ form.phone }}
+                </div>
+                <div class="col-md-6">
+                    <label>شماره تلفن 2</label>
+                    {{ form.phone2 }}
+                </div>
+                <div class="col-md-6">
+                    <label>شهر محل سکونت</label>
+                    {{ form.residence }}
+                </div>
+                <div class="col-md-12">
+                    <label>آدرس</label>
+                    {{ form.address }}
+                </div>
+                <hr>
+                <small>اطلاعات گواهینامه و هوشمند</small>
+                <div class="col-md-6">
+                    <label>شماره گواهینامه</label>
+                    {{ form.certificate }}
+                </div>
+                <div class="col-md-6">
+                    <label>تاریخ صدور گواهینامه</label>
+                    {{ form.certificate_date }}
+                </div>
+                <div class="col-md-6">
+                    <label>شماره هوشمند راننده</label>
+                    {{ form.driver_smart_card }}
+                </div>
+                <hr>
+                <small>اطلاعات بیمه نامه</small>
+                <div class="col-md-12">
+                    <label>شماره بیمه نامه</label>
+                    {{ form.insurance_policy_number }}
+                </div>
+                <div class="col-md-12">
+                    <label>تاریخ انقضاء بیمه نامه</label>
+                    {{ form.insurance_policy_expiry }}
+                </div>
+                <hr>
+                <small>اطلاعات بانکی</small>
+                <div class="col-md-12">
+                    <label>شماره کارت</label>
+                    {{ form.bank_card_number }}
+                </div>
+                <div class="col-md-12">
+                    <label>شماره حساب</label>
+                    {{ form.bank_account_number }}
+                </div>
+                <div class="col-md-12">
+                    <label>شماره شبا</label>
+                    {{ form.sheba_bank_number }}
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary mt-3">ذخیره تغییرات</button>
+            <a href="{% url 'issuance:crud:create_new' %}" class="btn btn-secondary mt-3">بازگشت</a>
+        </form>
+    </div>
+
+    <!-- اسکریپت date-picker -->
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/persian-datepicker@1.2.0/dist/css/persian-datepicker.min.css">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/persian-date@1.1.0/dist/persian-date.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/persian-datepicker@1.2.0/dist/js/persian-datepicker.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            // فعال کردن date-picker برای تمام فیلدهای با کلاس date-picker
+            $('.date-picker').persianDatepicker({
+                format: 'YYYY/MM/DD',
+                autoClose: true,
+                initialValue: true, // مقدار اولیه را نمایش بده
+                observer: true,
+                calendar: {
+                    persian: {
+                        locale: 'fa',
+                        leapYearMode: 'algorithmic'
+                    }
+                },
+                toolbox: {
+                    todayButton: {
+                        enabled: true,
+                        text: {fa: 'امروز'}
+                    }
+                },
+                timePicker: {enabled: false}
+            });
+        });
+    </script>
+{% endblock %}

@@ -1,0 +1,12 @@
+{% extends 'issuance/base.html' %}
+
+{% block content %}
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head><meta charset="UTF-8"><title>ثبت موفق</title></head>
+<body style="font-family: sans-serif; text-align: center; margin-top: 100px;">
+  <h2>اطلاعات با موفقیت ثبت شد!</h2>
+  <a href="{% url 'create_new' %}">بازگشت</a>
+</body>
+</html>
+{% endblock content %}

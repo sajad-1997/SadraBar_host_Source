@@ -1,0 +1,48 @@
+{% extends 'issuance/search/base.html' %}
+{% load humanize %}
+
+{% block content %}
+
+<h2>🔍 جستجوی زنده بارنامه‌ها</h2>
+
+<!-- فیلد جستجوی زنده -->
+<div class="card filter-card shadow-sm">
+    <div class="p-3">
+        <input
+            type="text"
+            id="live-search"
+            class="form-control"
+            placeholder="جستجو بر اساس کد رهگیری، نام، راننده، پلاک، مبدا یا مقصد..."
+            autocomplete="off"
+        >
+    </div>
+</div>
+
+<!-- نتایج -->
+<div id="search-results">
+    {% include "issuance/search/partials/bijak_list.html" %}
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    let searchTimer = null;
+
+    $('#live-search').on('keyup', function () {
+        clearTimeout(searchTimer);
+
+        const query = $(this).val();
+
+        searchTimer = setTimeout(function () {
+            $.ajax({
+                url: "{% url 'issuance:search:ajax_search_shipment' %}",
+                data: { q: query },
+                success: function (response) {
+                    $('#search-results').html(response.html);
+                }
+            });
+        }, 300); // debounce
+    });
+</script>
+{% endblock %}

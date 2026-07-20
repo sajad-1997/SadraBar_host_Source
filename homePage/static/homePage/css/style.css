@@ -1,0 +1,816 @@
+/* ----------- تعریف فونت IRANSansWeb ----------- */
+@font-face {
+    font-family: 'IRANSansWeb';
+    src: url('../../fonts/IRANSansWeb.woff2') format('woff2'),
+    url('../../fonts/IRANSansWeb.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap; /* برای بارگذاری بهتر فونت */
+}
+
+@font-face {
+    font-family: 'IRANSansWeb';
+    src: url('../../fonts/IRANSansWeb_Bold.woff2') format('woff2'),
+    url('../../fonts/IRANSansWeb_Bold.woff') format('woff');
+    font-weight: bold;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* ----------- استایل های عمومی ----------- */
+:root {
+    --primary-color: #4CAF50; /* رنگ سبز اصلی */
+    --text-color-dark: #333; /* رنگ متن تیره برای هدر/فوتر */
+    --text-color-light: #f0f0f0; /* رنگ متن روشن برای پس‌زمینه تیره */
+    --background-light: #f8f9fa; /* پس‌زمینه روشن */
+    --background-dark: #212529; /* پس‌زمینه تیره */
+    --glass-bg: rgba(255, 255, 255, 0.15); /* پس‌زمینه شیشه‌ای */
+    --glass-border: rgba(255, 255, 255, 0.2); /* حاشیه شیشه‌ای */
+    --input-bg: rgba(255, 255, 255, 0.25); /* پس‌زمینه ورودی */
+    --input-border: rgba(255, 255, 255, 0.35); /* حاشیه ورودی */
+    --input-focus-border: #ffffff; /* حاشیه ورودی هنگام فوکوس */
+}
+
+body {
+    font-family: 'IRANSansWeb', sans-serif; /* استفاده از فونت تعریف شده */
+    background-color: var(--background-light);
+    color: var(--text-color-dark);
+    margin: 0;
+    padding: 0;
+    line-height: 1.6;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* ----------- هدر ----------- */
+header {
+    background-color: var(--background-dark); /* پس‌زمینه تیره برای هدر */
+    padding: 15px 30px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky; /* هدر چسبان */
+    top: 0;
+    z-index: 1000;
+}
+
+header .logo a {
+    color: var(--text-color-light); /* متن روشن */
+    text-decoration: none;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+header nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+}
+
+header nav ul li {
+    margin-left: 25px;
+}
+
+header nav ul li a {
+    color: var(--text-color-light); /* متن روشن */
+    text-decoration: none;
+    font-size: 16px;
+    transition: color 0.3s ease;
+}
+
+header nav ul li a:hover {
+    color: var(--primary-color); /* سبز هنگام هاور */
+}
+
+/* ----------- فوتر ----------- */
+footer {
+    background-color: var(--background-dark); /* پس‌زمینه تیره برای فوتر */
+    color: var(--text-color-light); /* متن روشن */
+    text-align: center;
+    padding: 20px 30px;
+    margin-top: auto; /* چسباندن فوتر به پایین صفحه */
+    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.2);
+}
+
+footer p {
+    margin: 0;
+    font-size: 14px;
+}
+
+footer a {
+    color: var(--text-color-light);
+    text-decoration: none;
+    font-weight: bold;
+}
+
+footer a:hover {
+    color: var(--primary-color);
+}
+
+/* ----------- دکمه ها ----------- */
+.btn {
+    background-color: var(--primary-color); /* دکمه اصلی سبز */
+    color: white !important; /* رنگ متن سفید برای دکمه */
+    padding: 12px 25px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    text-decoration: none !important; /* حذف خط زیر لینک ها */
+    display: inline-block; /* برای اعمال padding و margin */
+}
+
+.btn:hover {
+    background-color: #388E3C; /* سبز تیره‌تر هنگام هاور */
+    transform: translateY(-2px);
+}
+
+.btn-secondary {
+    background-color: var(--glass-bg);
+    color: var(--text-color-light) !important;
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(10px);
+    padding: 10px 20px;
+    font-size: 15px;
+}
+
+.btn-secondary:hover {
+    background-color: rgba(255, 255, 255, 0.3);
+    color: var(--text-color-light) !important;
+}
+
+/* ----------- استایل عمومی محتوا ----------- */
+.container {
+    max-width: 1140px;
+    margin: 40px auto;
+    padding: 0 20px;
+    flex-grow: 1; /* برای اینکه محتوا فضای موجود را پر کند */
+    width: 100%;
+}
+
+/* ----------- استایل فرم ها (مانند services.html) ----------- */
+.form-container {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(15px);
+    padding: 30px;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    max-width: 600px;
+    margin: 20px auto;
+}
+
+.form-container h2 {
+    color: var(--text-color-dark); /* رنگ عنوان فرم تیره */
+    margin-bottom: 25px;
+    text-align: center;
+}
+
+.form-group {
+    margin-bottom: 20px;
+    text-align: right;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--text-color-dark); /* رنگ لیبل فرم تیره */
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.form-group input,
+.form-group textarea {
+    width: 100%;
+    padding: 12px 15px;
+    background: var(--input-bg); /* پس‌زمینه ورودی شیشه‌ای */
+    border: 1px solid var(--input-border); /* حاشیه ورودی */
+    border-radius: 10px;
+    color: var(--text-color-dark); /* رنگ متن ورودی تیره */
+    transition: border-color 0.3s ease, background-color 0.3s ease;
+    box-sizing: border-box; /* برای محاسبه padding و border در width */
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+    color: rgba(51, 51, 51, 0.7); /* رنگ placeholder تیره */
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+    border-color: var(--input-focus-border); /* حاشیه سفید */
+    background-color: rgba(255, 255, 255, 0.35); /* پس‌زمینه روشن‌تر */
+    outline: none;
+}
+
+/* styling for the submit button inside form-container */
+.form-container .btn {
+    width: 100%;
+    padding: 14px;
+    font-size: 17px;
+}
+
+/* ---- استایل های صفحه ورود/ثبت نام (auth.html) ---- */
+.auth-card {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(15px);
+    padding: 30px 40px;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    max-width: 450px;
+    width: 100%;
+    margin: 40px auto;
+    text-align: center;
+}
+
+.auth-header {
+    margin-bottom: 25px;
+}
+
+.auth-header h2 {
+    color: var(--text-color-light); /* متن روشن برای عنوان auth */
+    font-size: 26px;
+    margin: 0;
+    transition: .3s;
+}
+
+.auth-card .form-group {
+    margin-bottom: 20px;
+    text-align: right;
+}
+
+.auth-card .form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: #eee; /* رنگ لیبل کمی روشن تر */
+    font-weight: bold;
+    font-size: 13px;
+}
+
+.auth-card .form-group input {
+    width: 100%;
+    padding: 12px 15px;
+    background: var(--input-bg); /* استفاده از پس‌زمینه ورودی عمومی */
+    border: 1px solid var(--input-border); /* استفاده از حاشیه ورودی عمومی */
+    border-radius: 10px;
+    color: var(--text-color-light); /* رنگ متن ورودی روشن */
+    transition: .2s;
+}
+
+.auth-card .form-group input::placeholder {
+    color: rgba(240, 240, 240, 0.7); /* رنگ placeholder روشن */
+}
+
+.auth-card .form-group input:focus {
+    border-color: var(--input-focus-border); /* حاشیه سفید */
+    background: rgba(255, 255, 255, 0.35); /* پس‌زمینه روشن‌تر */
+    outline: none;
+}
+
+.auth-card .btn {
+    padding: 12px 20px;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: bold;
+    width: 100%; /* دکمه ورود/ثبت نام عرض کامل */
+}
+
+.toggle-auth {
+    margin-top: 20px;
+    color: rgba(255, 255, 255, 0.8);
+    cursor: pointer;
+    transition: .2s;
+    font-size: 14px;
+}
+
+.toggle-auth:hover {
+    color: #fff;
+}
+
+/* ----------- آیکون ها ----------- */
+.icon {
+    font-size: 20px;
+    margin-right: 10px;
+    vertical-align: middle;
+}
+
+/* ----------- responsive ----------- */
+@media (max-width: 768px) {
+    header {
+        flex-direction: column;
+        padding: 10px;
+    }
+
+    header nav ul {
+        margin-top: 15px;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    header nav ul li {
+        margin: 5px 15px;
+    }
+
+    .container {
+        padding: 0 15px;
+    }
+
+    .auth-card, .form-container {
+        padding: 25px;
+        margin: 20px auto;
+    }
+
+    .auth-header h2 {
+        font-size: 22px;
+    }
+}
+
+/* --- Global Styles for the Form --- */
+.booking-form-container { /* اگر فرم شما در یک کانتینر قرار دارد */
+    background-color: white;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    max-width: 600px; /* تنظیم عرض فرم */
+    margin: 50px auto; /* برای وسط چین کردن و اضافه کردن فاصله */
+    overflow: hidden;
+    font-family: 'IRANSansWeb', sans-serif; /* استفاده از فونت */
+}
+
+.booking-form-container h3 {
+    text-align: center;
+    color: #007bff; /* رنگ اصلی */
+    margin-bottom: 25px;
+    font-size: 26px;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 10px;
+}
+
+/* --- Step Styles --- */
+.steps {
+    display: none; /* همه مراحل به طور پیش‌فرض مخفی هستند */
+    animation: fadeIn 0.5s ease-in-out; /* انیمیشن ورود */
+}
+
+.steps.active {
+    display: block; /* مرحله فعال نمایش داده می‌شود */
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.steps label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: #444;
+    font-size: 14px;
+}
+
+/* --- Input Field Styles --- */
+.steps input[type="text"],
+.steps input[type="number"],
+.steps textarea,
+.steps select {
+    width: 100%;
+    padding: 14px 18px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    box-sizing: border-box; /* padding و border در عرض کل لحاظ شوند */
+    font-family: 'IRANSansWeb', sans-serif; /* اطمینان از فونت */
+    font-size: 15px;
+    color: #333;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    background-color: #fdfdfd;
+    margin-bottom: 20px; /* فاصله پایین فیلد */
+}
+
+.steps input:focus,
+.steps textarea:focus,
+.steps select:focus {
+    outline: none;
+    border-color: #007bff; /* رنگ فوکوس */
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.2); /* سایه ملایم */
+    background-color: white;
+}
+
+/* Placeholder styling */
+.steps input::placeholder,
+.steps textarea::placeholder {
+    color: #aaa;
+}
+
+.steps textarea {
+    resize: vertical; /* اجازه تغییر اندازه عمودی */
+}
+
+/* Styling for select dropdown arrow (optional, might need more complex CSS) */
+.steps select {
+    appearance: none; /* حذف استایل پیش‌فرض مرورگر */
+    background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2220%22%20height%3D%2210%22%20fill%3D%22%23555%22%3E%3Cpath%20d%3D%22M2%202L10%208l8-6%22%2F%3E%3C%2Fsvg%3E');
+    background-repeat: no-repeat;
+    background-position: left 15px top 50%;
+    background-size: 12px;
+    padding-left: 40px; /* فضای کافی برای آیکون */
+}
+
+
+/* --- Step Navigation Buttons --- */
+.step-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+}
+
+.step-buttons .btn {
+    background-color: #6c757d; /* رنگ ثانویه */
+    color: white;
+    padding: 12px 25px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-family: 'IRANSansWeb', sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    text-decoration: none; /* برای span هایی که نقش دکمه دارند */
+    display: inline-block;
+}
+
+.step-buttons .btn:hover {
+    background-color: #5a6268;
+    transform: translateY(-1px);
+}
+
+/* Style for the next/submit button */
+.step-buttons .btn:nth-of-type(2) { /* دکمه دوم در هر مرحله (معمولا next یا submit) */
+    background-color: #007bff; /* رنگ اصلی */
+}
+
+.step-buttons .btn:nth-of-type(2):hover {
+    background-color: #0056b3;
+}
+
+/* Style for the submit button specifically */
+.steps #step3 .step-buttons button[type="submit"] {
+    background-color: #28a745; /* رنگ سبز برای تایید نهایی */
+    color: white;
+}
+
+.steps #step3 .step-buttons button[type="submit"]:hover {
+    background-color: #218838;
+}
+
+/* Disable previous button on first step and submit button until valid (if needed) */
+.steps .step-buttons span:first-child:disabled { /* Example if you add disabled attribute */
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* --- Responsive Adjustments --- */
+@media (max-width: 768px) {
+    .booking-form-container {
+        margin: 30px 15px;
+        padding: 25px;
+    }
+
+    .steps h3 {
+        font-size: 22px;
+    }
+
+    .step-buttons .btn {
+        padding: 10px 20px;
+        font-size: 14px;
+    }
+}
+
+
+/* ----------- استایل های عمومی ----------- */
+:root {
+    --primary-color: #4CAF50; /* رنگ سبز اصلی */
+    --text-color-dark: #333; /* رنگ متن تیره برای هدر/فوتر */
+    --text-color-light: #f0f0f0; /* رنگ متن روشن برای پس‌زمینه تیره */
+    --background-light: #f8f9fa; /* پس‌زمینه روشن */
+    --background-dark: #212529; /* پس‌زمینه تیره */
+    --glass-bg: rgba(255, 255, 255, 0.15); /* پس‌زمینه شیشه‌ای */
+    --glass-border: rgba(255, 255, 255, 0.2); /* حاشیه شیشه‌ای */
+    --input-bg: rgba(255, 255, 255, 0.25); /* پس‌زمینه ورودی */
+    --input-border: rgba(255, 255, 255, 0.35); /* حاشیه ورودی */
+    --input-focus-border: #ffffff; /* حاشیه ورودی هنگام فوکوس */
+}
+
+body {
+    font-family: 'Vazirmatn', sans-serif;
+    background-color: var(--background-light); /* پس‌زمینه کلی روشن */
+    color: var(--text-color-dark); /* رنگ متن پیش‌فرض تیره */
+    margin: 0;
+    padding: 0;
+    line-height: 1.6;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh; /* حداقل ارتفاع صفحه نمایش */
+}
+
+/* ----------- هدر ----------- */
+header {
+    background-color: var(--background-dark); /* پس‌زمینه تیره برای هدر */
+    padding: 15px 30px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky; /* هدر چسبان */
+    top: 0;
+    z-index: 1000;
+}
+
+header .logo a {
+    color: var(--text-color-light); /* متن روشن */
+    text-decoration: none;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+header nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+}
+
+header nav ul li {
+    margin-left: 25px;
+}
+
+header nav ul li a {
+    color: var(--text-color-light); /* متن روشن */
+    text-decoration: none;
+    font-size: 16px;
+    transition: color 0.3s ease;
+}
+
+header nav ul li a:hover {
+    color: var(--primary-color); /* سبز هنگام هاور */
+}
+
+/* ----------- فوتر ----------- */
+footer {
+    background-color: var(--background-dark); /* پس‌زمینه تیره برای فوتر */
+    color: var(--text-color-light); /* متن روشن */
+    text-align: center;
+    padding: 20px 30px;
+    margin-top: auto; /* چسباندن فوتر به پایین صفحه */
+    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.2);
+}
+
+footer p {
+    margin: 0;
+    font-size: 14px;
+}
+
+footer a {
+    color: var(--text-color-light);
+    text-decoration: none;
+    font-weight: bold;
+}
+
+footer a:hover {
+    color: var(--primary-color);
+}
+
+/* ----------- دکمه ها ----------- */
+.btn {
+    background-color: var(--primary-color); /* دکمه اصلی سبز */
+    color: white !important; /* رنگ متن سفید برای دکمه */
+    padding: 12px 25px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    text-decoration: none !important; /* حذف خط زیر لینک ها */
+    display: inline-block; /* برای اعمال padding و margin */
+}
+
+.btn:hover {
+    background-color: #388E3C; /* سبز تیره‌تر هنگام هاور */
+    transform: translateY(-2px);
+}
+
+.btn-secondary {
+    background-color: var(--glass-bg);
+    color: var(--text-color-light) !important; /* تاکید روی رنگ متن */
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(10px);
+    padding: 10px 20px; /* کمی کوچکتر از دکمه اصلی */
+    font-size: 15px;
+}
+
+.btn-secondary:hover {
+    background-color: rgba(255, 255, 255, 0.3);
+    color: var(--text-color-light) !important; /* حفظ رنگ متن */
+}
+
+/* ----------- استایل عمومی محتوا ----------- */
+.container {
+    max-width: 1140px;
+    margin: 40px auto;
+    padding: 0 20px;
+    flex-grow: 1; /* برای اینکه محتوا فضای موجود را پر کند */
+    width: 100%;
+}
+
+/* ----------- استایل فرم ها (مانند services.html) ----------- */
+.form-container {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(15px);
+    padding: 30px;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    max-width: 600px;
+    margin: 20px auto;
+}
+
+.form-container h2 {
+    color: var(--text-color-dark); /* رنگ عنوان فرم تیره */
+    margin-bottom: 25px;
+    text-align: center;
+}
+
+.form-group {
+    margin-bottom: 20px;
+    text-align: right;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--text-color-dark); /* رنگ لیبل فرم تیره */
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.form-group input,
+.form-group textarea {
+    width: 100%;
+    padding: 12px 15px;
+    background: var(--input-bg); /* پس‌زمینه ورودی شیشه‌ای */
+    border: 1px solid var(--input-border); /* حاشیه ورودی */
+    border-radius: 10px;
+    color: var(--text-color-dark); /* رنگ متن ورودی تیره */
+    transition: border-color 0.3s ease, background-color 0.3s ease;
+    box-sizing: border-box; /* برای محاسبه padding و border در width */
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+    color: rgba(51, 51, 51, 0.7); /* رنگ placeholder تیره */
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+    border-color: var(--input-focus-border); /* حاشیه سفید */
+    background-color: rgba(255, 255, 255, 0.35); /* پس‌زمینه روشن‌تر */
+    outline: none;
+}
+
+/* styling for the submit button inside form-container */
+.form-container .btn {
+    width: 100%;
+    padding: 14px;
+    font-size: 17px;
+}
+
+/* ----------- استایل های صفحه ورود/ثبت نام (auth.html) ----------- */
+.auth-card {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(15px);
+    padding: 30px 40px;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    max-width: 450px;
+    width: 100%;
+    margin: 40px auto;
+    text-align: center;
+}
+
+.auth-header {
+    margin-bottom: 25px;
+}
+
+.auth-header h2 {
+    color: var(--text-color-light); /* متن روشن برای عنوان auth */
+    font-size: 26px;
+    margin: 0;
+    transition: .3s;
+}
+
+.auth-card .form-group {
+    margin-bottom: 20px;
+    text-align: right;
+}
+
+.auth-card .form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: #eee; /* رنگ لیبل کمی روشن تر */
+    font-weight: bold;
+    font-size: 13px;
+}
+
+.auth-card .form-group input {
+    width: 100%;
+    padding: 12px 15px;
+    background: var(--input-bg); /* پس‌زمینه ورودی شیشه‌ای */
+    border: 1px solid var(--input-border); /* حاشیه ورودی */
+    border-radius: 10px;
+    color: var(--text-color-light); /* رنگ متن ورودی روشن */
+    transition: .2s;
+}
+
+.auth-card .form-group input::placeholder {
+    color: rgba(240, 240, 240, 0.7); /* رنگ placeholder روشن */
+}
+
+.auth-card .form-group input:focus {
+    border-color: var(--input-focus-border); /* حاشیه سفید */
+    background: rgba(255, 255, 255, 0.35); /* پس‌زمینه روشن‌تر */
+    outline: none;
+}
+
+.auth-card .btn {
+    padding: 12px 20px;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: bold;
+    width: 100%; /* دکمه ورود/ثبت نام عرض کامل */
+}
+
+.toggle-auth {
+    margin-top: 20px;
+    color: rgba(255, 255, 255, 0.8);
+    cursor: pointer;
+    transition: .2s;
+    font-size: 14px;
+}
+
+.toggle-auth:hover {
+    color: #fff;
+}
+
+/* ----------- آیکون ها ----------- */
+.icon {
+    font-size: 20px;
+    margin-right: 10px;
+    vertical-align: middle;
+}
+
+/* ----------- responsive ----------- */
+@media (max-width: 768px) {
+    header {
+        flex-direction: column;
+        padding: 10px;
+    }
+
+    header nav ul {
+        margin-top: 15px;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    header nav ul li {
+        margin: 5px 15px;
+    }
+
+    .container {
+        padding: 0 15px;
+    }
+
+    .auth-card, .form-container {
+        padding: 25px;
+        margin: 20px auto;
+    }
+
+    .auth-header h2 {
+        font-size: 22px;
+    }
+}

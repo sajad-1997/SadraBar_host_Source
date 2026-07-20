@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html dir="rtl">
+<head><meta charset="UTF-8"><title>ورود شماره</title></head>
+<body>
+    <h2>تأیید دو مرحله‌ای</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">ارسال کد</button>
+    </form>
+    {% if messages %}
+        <ul>{% for msg in messages %}<li>{{ msg }}</li>{% endfor %}</ul>
+    {% endif %}
+</body>
+</html>

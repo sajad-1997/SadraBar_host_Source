@@ -1,0 +1,17 @@
+<div style="border:1px solid #333; padding:15px; margin:15px 0;">
+    <h3>پیش‌نمایش اطلاعات بارنامه</h3>
+
+    <p><strong>شماره بارنامه:</strong> {{ waybill.id }}</p>
+    <p><strong>فرستنده:</strong> {{ waybill.sender }}</p>
+    <p><strong>گیرنده:</strong> {{ waybill.receiver }}</p>
+    <p><strong>مبدا:</strong> {{ waybill.source }}</p>
+    <p><strong>مقصد:</strong> {{ waybill.destination }}</p>
+    <p><strong>نوع کالا:</strong> {{ waybill.cargo_type }}</p>
+    <p><strong>وزن:</strong> {{ waybill.weight }} کیلوگرم</p>
+    <p><strong>تاریخ ایجاد:</strong> {{ waybill.created_at|date:"Y-m-d H:i" }}</p>
+    <p><strong>وضعیت فعلی:</strong> {{ waybill.get_status_display }}</p>
+
+    {% if waybill.reject_reason %}
+        <p style="color:red;"><strong>علت آخرین رد:</strong> {{ waybill.reject_reason }}</p>
+    {% endif %}
+</div>

@@ -1,0 +1,138 @@
+{% extends 'issuance/search/base.html' %}
+{% block content %}
+
+<h2>🚛 لیست رانندگان</h2>
+
+<!-- فرم فیلتر -->
+<div class="card filter-card shadow-sm">
+    <form method="get">
+        <div class="row g-2">
+            <div class="col-12 col-md-3">
+                <input type="text" name="name" value="{{ filters.name }}"
+                       class="form-control" placeholder="نام راننده">
+            </div>
+
+            <div class="col-12 col-md-3">
+                <input type="text" name="national_id" value="{{ filters.national_id }}"
+                       class="form-control" placeholder="کد ملی">
+            </div>
+
+            <div class="col-12 col-md-3">
+                <input type="text" name="phone" value="{{ filters.phone }}"
+                       class="form-control" placeholder="شماره تماس">
+            </div>
+
+            <div class="col-12 col-md-3">
+                <input type="text" name="certificate" value="{{ filters.certificate }}"
+                       class="form-control" placeholder="شماره گواهینامه">
+            </div>
+        </div>
+
+        <div class="row g-2 mt-2">
+            <div class="col-12 col-md-3">
+                <input type="text" name="smart_card" value="{{ filters.smart_card }}"
+                       class="form-control" placeholder="کارت هوشمند راننده">
+            </div>
+
+            <div class="col-6 col-md-3">
+                <button type="submit" class="btn w-100">اعمال فیلتر</button>
+            </div>
+
+            <div class="col-6 col-md-3">
+                <a href="{% url 'issuance:manager:driver_list' %}"
+                   class="btn btn-outline-secondary w-100">پاکسازی فیلتر</a>
+            </div>
+        </div>
+    </form>
+</div>
+
+
+<!-- کارت موبایل -->
+{% for d in drivers %}
+<div class="bijak-card">
+
+    <div class="bijak-header">
+        {{ d.name }} | کد ملی: {{ d.national_id }}
+    </div>
+
+    <div class="bijak-row">
+        <span>تماس: {{ d.phone }}</span>
+        <span>گواهینامه: {{ d.certificate }}</span>
+    </div>
+
+    <div class="bijak-row">
+        <span>کارت هوشمند: {{ d.driver_smart_card|default:"---" }}</span>
+        <span>شهر: {{ d.residence|default:"---" }}</span>
+    </div>
+
+    <div class="bijak-row">
+        <span>پلاک‌ها:</span>
+        <span>
+            {% for v in d.vehicle_set.all %}
+                {{ v.license_plate_two_digit }}
+                {{ v.license_plate_alphabet }}
+                {{ v.license_plate_three_digit }}
+                ایران {{ v.license_plate_series }}
+                <br>
+            {% empty %}
+                ثبت نشده
+            {% endfor %}
+        </span>
+    </div>
+
+    <div class="btn-group-card">
+        <a href="{% url 'issuance:crud:edit_driver' d.pk %}"
+           class="btn btn-sm btn-warning w-100">ویرایش</a>
+    </div>
+
+</div>
+{% empty %}
+<p class="text-center mt-3">هیچ راننده‌ای یافت نشد</p>
+{% endfor %}
+
+
+
+<!-- جدول دسکتاپ -->
+<table class="desktop-table">
+    <thead>
+    <tr>
+        <th>نام</th>
+        <th>کد ملی</th>
+        <th>تلفن</th>
+        <th>گواهینامه</th>
+        <th>کارت هوشمند</th>
+        <th>شهر</th>
+        <th>پلاک خودرو</th>
+        <th>عملیات</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for d in drivers %}
+    <tr>
+        <td>{{ d.name }}</td>
+        <td>{{ d.national_id }}</td>
+        <td>{{ d.phone }}</td>
+        <td>{{ d.certificate }}</td>
+        <td>{{ d.driver_smart_card|default:"---" }}</td>
+        <td>{{ d.residence|default:"---" }}</td>
+        <td>
+            {% for v in d.vehicle_set.all %}
+                {{ v.license_plate_two_digit }}
+                {{ v.license_plate_alphabet }}
+                {{ v.license_plate_three_digit }}
+                ایران {{ v.license_plate_series }}
+                <br>
+            {% empty %}
+                ---
+            {% endfor %}
+        </td>
+        <td>
+            <a href="{% url 'issuance:crud:edit_driver' d.pk %}"
+               class="btn btn-sm btn-warning">ویرایش</a>
+        </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

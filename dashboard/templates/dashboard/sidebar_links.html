@@ -1,0 +1,27 @@
+<div class="sidebar-header">
+    <h5>پنل مدیریت</h5>
+    <a href="{% url 'home' %}">صفحه اصلی</a>
+
+</div>
+<div class="sidebar-divider"></div>
+
+
+<div class="sidebar-section">گزارش گیری</div>
+<a href="{% url 'report:report_dashboard' %}">گزارش بارنامه‌ها</a>
+<a href="#">گزارش بیمه</a>
+
+<div class="sidebar-divider"></div>
+
+<div class="sidebar-section">عملیاتی</div>
+<a href="{% url 'issuance:crud:create_new' %}">صدور بارنامه</a>
+<a href="{% url 'issuance:manager:waiting_list' %}">تأیید / رد بارنامه</a>
+<a href="{% url 'issuance:search:search_shipment' %}">جستجوی بارنامه</a>
+<a href="{% url 'issuance:manager:status_list' %}">وضعیت بارنامه‌</a>
+
+
+<div class="sidebar-divider"></div>
+
+<div class="sidebar-section">مشاهده</div>
+<a href="#">لیست کاربران</a>
+<a href="#">لیست مشتریان</a>
+<a href="{% url 'issuance:manager:driver_list' %}">لیست رانندگان</a>

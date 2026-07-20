@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>افزودن توضیحات</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            direction: rtl;
+            margin: 50px;
+        }
+
+        .form-box {
+            max-width: 600px;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+        }
+
+        label {
+            display: block;
+            margin-top: 10px;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+        }
+
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background: #28a745;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+<h3>افزودن توضیحات در پاورقی</h3>
+
+<form method="post">
+    {% csrf_token %}
+
+    <div class="mb-3">
+        <label>عنوان توضیحات:</label>
+        <input type="text" name="name" class="form-control" required>
+    </div>
+
+    <div class="mb-3">
+        <label>محتوای توضیحات:</label>
+        <input type="text" name="content" class="form-control" required>
+    </div>
+
+    <button type="submit" class="btn btn-success">ذخیره</button>
+    <div class="btn btn-success">
+        <a href="{% url 'create_new' %}">صفحه اصلی</a>
+    </div>
+</form>
+
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-success" id="success-message">
+            {{ message }}
+        </div>
+    {% endfor %}
+{% endif %}
+
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    // پیام بعد از چند ثانیه محو بشه
+    setTimeout(function () {
+        let msg = document.getElementById("success-message");
+        if (msg) {
+            msg.style.transition = "opacity 1s";
+            msg.style.opacity = 0;
+        }
+    }, 3000); // شروع محو شدن بعد از 3 ثانیه
+</script>
+</body>
+</html>

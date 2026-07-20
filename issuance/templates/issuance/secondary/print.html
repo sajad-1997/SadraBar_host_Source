@@ -1,0 +1,431 @@
+{% load static %}
+{% load jalali_tags %}
+
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="utf-8">
+    <title>پیش‌نمایش بارنامه</title>
+
+    <!-- Bootstrap (اختیاری اما پیشنهاد می‌شود) -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
+
+    <style>
+        /* اندازه A5: 148mm × 210mm  */
+        @page {
+            size: A5 portrait;
+            margin: 10mm;
+        }
+
+        html, body {
+            background: #f6f7fb;
+            height: 100%;
+            font-family: Vazirmatn, IRANSans, Segoe UI, Tahoma, sans-serif;
+        }
+
+        .sheet {
+            width: 148mm;
+            min-height: 210mm;
+            background: #fff;
+            margin: 16px auto;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, .08);
+            border-radius: 12px;
+            padding: 10mm;
+        }
+
+        .section-card {
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 12px;
+            background: #fff;
+        }
+
+        .section-title {
+            font-weight: 700;
+            font-size: 14px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .kv .k {
+            color: #6b7280;
+            min-width: 90px;
+            display: inline-block;
+        }
+
+        .kv .v {
+            color: #111827;
+            font-weight: 500;
+        }
+
+        .divider {
+            height: 1px;
+            background: #f1f2f6;
+            margin: 10px 0;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .brand {
+            font-size: 16px;
+            font-weight: 800;
+        }
+
+        .meta {
+            font-size: 12px;
+            color: #374151;
+        }
+
+        .actions-top {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        @media print {
+            html, body {
+                background: #fff;
+            }
+
+            .sheet {
+                box-shadow: none;
+                margin: 0 auto;
+            }
+
+            .no-print {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container my-3">
+    <div class="no-print d-flex justify-content-between align-items-center mb-2">
+        <h1 class="h5 m-0">پیش‌نمایش بارنامه</h1>
+        <div class="d-flex gap-2">
+            <a href="{% url 'issuance:crud:create_new' %}" class="btn btn-outline-secondary btn-sm">بازگشت به فرم</a>
+            <button onclick="window.print()" class="btn btn-primary btn-sm">چاپ</button>
+        </div>
+    </div>
+
+    <!-- برگه A5 -->
+    <div class="sheet">
+        <!-- هدر -->
+        <div class="header">
+            <div class="brand">بارنامه / بیجک</div>
+            <div class="meta text-end">
+                <div>کد رهگیری: <strong>{{ bijak.tracking_code|default:"—" }}</strong></div>
+                <div>تاریخ بارنامه: <strong>{{ bijak.issuance_date }}</strong></div>
+            </div>
+        </div>
+        <div class="divider"></div>
+
+        <!-- ردیف اول: فرستنده / گیرنده -->
+        <div class="row g-3">
+            <!-- فرستنده -->
+            <div class="col-12 col-md-6">
+                <div class="section-card">
+                    <div class="section-title">
+                        <span>فرستنده</span>
+                        <a href="{% url 'issuance:crud:edit_customer' %}" class="btn btn-sm btn-outline-primary">ویرایش</a>
+                    </div>
+                    <div class="kv"><span class="k">نام:</span> <span class="v">{{ shipment.sender.name }}</span></div>
+                    <div class="kv"><span class="k">کد ملی:</span> <span
+                            class="v">{{ shipment.sender.national_id|default:"—" }}</span></div>
+                    <div class="kv"><span class="k">آدرس:</span> <span
+                            class="v">{{ shipment.sender.address|default:"—" }}</span></div>
+                </div>
+            </div>
+
+            <!-- گیرنده -->
+            <div class="col-12 col-md-6">
+                <div class="section-card">
+                    <div class="section-title">
+                        <span>گیرنده</span>
+                        <a href="{% url 'issuance:crud:edit_customer' %}" class="btn btn-sm btn-outline-primary">ویرایش</a>
+                    </div>
+                    <div class="kv"><span class="k">نام:</span> <span
+                            class="v">{{ shipment.Customer.first_name }} {{ shipment.Customer.last_name }}</span></div>
+                    <div class="kv"><span class="k">کد ملی:</span> <span
+                            class="v">{{ shipment.Customer.national_id|default:"—" }}</span></div>
+                    <div class="kv"><span class="k">آدرس:</span> <span
+                            class="v">{{ shipment.Customer.address|default:"—" }}</span></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- ردیف دوم: راننده / خودرو -->
+        <div class="row g-3">
+            <!-- راننده -->
+            <div class="col-12 col-md-6">
+                <div class="section-card">
+                    <div class="section-title">
+                        <span>راننده</span>
+                        <a href="{% url 'edit_driver' %}" class="btn btn-sm btn-outline-primary">ویرایش</a>
+                    </div>
+                    <div class="kv"><span class="k">نام:</span> <span
+                            class="v">{{ shipment.driver.first_name }} {{ shipment.driver.last_name }}</span></div>
+                    <div class="kv"><span class="k">کد ملی:</span> <span
+                            class="v">{{ shipment.driver.national_id|default:"—" }}</span></div>
+                    <div class="kv"><span class="k">تاریخ تولد:</span> <span
+                            class="v">{{ shipment.driver.birth_date|default:"—" }}</span></div>
+                    <div class="kv"><span class="k">شماره گواهی‌نامه:</span> <span
+                            class="v">{{ shipment.driver.license_number|default:"—" }}</span></div>
+                    <div class="kv"><span class="k">تاریخ صدور گواهی‌نامه:</span> <span
+                            class="v">{{ shipment.driver.license_issue_date|default:"—" }}</span></div>
+                    <div class="kv"><span class="k">موبایل:</span> <span
+                            class="v">{{ shipment.driver.phone|default:"—" }}</span></div>
+                    <div class="kv"><span class="k">تلفن منزل:</span> <span
+                            class="v">{{ shipment.driver.home_phone|default:"—" }}</span></div>
+                    <div class="kv"><span class="k">آدرس:</span> <span
+                            class="v">{{ shipment.driver.address|default:"—" }}</span></div>
+                </div>
+            </div>
+
+            <!-- خودرو -->
+            <div class="col-12 col-md-6">
+                <div class="section-card">
+                    <div class="section-title">
+                        <span>خودرو</span>
+                        <a href="{% url 'edit_vehicle' %}" class="btn btn-sm btn-outline-primary">ویرایش</a>
+                    </div>
+                    <div class="kv"><span class="k">شماره پلاک:</span> <span
+                            class="v">{{ shipment.vehicle.plate_number|default:"—" }}</span></div>
+                    <div class="kv"><span class="k">راننده:</span> <span
+                            class="v">{{ shipment.vehicle.driver.first_name }} {{ shipment.vehicle.driver.last_name }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- ردیف سوم: محموله / مالی -->
+        <div class="row g-3">
+            <!-- محموله -->
+            <div class="col-12 col-md-7">
+                <div class="section-card">
+                    <div class="section-title">
+                        <span>محموله</span>
+                        <a href="{% url 'edit_cargo' %}" class="btn btn-sm btn-outline-primary">ویرایش</a>
+                    </div>
+                    <div class="kv"><span class="k">شرح:</span> <span
+                            class="v">{{ shipment.cargo.description|default:"—" }}</span></div>
+                    <div class="kv"><span class="k">وزن:</span> <span
+                            class="v">{{ shipment.cargo.weight|default:"—" }}</span></div>
+                </div>
+            </div>
+
+            <!-- جمع‌مالی -->
+            <div class="col-12 col-md-5">
+                <div class="section-card">
+                    <div class="section-title">
+                        <span>اطلاعات مالی</span>
+                        <a href="{% url 'edit_bijak' %}" class="btn btn-sm btn-outline-primary">ویرایش</a>
+                    </div>
+                    <div class="kv"><span class="k">کرایه حمل:</span> <span
+                            class="v">{{ shipment.fare|default:"—" }}</span></div>
+                    <div class="kv"><span class="k">کد رهگیری:</span> <span
+                            class="v">{{ shipment.tracking_code|default:"—" }}</span></div>
+                    <div class="kv"><span class="k">تاریخ بارنامه:</span> <span
+                            class="v">{{ shipment.date|default:"—" }}</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- اکشن‌های پایانی (فقط نمایش) -->
+        <div class="mt-3 d-flex gap-2 actions-top no-print">
+            <a href="{% url 'edit_bijak' %}" class="btn btn-primary btn-sm">ویرایش کلی بارنامه</a>
+            <button class="btn btn-outline-secondary btn-sm" onclick="window.print()">چاپ همین صفحه</button>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
+
+
+{#<!DOCTYPE html>#}
+{#<html lang="fa" dir="rtl">#}
+{#<head>#}
+{#    <meta charset="UTF-8">#}
+{#    <title>چاپ بارنامه</title>#}
+{#    <style>#}
+{#        body {#}
+{#            margin: 0;#}
+{#            padding: 0;#}
+{#            background: #fff;#}
+{#        }#}
+{##}
+{#        .page {#}
+{#            width: 1123px;#}
+{#            height: 1536px;#}
+{#            background-image: url('{% static "images/IMG_2902.jpg" %}');#}
+{#            background-size: cover;#}
+{#            background-repeat: no-repeat;#}
+{#            background-position: center top;#}
+{#            position: relative;#}
+{#            direction: rtl;#}
+{#            font-family: sans-serif;#}
+{#        }#}
+{##}
+{#        .field {#}
+{#            position: absolute;#}
+{#            font-size: 15px;#}
+{#            color: #000;#}
+{#            white-space: nowrap;#}
+{#        }#}
+{##}
+{#        .tracking_code {#}
+{#            top: 36px;#}
+{#            right: 70px;#}
+{#        }#}
+{##}
+{#        .date {#}
+{#            top: 36px;#}
+{#            right: 250px;#}
+{#        }#}
+{##}
+{#        .sender_name {#}
+{#            top: 95px;#}
+{#            right: 670px;#}
+{#        }#}
+{##}
+{#        .sender_national {#}
+{#            top: 95px;#}
+{#            right: 410px;#}
+{#        }#}
+{##}
+{#        .sender_address {#}
+{#            top: 135px;#}
+{#            right: 670px;#}
+{#        }#}
+{##}
+{#        .Customer_name {#}
+{#            top: 95px;#}
+{#            right: 160px;#}
+{#        }#}
+{##}
+{#        .Customer_national {#}
+{#            top: 95px;#}
+{#            right: 10px;#}
+{#        }#}
+{##}
+{#        .Customer_address {#}
+{#            top: 135px;#}
+{#            right: 160px;#}
+{#        }#}
+{##}
+{#        .driver_name {#}
+{#            top: 190px;#}
+{#            right: 670px;#}
+{#        }#}
+{##}
+{#        .driver_national {#}
+{#            top: 190px;#}
+{#            right: 410px;#}
+{#        }#}
+{##}
+{#        .driver_birth {#}
+{#            top: 190px;#}
+{#            right: 160px;#}
+{#        }#}
+{##}
+{#        .driver_license {#}
+{#            top: 230px;#}
+{#            right: 670px;#}
+{#        }#}
+{##}
+{#        .license_issue {#}
+{#            top: 230px;#}
+{#            right: 410px;#}
+{#        }#}
+{##}
+{#        .driver_phone {#}
+{#            top: 230px;#}
+{#            right: 160px;#}
+{#        }#}
+{##}
+{#        .driver_address {#}
+{#            top: 270px;#}
+{#            right: 670px;#}
+{#        }#}
+{##}
+{#        .home_phone {#}
+{#            top: 270px;#}
+{#            right: 160px;#}
+{#        }#}
+{##}
+{#        .vehicle_plate {#}
+{#            top: 310px;#}
+{#            right: 670px;#}
+{#        }#}
+{##}
+{#        .vehicle_type {#}
+{#            top: 310px;#}
+{#            right: 410px;#}
+{#        }#}
+{##}
+{#        .fare {#}
+{#            top: 1380px;#}
+{#            right: 150px;#}
+{#        }#}
+{##}
+{#        .stamp {#}
+{#            top: 1450px;#}
+{#            right: 580px;#}
+{#            color: red;#}
+{#            font-weight: bold;#}
+{#            font-size: 18px;#}
+{#        }#}
+{##}
+{#        @media print {#}
+{#            button {#}
+{#                display: none;#}
+{#            }#}
+{#        }#}
+{#    </style>#}
+{#</head>#}
+{#<body>#}
+{#<div class="page">#}
+{#    <div class="field tracking_code">{{ shipment.tracking_code }}</div>#}
+{#    <div class="field date">{{ shipment.date }}</div>#}
+{##}
+{#    <div class="field sender_name">{{ shipment.sender.name }}</div>#}
+{#    <div class="field sender_national">{{ shipment.sender.national_id }}</div>#}
+{#    <div class="field sender_address">{{ shipment.sender.address }}</div>#}
+{##}
+{#    <div class="field Customer_name">{{ shipment.Customer.name }}</div>#}
+{#    <div class="field Customer_national">{{ shipment.Customer.national_id }}</div>#}
+{#    <div class="field Customer_address">{{ shipment.Customer.address }}</div>#}
+{##}
+{#    <div class="field driver_name">{{ shipment.driver.name }}</div>#}
+{#    <div class="field driver_national">{{ shipment.driver.national_id }}</div>#}
+{#    <div class="field driver_birth">{{ shipment.driver.birth_date }}</div>#}
+{#    <div class="field driver_license">{{ shipment.driver.license_number }}</div>#}
+{#    <div class="field license_issue">{{ shipment.driver.license_issue_date }}</div>#}
+{#    <div class="field driver_phone">{{ shipment.driver.mobile_number }}</div>#}
+{#    <div class="field driver_address">{{ shipment.driver.home_address }}</div>#}
+{#    <div class="field home_phone">{{ shipment.driver.home_phone }}</div>#}
+{##}
+{#    <div class="field vehicle_plate">{{ shipment.vehicle.license_plate }}</div>#}
+{#    <div class="field vehicle_type"></div>#}
+{##}
+{#    <div class="field fare">{{ shipment.fare }} تومان</div>#}
+{#    <div class="field stamp">صدرا بار خراسان</div>#}
+{#</div>#}
+{#<div style="text-align: center; margin-top: 20px;">#}
+{#    <button onclick="window.print()">چاپ بارنامه</button>#}
+{#</div>#}
+{#</body>#}
+{#</html>#}

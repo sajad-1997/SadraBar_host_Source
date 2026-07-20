@@ -1,0 +1,243 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}مؤسسه حمل و نقل صدرابار خراسان{% endblock %}</title>
+
+    <link rel="stylesheet" href="{% static 'issuance/css/main.css' %}">
+<!--{#    <link rel="stylesheet" href="{% static 'issuance/css/form_new.css' %}">#}-->
+<!--{#    <link rel="stylesheet" href="{% static 'issuance/css/new_style_old.css' %}">#}-->
+    <link rel="stylesheet" href="{% static 'issuance/css/page_link_style.css' %}">
+
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet"/>
+
+
+    <!-- Bootstrap RTL -->
+    <link rel="stylesheet" href="{% static 'issuance/css/bootstrap.rtl.min.css' %}">
+
+    <!-- Persian Datepicker -->
+    <link rel="stylesheet" href="{% static 'issuance/css/persian-datepicker.css' %}">
+
+{% block extra_css %}
+{% endblock %}
+
+    <style>
+        /* تمام استایل‌ها با پیشوند #custom-main-header محدود شده‌اند */
+        #custom-main-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            background: rgba(255, 255, 255, 0.96);
+            backdrop-filter: blur(4px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05), 0 1px 0 rgba(0, 0, 0, 0.02);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            padding: 0.8rem 2rem;
+
+            /* تغییرات برای رفتن به زیر عناصر دیگر */
+            position: relative; /* جایگزین sticky */
+            z-index: 1; /* عدد کم (پایین‌تر از محتوای معمولی) */
+
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', 'Roboto', 'Vazir', sans-serif;
+            direction: rtl;
+        }
+
+        /* بقیه استایل‌ها کاملاً مشابه قبل هستند (فقط قسمت position و z-index تغییر کرد) */
+        #custom-main-header .stamp {
+            text-align: right;
+            transition: transform 0.2s ease;
+        }
+
+        #custom-main-header .stamp:hover {
+            transform: translateY(-1px);
+        }
+
+        #custom-main-header .stamp h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            background: linear-gradient(135deg, #1e2a3a, #0f2b3d);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            letter-spacing: -0.3px;
+            margin-bottom: 0.2rem;
+        }
+
+        #custom-main-header .stamp h3 {
+            font-size: 1rem;
+            font-weight: 500;
+            color: #5a6e7c;
+            margin-top: 0.1rem;
+            border-right: 2px solid #ffb74d;
+            padding-right: 0.75rem;
+        }
+
+        #custom-main-header ul {
+            display: flex;
+            gap: 1.8rem;
+            list-style: none;
+            align-items: center;
+            margin: 0;
+            padding: 0;
+        }
+
+        #custom-main-header ul li a {
+            text-decoration: none;
+            font-weight: 550;
+            font-size: 1rem;
+            padding: 0.5rem 0.2rem;
+            color: #2c3e50;
+            transition: all 0.25s ease;
+            position: relative;
+            letter-spacing: -0.2px;
+        }
+
+        #custom-main-header ul li a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #ff9a3c, #ff6a1a);
+            transition: width 0.3s ease;
+            border-radius: 2px;
+        }
+
+        #custom-main-header ul li a:hover {
+            color: #e67e22;
+        }
+
+        #custom-main-header ul li a:hover::after {
+            width: 100%;
+            right: 0;
+            left: auto;
+        }
+
+        /* ریسپانسیو */
+        @media (max-width: 768px) {
+            #custom-main-header {
+                flex-direction: column;
+                text-align: center;
+                padding: 1rem 1.5rem;
+                gap: 0.8rem;
+            }
+
+            #custom-main-header .stamp {
+                text-align: center;
+            }
+
+            #custom-main-header .stamp h3 {
+                border-right: none;
+                padding-right: 0;
+                border-bottom: 1px dashed #ffb74d;
+                display: inline-block;
+                padding-bottom: 4px;
+            }
+
+            #custom-main-header ul {
+                gap: 1.2rem;
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+
+            #custom-main-header ul li a {
+                font-size: 0.95rem;
+                padding: 0.4rem 0;
+            }
+        }
+
+        @media (max-width: 480px) {
+            #custom-main-header {
+                padding: 0.8rem 1rem;
+            }
+
+            #custom-main-header .stamp h2 {
+                font-size: 1rem;
+            }
+
+            #custom-main-header .stamp h3 {
+                font-size: 0.85rem;
+            }
+
+            #custom-main-header ul {
+                gap: 1rem;
+            }
+        }
+
+        /* پشتیبانی از حالت تاریک */
+        @media (prefers-color-scheme: dark) {
+            #custom-main-header {
+                background: rgba(20, 24, 30, 0.96);
+                backdrop-filter: blur(8px);
+                border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            }
+
+            #custom-main-header .stamp h2 {
+                background: linear-gradient(135deg, #e0e7ff, #a5d8ff);
+                background-clip: text;
+                -webkit-background-clip: text;
+            }
+
+            #custom-main-header .stamp h3 {
+                color: #9aaebf;
+            }
+
+            #custom-main-header ul li a {
+                color: #e2e8f0;
+            }
+
+            #custom-main-header ul li a:hover {
+                color: #ffb347;
+            }
+        }
+    </style>
+
+</head>
+
+<body>
+
+<div class="container" id="custom-main-header">
+    <div class="stamp">
+        <h2>سازمان راهداری و حمل و نقل جاده ای</h2>
+        <h3>مؤسسه حمل و نقل صدرا بار خراسان</h3>
+    </div>
+    <div>
+        <ul>
+            <li><a href="{% url 'home' %}">صفحه اصلی</a></li>
+            <li><a href="{% url 'go_dashboard' %}">پنل کاربری</a></li>
+        </ul>
+    </div>
+</div>
+
+{% block content %}
+{% endblock %}
+
+
+<!-- اسکریپت‌ها -->
+<!-- jQuery (الزامی) -->
+<script src="{% static 'issuance/jquery.js' %}"></script>
+
+<!-- Persian Date (هسته محاسبات شمسی) -->
+<script src="{% static 'issuance/persian-date.js' %}"></script>
+
+<!-- Persian Datepicker -->
+<script src="{% static 'issuance/persian-datepicker.js' %}"></script>
+
+<script src="{% static 'issuance/shipment_form.js' %}"></script>
+
+<script src="{% static 'issuance/bootstrap.bundle.min.js' %}"></script>
+
+
+<!--<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>-->
+
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+{% block extra_scripts %}
+{% endblock %}
+
+</body>
+</html>

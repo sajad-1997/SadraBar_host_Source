@@ -1,0 +1,17 @@
+{% extends "issuance/search/base.html" %}
+{% block content %}
+<h2>جزئیات Cluster {{ cluster.id }}</h2>
+
+{% include "duplicate_audit/base_table.html" %}
+
+{% if not cluster.is_resolved %}
+<form method="post">
+{% csrf_token %}
+<button class="btn btn-danger" {% if has_undecided %}disabled{% endif %}>
+اعمال نهایی تغییرات
+</button>
+</form>
+{% else %}
+<p class="text-success">این Cluster قبلاً اعمال شده و بسته شده است.</p>
+{% endif %}
+{% endblock %}

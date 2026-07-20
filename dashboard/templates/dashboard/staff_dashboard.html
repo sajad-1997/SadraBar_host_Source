@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ user.username }} | داشبورد کارمندان</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: "Vazirmatn", sans-serif;
+            background-color: #f6f7fb;
+            color: #333;
+        }
+
+        header {
+            background: linear-gradient(135deg, #0d47a1, #1976d2);
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        header h1 {
+            font-size: 1.5rem;
+            margin: 0;
+        }
+
+        header .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        header .user-info span {
+            font-weight: bold;
+        }
+
+        header .logout-btn {
+            background-color: #ffc107;
+            border: none;
+            color: #222;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        header .logout-btn:hover {
+            background-color: #ffb300;
+        }
+
+        nav {
+            background-color: #fff;
+            width: 250px;
+            height: 100vh;
+            padding: 2rem 1rem;
+            position: fixed;
+            top: 0;
+            right: 0;
+            box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        nav ul {
+            list-style: none;
+            padding: 0;
+            margin-top: 2rem;
+        }
+
+        nav ul li {
+            margin-bottom: 1rem;
+        }
+
+        nav ul li a {
+            text-decoration: none;
+            color: #333;
+            background-color: #f1f3f5;
+            display: block;
+            padding: 0.7rem 1rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        nav ul li a:hover {
+            background-color: #0d47a1;
+            color: white;
+        }
+
+        main {
+            margin-right: 270px;
+            padding: 2rem;
+        }
+
+        .welcome {
+            background: #fff;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .welcome h2 {
+            color: #0d47a1;
+        }
+
+        /* واکنش‌گرایی */
+        @media (max-width: 900px) {
+            nav {
+                position: static;
+                width: 100%;
+                height: auto;
+                box-shadow: none;
+                display: flex;
+                overflow-x: auto;
+            }
+
+            nav ul {
+                display: flex;
+                flex-direction: row;
+                gap: 1rem;
+                margin: 0;
+            }
+
+            main {
+                margin: 0;
+            }
+
+            header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>پنل کارمندان صدرا بار</h1>
+    <div class="user-info">
+        <span> سلام {{ user.username }} 👋</span>
+        <form action="{% url 'logout' %}" method="post">
+            {% csrf_token %}
+            <button type="submit" class="logout-btn">خروج</button>
+        </form>
+    </div>
+</header>
+
+<nav>
+    <ul>
+        <li><a href="{% url 'home' %}">🏠 صفحه اصلی</a></li>
+        {% if permissions.can_issuance_shipments %}
+            <li><a href="{% url 'issuance:crud:create_new' %}">🖥️ صدور بارنامه‌ها</a></li>
+        {% endif %}
+
+        {% if permissions.can_manage_shipments %}
+            <li><a href="{% url 'issuance:search:search_shipment' %}">🚚 جستجوی بارنامه‌ها</a></li>
+            <li><a href="{% url 'issuance:crud:pending' %}">✅ لیست بررسی بارنامه ها</a></li>
+            <li><a href="{% url 'issuance:manager:status_list' %}">✅ تعین وضعیت بارنامه ها</a></li>
+        {% endif %}
+
+        <!--{% if permissions.can_edit_final_status %}-->
+        <!--{% endif %}-->
+        {% if permissions.can_view_reports %}
+            <li><a href="#">📈 گزارش‌ها</a></li>
+        {% endif %}
+        {% if permissions.can_manage_customers %}
+            <li><a href="#">📈 لیست مشتریان</a></li>
+        {% endif %}
+        {% if permissions.can_manage_drivers %}
+            <li><a href="{% url 'issuance:manager:driver_list' %}">📈 لیست رانندگان</a></li>
+        {% endif %}
+        <!--{#        {% if permissions.can_access_dashboard %}#}-->
+        <!--{#            <li><a href="#">📊 داشبورد اصلی</a></li>#}-->
+        <!--{#        {% endif %}#}-->
+    </ul>
+</nav>
+
+<main>
+    <div class="welcome">
+        <h2>به سامانه عملیاتی صدرا بار خوش آمدید</h2>
+        <p>در این بخش می‌توانید وظایف، بارنامه‌ها و گزارش‌های خود را مشاهده و مدیریت کنید.</p>
+    </div>
+</main>
+
+</body>
+</html>

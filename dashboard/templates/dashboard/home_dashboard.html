@@ -1,0 +1,34 @@
+{% extends 'dashboard/base.html' %}
+
+{% block title %}داشبورد{% endblock %}
+
+{% block content %}
+
+<h2>داشبورد ادمین</h2>
+
+<div class="welcome-box card">
+    <p>به پنل مدیریت خوش آمدید، {{ user.username }} 👋</p>
+    <p>در اینجا می‌توانید وضعیت کلی سیستم را مشاهده کنید.</p>
+</div>
+
+<!-- آمار بارنامه‌ها -->
+<div class="stats">
+    <div class="stat-card card">
+        <h4>بارنامه‌های امروز</h4>
+        <p>{{ today_count|default:25 }}</p>
+    </div>
+    <div class="stat-card card">
+        <h4>بارنامه‌های این هفته</h4>
+        <p>{{ week_count|default:142 }}</p>
+    </div>
+    <div class="stat-card card">
+        <h4>بارنامه‌های این ماه</h4>
+        <p>{{ month_count|default:512 }}</p>
+    </div>
+    <div class="stat-card card">
+        <h4>کل بارنامه‌ها</h4>
+        <p>{{ total_count|default:1205 }}</p>
+    </div>
+</div>
+
+{% endblock %}

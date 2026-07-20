@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>باربری آنلاین – نسخه حرفه‌ای (ریسپانسیو، انیمیشن، نقشه زنده)</title>
+  <meta name="description" content="سامانه هوشمند باربری؛ استعلام هزینه، ثبت سفارش، ردیابی مرسوله و مدیریت ناوگان با تجربه کاربری مدرن و ریسپانسیو." />
+  <meta name="theme-color" content="#0ea5e9" />
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Swiper for sliders -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.css" />
+  <script src="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.js"></script>
+  <!-- GSAP for animations -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <!-- Leaflet for map -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <!-- Font Persian -->
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root{ --accent-1:#06b6d4; --accent-2:#3b82f6; }
+    html.dark { background:#031029; color:#e6eef8 }
+    body{ font-family:'Vazirmatn',sans-serif; }
+
+    .hero-bg{ background: linear-gradient(180deg, rgba(2,6,23,0.25), rgba(2,6,23,0.55)), url('https://images.unsplash.com/photo-1505852679233-d9fd70aff56d?auto=format&fit=crop&w=1600&q=80') center/cover no-repeat; }
+
+    .glass{ backdrop-filter: blur(14px); background: rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.06) }
+    html.dark .glass{ background: rgba(0,0,0,0.35); border:1px solid rgba(255,255,255,0.04) }
+
+    .card-hover{ transition: transform .35s cubic-bezier(.2,.9,.4,1), box-shadow .35s; }
+    .card-hover:hover{ transform: translateY(-8px); box-shadow: 0 30px 60px rgba(2,6,23,0.18); }
+
+    .gradient-text{ background: linear-gradient(90deg,var(--accent-1),var(--accent-2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent }
+
+    a:focus, button:focus, input:focus { outline: 3px solid rgba(14,165,233,0.25); outline-offset: 2px; }
+    @media (max-width:640px){ .hero-cta-group{ flex-direction:column; gap:0.5rem } }
+
+    .enter-up { transform: translateY(18px); opacity:0; animation: enterUp .6s forwards; }
+    @keyframes enterUp { to{ transform:translateY(0); opacity:1 } }
+
+    /* map */
+    #liveMap{ height:320px; border-radius:12px; }
+
+    /* tracking timeline */
+    .timeline{ counter-reset: step; }
+    .timeline-item{ position:relative; padding:1rem 1rem 1rem 3rem; border-radius:8px; background:linear-gradient(180deg,#fff,#f8fafc); }
+    .timeline-item + .timeline-item{ margin-top:0.8rem; }
+    .timeline-item:before{ counter-increment: step; content:counter(step); position:absolute; right: -1.6rem; top:1rem; background:var(--accent-2); color:#fff; width:32px;height:32px;border-radius:999px; display:flex; align-items:center; justify-content:center; font-weight:700 }
+    html.dark .timeline-item{ background:linear-gradient(180deg,#071126,#041022); }
+
+    /* modal */
+    .modal-backdrop{ background: rgba(0,0,0,0.5); }
+  </style>
+
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+<!-- TOP BAR -->
+<div class="bg-gradient-to-r from-blue-600 to-cyan-500 text-white py-1 text-center text-sm">ارسال رایگان برای سفارش‌های بالای ۵۰۰ هزار تومان — پشتیبانی ۲۴/۷</div>
+
+<!-- HEADER -->
+<header class="fixed top-0 left-0 right-0 z-50 bg-white/80 dark:bg-[#021124]/80 backdrop-blur shadow">
+  <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <div class="text-2xl font-extrabold text-blue-600">باربری آنلاین</div>
+      <span class="hidden sm:inline text-sm text-gray-600 dark:text-gray-300">ردیابی ۲۴/۷</span>
+    </div>
+
+    <nav class="hidden md:flex gap-8 items-center text-lg">
+      <a href="#services" class="hover:text-blue-600">خدمات</a>
+      <a href="#fleet" class="hover:text-blue-600">ناوگان</a>
+      <a href="#pricing" class="hover:text-blue-600">تعرفه‌ها</a>
+      <a href="#tracking" class="hover:text-blue-600">ردیابی</a>
+      <a href="#contact" class="hover:text-blue-600">تماس</a>
+    </nav>
+
+    <div class="flex items-center gap-3">
+      <button id="themeToggle" aria-label="تغییر حالت" class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">🌙</button>
+      <a id="downloadHtml" class="hidden md:inline-block bg-white text-blue-700 px-3 py-2 rounded-md border">دانلود HTML</a>
+      <a href="#pricing" class="hidden md:inline-block bg-gradient-to-r from-blue-600 to-blue-700 text-white px-4 py-2 rounded-md">ثبت سفارش</a>
+      <button id="openMenu" class="md:hidden p-2 rounded-md bg-gray-100 dark:bg-gray-800">☰</button>
+    </div>
+  </div>
+</header>
+
+<!-- MOBILE PANEL -->
+<div id="mobileMenu" class="fixed inset-0 z-40 hidden">
+  <div class="absolute inset-0 bg-black/40" onclick="toggleMobile(false)"></div>
+  <aside class="absolute right-0 top-0 h-full w-72 bg-white dark:bg-[#041428] p-6 shadow-lg">
+    <div class="flex items-center justify-between mb-6">
+      <div class="font-bold text-lg">باربری آنلاین</div>
+      <button onclick="toggleMobile(false)" aria-label="بستن">✕</button>
+    </div>
+    <nav class="flex flex-col gap-3">
+      <a href="#services" onclick="toggleMobile(false)" class="py-2">خدمات</a>
+      <a href="#fleet" onclick="toggleMobile(false)" class="py-2">ناوگان</a>
+      <a href="#pricing" onclick="toggleMobile(false)" class="py-2">تعرفه‌ها</a>
+      <a href="#tracking" onclick="toggleMobile(false)" class="py-2">ردیابی</a>
+      <a href="#contact" onclick="toggleMobile(false)" class="py-2">تماس</a>
+    </nav>
+    <div class="mt-6"><a href="#pricing" class="block text-center bg-blue-600 text-white py-2 rounded-md">ثبت سفارش</a></div>
+  </aside>
+</div>
+
+<!-- HERO -->
+<section class="hero-bg min-h-[78vh] flex items-center py-24">
+  <div class="max-w-7xl mx-auto px-6 w-full grid md:grid-cols-2 gap-10 items-center">
+
+    <div class="text-white">
+      <h1 class="text-4xl md:text-6xl font-extrabold leading-tight mb-6 gradient-text">حمل و نقل هوشمند با ردیابی لحظه‌ای</h1>
+      <p class="text-lg mb-6">پلتفرم مدیریت و ارسال بار؛ ثبت سفارش، انتخاب ناوگان، بیمه و پیگیری ساده با UX مشابه سرویس‌های بین‌المللی</p>
+
+      <div class="flex hero-cta-group gap-4 mb-6">
+        <a href="#pricing" class="bg-white text-blue-700 px-6 py-3 rounded-lg font-semibold shadow">استعلام رایگان</a>
+        <a href="#tracking" class="border-2 border-white text-white px-6 py-3 rounded-lg">پیگیری مرسوله</a>
+      </div>
+
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm">
+        <div class="bg-white/10 glass p-3 rounded-lg">بیمه کامل</div>
+        <div class="bg-white/10 glass p-3 rounded-lg">پشتیبانی ۲۴/۷</div>
+        <div class="bg-white/10 glass p-3 rounded-lg">پرداخت امن</div>
+        <div class="bg-white/10 glass p-3 rounded-lg">پوشش سراسری</div>
+      </div>
+    </div>
+
+    <!-- Booking Wizard (Step form) -->
+    <div class="glass rounded-2xl p-6 shadow-lg" aria-labelledby="wizardTitle" role="region">
+      <div class="text-right mb-4">
+        <div id="wizardTitle" class="text-sm text-gray-200">فرم ثبت سفارش سریع</div>
+        <h3 class="text-2xl font-bold">گام‌ها را تکمیل کنید</h3>
+      </div>
+
+      <form id="wizard" class="space-y-4 text-black" novalidate>
+        <div class="flex items-center gap-2 mb-2">
+          <div id="stepIndicator" class="text-sm text-gray-600">مرحله 1 از 3</div>
+          <div class="flex-1 bg-white/20 h-2 rounded overflow-hidden"><div id="stepBar" class="h-2 bg-gradient-to-r from-cyan-400 to-blue-500 w-1/3"></div></div>
+        </div>
+
+        <div id="step1" class="step">
+          <label class="text-sm">مبدا</label>
+          <input name="from" required aria-required="true" class="w-full p-3 rounded-md border" placeholder="شهر یا آدرس" />
+          <label class="text-sm mt-2">مقصد</label>
+          <input name="to" required aria-required="true" class="w-full p-3 rounded-md border" placeholder="شهر یا آدرس" />
+        </div>
+
+        <div id="step2" class="step hidden">
+          <label class="text-sm">نوع بار</label>
+          <input name="type" class="w-full p-3 rounded-md border" placeholder="مثلاً: لوازم خانگی" />
+          <label class="text-sm mt-2">وزن (kg)</label>
+          <input name="weight" type="number" min="1" class="w-full p-3 rounded-md border" placeholder="مثلاً: 50" />
+        </div>
+
+        <div id="step3" class="step hidden">
+          <label class="text-sm">سرویس</label>
+          <select name="service" class="w-full p-3 rounded-md border">
+            <option value="standard">عادی</option>
+            <option value="express">فوری</option>
+            <option value="fragile">حساس (بسته‌بندی ویژه)</option>
+          </select>
+          <label class="text-sm mt-2">تماس</label>
+          <input name="phone" inputmode="tel" class="w-full p-3 rounded-md border" placeholder="شماره تماس" />
+        </div>
+
+        <div class="flex items-center gap-3">
+          <button type="button" id="prevBtn" class="px-4 py-2 rounded-md bg-white/10" disabled>قبلی</button>
+          <button type="button" id="nextBtn" class="px-4 py-2 rounded-md bg-gradient-to-r from-blue-600 to-blue-700 text-white">بعدی</button>
+          <div class="flex-1 text-sm text-gray-500 text-left">هزینه نهایی پس از بررسی اپراتور محاسبه می‌شود.</div>
+        </div>
+      </form>
+    </div>
+
+  </div>
+</section>
+
+<!-- SERVICES GRID -->
+<section id="services" class="py-16">
+  <div class="max-w-7xl mx-auto px-6">
+    <h2 class="text-3xl font-bold text-center mb-8">خدمات</h2>
+    <div class="grid md:grid-cols-3 gap-6">
+      <div class="card-hover p-6 rounded-xl bg-white shadow enter-up">
+        <h4 class="font-bold mb-2">حمل زمینی</h4>
+        <p class="text-sm text-gray-600">ناوگان مجهز برای هر نوع بار</p>
+      </div>
+      <div class="card-hover p-6 rounded-xl bg-white shadow enter-up" style="animation-delay:.08s">
+        <h4 class="font-bold mb-2">بارهای حساس</h4>
+        <p class="text-sm text-gray-600">بسته‌بندی و بیمه ویژه</p>
+      </div>
+      <div class="card-hover p-6 rounded-xl bg-white shadow enter-up" style="animation-delay:.16s">
+        <h4 class="font-bold mb-2">ارسال سریع</h4>
+        <p class="text-sm text-gray-600">سرویس اکسپرس برای محموله‌های فوری</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SWIPER TESTIMONIALS -->
+<section class="py-16 bg-gradient-to-b from-gray-50 to-white">
+  <div class="max-w-6xl mx-auto px-6">
+    <h3 class="text-3xl font-bold text-center mb-8">نظرات مشتریان</h3>
+    <div class="swiper mySwiper">
+      <div class="swiper-wrapper">
+        <div class="swiper-slide p-6 bg-white rounded-xl shadow">"بسیار سریع و مطمئن" — حسین</div>
+        <div class="swiper-slide p-6 bg-white rounded-xl shadow">"بار به‌موقع رسید" — مریم</div>
+        <div class="swiper-slide p-6 bg-white rounded-xl shadow">"پشتیبانی عالی" — احمد</div>
+      </div>
+      <div class="swiper-pagination"></div>
+    </div>
+  </div>
+</section>
+
+<!-- FLEET + LIVE MAP + STATS -->
+<section id="fleet" class="py-16 bg-blue-50">
+  <div class="max-w-7xl mx-auto px-6 grid md:grid-cols-2 gap-6 items-center">
+    <div>
+      <h3 class="text-3xl font-bold mb-4">ناوگان مجهز</h3>
+      <p class="text-sm text-gray-700 mb-4">کامیون، خاور، وانت و موتوری — همه تحت نظارت و با رانندگان احراز هویت‌شده</p>
+      <div class="grid grid-cols-3 gap-3 mb-4">
+        <div class="p-4 bg-white rounded-lg shadow text-center">+12k ارسال</div>
+        <div class="p-4 bg-white rounded-lg shadow text-center">99.8% رضایت</div>
+        <div class="p-4 bg-white rounded-lg shadow text-center">+180 شهر</div>
+      </div>
+      <button onclick="openOrderModal()" class="px-4 py-2 rounded-md bg-gradient-to-r from-cyan-400 to-blue-600 text-white">درخواست ناوگان</button>
+    </div>
+    <div>
+      <div id="liveMap"></div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section id="pricing" class="py-16 bg-white">
+  <div class="max-w-6xl mx-auto px-6">
+    <h3 class="text-3xl font-bold text-center mb-8">تعرفه‌ها</h3>
+    <div class="grid md:grid-cols-3 gap-6">
+      <div class="p-6 rounded-xl shadow glass enter-up">
+        <div class="text-sm text-gray-500">وانت</div>
+        <div class="text-2xl font-bold mt-2">۱۲۰,۰۰۰ تومان</div>
+        <p class="text-sm text-gray-600 mt-2">درون‌شهری، تا ۵۰۰ کیلو</p>
+        <button class="mt-4 w-full py-2 rounded-md bg-gradient-to-r from-cyan-400 to-blue-600 text-white">انتخاب</button>
+      </div>
+      <div class="p-6 rounded-xl shadow glass border-2 border-blue-50 enter-up" style="animation-delay:.06s">
+        <div class="text-sm text-gray-500">خاور</div>
+        <div class="text-2xl font-bold mt-2">۳۴۹,۰۰۰ تومان</div>
+        <p class="text-sm text-gray-600 mt-2">بین‌شهری، بیمه کامل</p>
+        <button class="mt-4 w-full py-2 rounded-md bg-gradient-to-r from-blue-600 to-indigo-600 text-white">انتخاب</button>
+      </div>
+      <div class="p-6 rounded-xl shadow glass enter-up" style="animation-delay:.12s">
+        <div class="text-sm text-gray-500">کامیون</div>
+        <div class="text-2xl font-bold mt-2">۵۹۹,۰۰۰ تومان</div>
+        <p class="text-sm text-gray-600 mt-2">حمل سنگین، پشتیبانی ۲۴/۷</p>
+        <button class="mt-4 w-full py-2 rounded-md bg-gradient-to-r from-cyan-400 to-blue-600 text-white">انتخاب</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TRACKING -->
+<section id="tracking" class="py-16 bg-blue-50">
+  <div class="max-w-4xl mx-auto px-6 text-center">
+    <h3 class="text-3xl font-bold mb-4">پیگیری مرسوله</h3>
+    <p class="text-sm text-gray-700 mb-6">کد پیگیری خود را وارد کنید</p>
+    <div class="flex justify-center gap-3">
+      <input id="trackCode" aria-label="کد پیگیری" class="p-3 rounded-md border w-64" placeholder="TRK123456" />
+      <button onclick="track()" class="px-4 py-2 rounded-md bg-gradient-to-r from-blue-600 to-cyan-500 text-white">پیگیری</button>
+    </div>
+    <div id="trackResult" class="mt-6 text-gray-700"></div>
+
+    <!-- timeline example -->
+    <div id="timeline" class="timeline mt-6">
+      <!-- populated dynamically -->
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT & FOOTER -->
+<footer id="contact" class="bg-gray-900 text-white py-12">
+  <div class="max-w-7xl mx-auto px-6 grid md:grid-cols-3 gap-6">
+    <div>
+      <h4 class="font-bold mb-2">باربری آنلاین</h4>
+      <p class="text-gray-300">ارسال امن و سریع. بیمه و پشتیبانی ۲۴ ساعته.</p>
+    </div>
+    <div>
+      <h4 class="font-bold mb-2">فرم تماس</h4>
+      <form id="contactForm" class="space-y-2 text-sm">
+        <input name="name" placeholder="نام" class="w-full p-2 rounded-md text-black" />
+        <input name="email" placeholder="ایمیل" class="w-full p-2 rounded-md text-black" />
+        <textarea name="message" placeholder="پیام" class="w-full p-2 rounded-md text-black"></textarea>
+        <button type="button" onclick="submitContact()" class="px-4 py-2 rounded-md bg-gradient-to-r from-blue-600 to-cyan-400 text-white">ارسال</button>
+      </form>
+    </div>
+    <div>
+      <h4 class="font-bold mb-2">ارتباط</h4>
+      <p class="text-gray-300">تلفن: 021-12345678</p>
+      <p class="text-gray-300">ایمیل: support@example.com</p>
+      <div class="mt-3 flex gap-3">
+        <a class="text-gray-300 hover:text-white">اینستاگرام</a>
+        <a class="text-gray-300 hover:text-white">تلگرام</a>
+        <a class="text-gray-300 hover:text-white">واتساپ</a>
+      </div>
+    </div>
+  </div>
+  <div class="text-center text-gray-500 mt-6">© 2025 BarBari. همه حقوق محفوظ است.</div>
+</footer>
+
+
+<!-- ORDER MODAL (reusable) -->
+<div id="orderModal" class="fixed inset-0 z-50 hidden items-center justify-center">
+  <div class="modal-backdrop absolute inset-0"></div>
+  <div class="relative bg-white rounded-xl shadow-lg w-full max-w-lg p-6">
+    <button onclick="closeOrderModal()" class="absolute left-4 top-4">✕</button>
+    <h4 class="text-xl font-bold mb-3">درخواست ناوگان</h4>
+    <p class="text-sm text-gray-600 mb-4">فرم زیر را پر کنید تا تیم ما با شما تماس بگیرد.</p>
+    <form id="orderForm" class="space-y-3 text-sm">
+      <input name="o_from" placeholder="مبدا" class="w-full p-3 rounded-md border" />
+      <input name="o_to" placeholder="مقصد" class="w-full p-3 rounded-md border" />
+      <input name="o_phone" placeholder="شماره تماس" class="w-full p-3 rounded-md border" />
+      <div class="flex justify-end gap-3">
+        <button type="button" onclick="closeOrderModal()" class="px-3 py-2 rounded-md">انصراف</button>
+        <button type="button" onclick="submitOrder()" class="px-3 py-2 rounded-md bg-blue-600 text-white">ارسال درخواست</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+
+<!-- SCRIPTS: Wizard, tracking, swiper, dark mode, contact mock, map, download -->
+<script>
+  // Mobile toggle
+  function toggleMobile(show){ document.getElementById('mobileMenu').style.display = show ? 'block' : 'none'; }
+  const openMenuEl = document.getElementById('openMenu');
+  if(openMenuEl) openMenuEl.addEventListener('click', ()=> toggleMobile(true));
+
+  // Dark mode toggle (persist in localStorage)
+  const themeToggle = document.getElementById('themeToggle');
+  const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  if(themeToggle){ if(localStorage.theme === 'dark' || (!localStorage.theme && prefersDark)){ document.documentElement.classList.add('dark'); themeToggle.textContent='☀️' }}
+  if(themeToggle) themeToggle.addEventListener('click', ()=>{
+    document.documentElement.classList.toggle('dark');
+    localStorage.theme = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+    themeToggle.textContent = document.documentElement.classList.contains('dark') ? '☀️' : '🌙';
+  });
+
+  // Swiper init (guard)
+  try{ if(window.Swiper){ const swiper = new Swiper('.mySwiper', { loop:true, pagination:{ el:'.swiper-pagination', clickable:true }, autoplay:{ delay:4500 } }); }}catch(e){ console.warn('Swiper init failed', e); }
+
+  // GSAP entrance animations (guard)
+  try{ if(window.gsap){ gsap.from('.gradient-text',{ y:20, opacity:0, duration:0.8, ease:'power3.out' }); gsap.from('.enter-up',{ y:20, opacity:0, duration:0.8, stagger:0.08, ease:'power3.out' }); }}catch(e){ console.warn('GSAP failed', e); }
+
+  // Booking wizard logic
+  const steps = Array.from(document.querySelectorAll('#wizard .step'));
+  let current = 0;
+  const stepBar = document.getElementById('stepBar');
+  const stepIndicator = document.getElementById('stepIndicator');
+  function showStep(i){ steps.forEach((s,idx)=> s.classList.toggle('hidden', idx!==i)); if(stepBar) stepBar.style.width = ((i+1)/steps.length*100)+'%'; if(stepIndicator) stepIndicator.textContent = `مرحله ${i+1} از ${steps.length}`; const prevBtn = document.getElementById('prevBtn'); if(prevBtn) prevBtn.disabled = i===0; const nextBtn = document.getElementById('nextBtn'); if(nextBtn) nextBtn.textContent = i===steps.length-1 ? 'ارسال' : 'بعدی'; }
+  if(steps.length) showStep(0);
+  const nextBtnEl = document.getElementById('nextBtn');
+  if(nextBtnEl) nextBtnEl.addEventListener('click', ()=>{
+    const inputs = steps[current].querySelectorAll('input,select');
+    for(const inp of inputs){ if(inp.hasAttribute('required') && !inp.value.trim()){ inp.focus(); return; } }
+    if(current < steps.length-1){ current++; showStep(current); } else {
+      // mock submit: open modal
+      openOrderModal();
+    }
+  });
+  const prevBtnEl = document.getElementById('prevBtn');
+  if(prevBtnEl) prevBtnEl.addEventListener('click', ()=>{ if(current>0){ current--; showStep(current); } });
+
+  // tracking mock + timeline
+  function track(){ const codeEl = document.getElementById('trackCode'); const out = document.getElementById('trackResult'); const tl = document.getElementById('timeline'); if(tl) tl.innerHTML=''; const code = codeEl ? codeEl.value.trim() : ''; if(!code){ if(out) out.textContent='لطفاً کد پیگیری را وارد کنید.'; return; } const states=['ثبت شده','بارگیری','در مسیر','رسیده به مرکز توزیع','تحویل شد']; const idx = Math.abs(code.split('').reduce((a,c)=>a + c.charCodeAt(0),0)) % states.length; if(out) out.innerHTML = `<div class="p-4 bg-white rounded-md text-right">کد: <strong>${code}</strong><br>وضعیت: <strong>${states[idx]}</strong></div>`;
+    // populate timeline (mock recent -> older)
+    for(let i=idx;i>=0;i--){ const div=document.createElement('div'); div.className='timeline-item'; div.innerHTML = `<div class="text-sm font-bold">${states[i]}</div><div class="text-xs text-gray-600">${new Date(Date.now() - (idx-i)*3600*1000).toLocaleString()}</div>`; if(tl) tl.appendChild(div); }
+  }
+
+  // order modal
+  function openOrderModal(){ const modal = document.getElementById('orderModal'); if(modal){ modal.style.display='flex'; modal.classList.remove('hidden'); }}
+  function closeOrderModal(){ const modal = document.getElementById('orderModal'); if(modal){ modal.style.display='none'; modal.classList.add('hidden'); }}
+  function submitOrder(){ alert('درخواست شما ثبت شد. اپراتور با شما تماس خواهد گرفت.'); closeOrderModal(); const form = document.getElementById('orderForm'); if(form) form.reset(); }
+
+  // contact mock
+  function submitContact(){ alert('پیام شما ارسال شد — تیم ما به زودی پاسخ خواهد داد.'); const cf = document.getElementById('contactForm'); if(cf) cf.reset(); }
+
+  // Live Map (Leaflet) - sample markers (guard)
+  try{
+    if(window.L){ const mapEl = document.getElementById('liveMap'); if(mapEl){ const map = L.map('map').setView([32.4279, 53.6880], 6);
+
+// --- Iran Transit Routes ---
+const transitRoutes = [
+  {
+    name: 'تهران → قم → اصفهان → شیراز',
+    coords: [
+      [35.6892, 51.3890],
+      [34.6401, 50.8764],
+      [32.6539, 51.6660],
+      [29.5918, 52.5837]
+    ]
+  },
+  {
+    name: 'تبریز → زنجان → قزوین → تهران',
+    coords: [
+      [38.0962, 46.2738],
+      [36.6736, 48.4787],
+      [36.2688, 50.0041],
+      [35.6892, 51.3890]
+    ]
+  },
+  {
+    name: 'مشهد → سبزوار → سمنان → تهران',
+    coords: [
+      [36.2605, 59.6168],
+      [36.2126, 57.6762],
+      [35.5750, 53.3949],
+      [35.6892, 51.3890]
+    ]
+  }
+];
+
+transitRoutes.forEach(route => {
+  L.polyline(route.coords, { weight: 4 }).addTo(map).bindPopup(route.name);
+});
+
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; OpenStreetMap contributors' }).addTo(map);
+      const vehicles = [ [35.6892,51.3890,'ناوگان تهران'], [32.6546,51.6680,'ناوگان اصفهان'], [36.2605,59.6168,'ناوگان مشهد'] ];
+      vehicles.forEach(v=>{ L.marker([v[0],v[1]]).addTo(map).bindPopup(`<strong>${v[2]}</strong>`); });
+    }}
+  }catch(e){ console.warn('Leaflet map failed', e); }
+
+  // Download HTML - creates a file of current page's HTML (single-file snapshot)
+  const downloadBtn = document.getElementById('downloadHtml');
+  if(downloadBtn){ downloadBtn.addEventListener('click', ()=>{
+    try{
+      // build a simple snapshot of current HTML
+      const docHtml = '<!doctype html>\n' + document.documentElement.outerHTML;
+      const blob = new Blob([docHtml], { type: 'text/html;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href=url; a.download='barbari-landing.html'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+    }catch(err){ console.error('Download failed', err); alert('دانلود انجام نشد — لطفاً مجدداً تلاش کنید.'); }
+  }); }
+
+  // accessibility: keyboard close modal
+  document.addEventListener('keydown', e=>{ if(e.key==='Escape'){ closeOrderModal(); toggleMobile(false);} });
+
+  // expose some functions globally for inline onclick handlers
+  window.track = track; window.openOrderModal = openOrderModal; window.closeOrderModal = closeOrderModal; window.submitOrder = submitOrder; window.submitContact = submitContact; window.toggleMobile = toggleMobile;
+</script>
+
+</body>
+</html>

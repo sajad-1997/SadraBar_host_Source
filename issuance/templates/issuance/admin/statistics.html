@@ -1,0 +1,37 @@
+{% extends "admin/change_list.html" %}
+
+{% block content %}
+    {{ block.super }}
+
+    <h2>📊 گزارش بیجک‌ها</h2>
+
+    <h3>روزانه</h3>
+    <ul>
+        {% for row in daily_counts %}
+            <li>{{ row.day }}: {{ row.count }} بیجک</li>
+        {% empty %}
+            <li>هیچ بیجکی ثبت نشده است.</li>
+        {% endfor %}
+    </ul>
+
+    <h3>هفتگی</h3>
+    <ul>
+        {% for row in weekly_counts %}
+            <li>{{ row.week }}: {{ row.count }} بیجک</li>
+        {% endfor %}
+    </ul>
+
+    <h3>ماهانه</h3>
+    <ul>
+        {% for row in monthly_counts %}
+            <li>{{ row.month }}: {{ row.count }} بیجک</li>
+        {% endfor %}
+    </ul>
+
+    <h3>سالانه</h3>
+    <ul>
+        {% for row in yearly_counts %}
+            <li>{{ row.year }}: {{ row.count }} بیجک</li>
+        {% endfor %}
+    </ul>
+{% endblock %}

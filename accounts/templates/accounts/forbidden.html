@@ -1,0 +1,8 @@
+{% extends "issuance/base.html" %}
+{% block content %}
+    <div class="container text-center mt-5">
+        <h2>⛔ دسترسی غیرمجاز</h2>
+        <p>شما اجازه ورود به این بخش را ندارید.</p>
+        <a href="{% url 'home' %}" class="btn btn-primary mt-3">بازگشت به صفحه اصلی</a>
+    </div>
+{% endblock %}

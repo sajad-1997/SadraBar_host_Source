@@ -1,0 +1,56 @@
+{# 
+    کامپوننت انتخاب تاریخ شمسی
+    ورودی‌ها:
+    - start_name: نام فیلد شروع (برای فرم)
+    - end_name: نام فیلد پایان (برای فرم)
+    - start_value: مقدار پیش‌فرض شروع (اختیاری)
+    - end_value: مقدار پیش‌فرض پایان (اختیاری)
+#}
+
+<div class="row g-2">
+    <div class="col-12 col-md-6">
+        <input type="text" id="start_date" name="start_date_display" class="form-control datepicker-input"
+               placeholder="تاریخ شروع" value="{{ start_value|default:'' }}">
+        <input type="hidden" name="{{ start_name|default:'start_date' }}" id="start_date_alt" value="{{ start_value|default:'' }}">
+    </div>
+    <div class="col-12 col-md-6">
+        <input type="text" id="end_date" name="end_date_display" class="form-control datepicker-input"
+               placeholder="تاریخ پایان" value="{{ end_value|default:'' }}">
+        <input type="hidden" name="{{ end_name|default:'end_date' }}" id="end_date_alt" value="{{ end_value|default:'' }}">
+    </div>
+</div>
+
+<!-- JQuery و Persian Datepicker JS -->
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/persian-date@1.1.0/dist/persian-date.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/persian-datepicker@1.2.0/dist/js/persian-datepicker.min.js"></script>
+
+<script>
+$(document).ready(function(){
+
+    $("#start_date").persianDatepicker({
+        format: 'YYYY-MM-DD',
+        autoClose: true,
+        calendarType: 'persian',
+        altField: '#start_date_alt',
+        altFormat: 'YYYY-MM-DD',
+        onSelect: function(unix){
+            var pd = new persianDate(unix);
+            $('#start_date_alt').val(pd.toCalendar('gregorian').format('YYYY-MM-DD'));
+        }
+    });
+
+    $("#end_date").persianDatepicker({
+        format: 'YYYY-MM-DD',
+        autoClose: true,
+        calendarType: 'persian',
+        altField: '#end_date_alt',
+        altFormat: 'YYYY-MM-DD',
+        onSelect: function(unix){
+            var pd = new persianDate(unix);
+            $('#end_date_alt').val(pd.toCalendar('gregorian').format('YYYY-MM-DD'));
+        }
+    });
+
+});
+</script>

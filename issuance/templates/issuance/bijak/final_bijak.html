@@ -1,0 +1,371 @@
+{% load static %}
+{% load persian_numbers %}
+{% load jalali_tags %}
+
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>فرم حمل و نقل</title>
+    <link rel="stylesheet" href="{% static 'issuance/css/print.css' %}">
+
+</head>
+<body>
+<div class="container">
+    <div class="controls no-print">
+        <!--<button onclick="togglePreview()">پیش‌نمایش A5 افقی</button>-->
+        <button onclick="window.print()">چاپ فرم</button>
+        <!--<button onclick="showFormData()" class="secondary">ویرایش اطلاعات</button>-->
+    </div>
+
+    <div class="form-content" id="formContent">
+        <!-- Header Section -->
+        <div class="header-section section">
+            <div>
+                <!-- Contact Information -->
+                <div class="phone-section section">
+                    <div class="qr-container">
+                        {% if shipment.pk %}
+                            <img src="{% url 'issuance:qr_code:bijak_qr' shipment.pk %}" alt="QR Code">
+                        {% endif %}
+                    </div>
+                    <div class="phones">
+                        <span>۰۵۱۳۵۴۲۰۷۰۳</span>
+                        <span>۰۵۱۳۵۴۲۰۷۰۴</span>
+                        <span>۰۹۳۰۹۸۴۳۷۰۴</span>
+                        <span>۰۹۱۵۹۱۷۵۲۰۳</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="company-header">
+                <!--<h1>سازمان راهداری و حمل ونقل جاده ای</h1>-->
+                <p>اتحادیه وانت بارهای مشهد و حومه</p>
+                <p>حواله جاده ای داخلی</p>
+                <h2>موسسه حمل و نقل صدرا بار خراسان شماره ثبت: ۲۵۱</h2>
+            </div>
+
+            <!-- Bijak Information -->
+            <div class="bijak-section section">
+                <div>
+                    <div>
+                        <label>ارزش محموله:</label>
+                        <span>
+                        {{ shipment.value|persian_numbers }} ریال
+                        </span>
+                    </div>
+                    <div>
+                        <label>شماره بارنامه:</label>
+                        <span>
+                        {{ shipment.tracking_code|persian_numbers }}
+                        </span>
+                    </div>
+                    <div>
+                        <label>زمان صدور:</label>
+                        <span>
+                        {{ shipment.issuance_datetime.date|date:"Y/m/d"|persian_numbers }}
+                        </span>
+                    </div>
+                    {#                    <div>#}
+                    {#                        <label>زمان بارگیری:</label>#}
+                    {#                        <span>#}
+                    {#                        {{ shipment.issuance_datetime|persian_numbers }}#}
+                    {#                        </span>#}
+                    {#                    </div>#}
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Data Table -->
+        <div class="section">
+            <table class="form-table">
+                <tr>
+                    <th class="table-header" style="width: 20%;">فرستنده:</th>
+                    <th class="table-header" style="width: 15%;">شناسه/کد ملی:</th>
+                    <th class="table-header" style="width: 9%;">کد پستی:</th>
+                    <th class="table-header" style="width: 100%;">آدرس محل بارگیری:</th>
+                    <th class="table-header">تلفن:</th>
+
+                </tr>
+                <tr>
+                    <td class="table-cell">{{ shipment.sender.name }}</td>
+                    <td class="table-cell">{{ shipment.sender.national_id|persian_numbers|default_if_none:"—" }}</td>
+                    <td class="table-cell">{{ shipment.sender.postal|persian_numbers|default_if_none:"—" }}</td>
+                    <td class="table-cell" style="width: 100%;">
+                        {{ shipment.sender.address|persian_numbers }}
+                    </td>
+                    <td class="table-cell">{{ shipment.sender.phone|persian_numbers|default_if_none:"—" }}</td>
+                </tr>
+                <tr>
+                </tr>
+                <tr>
+                </tr>
+            </table>
+            <table class="form-table">
+                <tr>
+                    <th class="table-header" style="width: 20%;">گیرنده:</th>
+                    <th class="table-header" style="width: 15%;">شناسه/کد ملی:</th>
+                    <th class="table-header" style="width: 9%;">کد پستی:</th>
+                    <th class="table-header" style="width: 100%;">آدرس محل تخلیه:</th>
+                    <th class="table-header">تلفن:</th>
+                </tr>
+                <tr>
+                    <td class="table-cell">{{ shipment.receiver.name }}</td>
+                    <td class="table-cell">{{ shipment.receiver.national_id|persian_numbers }}</td>
+                    <td class="table-cell">{{ shipment.receiver.postal|persian_numbers }}</td>
+                    <td class="table-cell" style="width: 100%;">
+                        {{ shipment.receiver.address|persian_numbers }}
+                    </td>
+                    <td class="table-cell">{{ shipment.receiver.phone|persian_numbers }}</td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Driver Information Table -->
+        <div class="section">
+            <table class="form-table">
+                <tr>
+                    <th class="table-header" style="width: 20%">نام و نام خانوادگی راننده</th>
+                    <th class="table-header" style="width: 15%">کد ملی</th>
+                    <th class="table-header" style="width: 10%">تاریخ تولد</th>
+                    <th class="table-header">نام پدر</th>
+                    <th class="table-header">شماره گواهینامه</th>
+                    <th class="table-header">تاریخ صدور گواهینامه</th>
+                </tr>
+                <tr>
+                    <td class="table-cell">{{ shipment.driver.name }}</td>
+                    <td class="table-cell">{{ shipment.driver.national_id|persian_numbers }}</td>
+                    <td class="table-cell">{{ shipment.driver.birth_date|date:"Y/m/d"|persian_numbers }}</td>
+                    <td class="table-cell">{{ shipment.driver.father_name|default_if_none:"—" }}</td>
+                    <td class="table-cell">{{ shipment.driver.certificate|persian_numbers }}</td>
+                    <td class="table-cell">{{ shipment.driver.certificate_date|date:"Y/m/d"|persian_numbers }}</td>
+                </tr>
+            </table>
+            <table class="form-table">
+                <tr>
+                    <th class="table-header" style="width: 15%;">شماره تلفن راننده</th>
+                    <th class="table-header" style="width: 15%">شماره تلفن دوم راننده</th>
+                    <th class="table-header" style="width: 10%">ساکن شهر</th>
+                    <th class="table-header">آدرس راننده</th>
+                    <th class="table-header">شماره بیمه نامه</th>
+                    <th class="table-header">تاریخ انقضاء بیمه نامه</th>
+                </tr>
+                <tr>
+                    <td class="table-cell">{{ shipment.driver.phone|persian_numbers }}</td>
+                    <td class="table-cell">{{ shipment.driver.phone2|persian_numbers|default_if_none:"—" }}</td>
+                    <td class="table-cell">{{ shipment.driver.residence|default_if_none:"—" }}</td>
+                    <td class="table-cell">{{ shipment.driver.address|persian_numbers|default_if_none:"—" }}</td>
+                    <td class="table-cell">{{ shipment.driver.insurance_policy_number|date:"Y/m/d"|persian_numbers|default_if_none:"—" }}</td>
+                    <td class="table-cell">{{ shipment.driver.insurance_policy_expiry|date:"Y/m/d"|persian_numbers|default_if_none:"—" }}</td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Vehicle Information Table -->
+        <div class="section">
+            <table class="form-table">
+                <tr>
+                    <th class="table-header">نوع ناوگان</th>
+                    <th class="table-header">شماره پلاک</th>
+                    <th class="table-header">سری پلاک</th>
+                    <th class="table-header">هوشمند ناوگان</th>
+                    <th class="table-header">هوشمند راننده</th>
+                </tr>
+                <tr>
+                    <td class="table-cell">{{ shipment.vehicle.get_type_display }}</td>
+                    <td class="table-cell">
+                        {{ shipment.vehicle.license_plate_three_digit|persian_numbers }}
+                        {{ shipment.vehicle.license_plate_alphabet }}
+                        {{ shipment.vehicle.license_plate_two_digit|persian_numbers }}
+                    </td>
+                    <td class="table-cell">
+                        <span>ایران   </span>
+                        {{ shipment.vehicle.license_plate_series|persian_numbers }}
+                    </td>
+                    <td class="table-cell"></td>
+                    <td class="table-cell"></td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Cargo Information Table -->
+        <div class="section">
+            <table class="form-table-cargo">
+                <thead>
+                <tr>
+                    <th class="table-header-cargo">نام محموله</th>
+                    <th class="table-header-cargo">وزن(کیلوگرم)/حجم(لیتر)</th>
+                    <th class="table-header-cargo">نوع بسته بندی</th>
+                    <th class="table-header-cargo">تعداد بسته</th>
+                    <th class="table-header-cargo">مبدا بارگیری</th>
+                    <th class="table-header-cargo">مقصد تخلیه</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr class="green-boxes">
+                    <td class="table-cell-cargo">{{ shipment.cargo.name }}</td>
+                    <td class="table-cell-cargo">{{ shipment.cargo.weight|persian_numbers|default:"-" }}</td>
+                    <td class="table-cell-cargo">{{ shipment.cargo.package_type|default:"-" }}</td>
+                    <td class="table-cell-cargo">{{ shipment.cargo.number_of_packaging|persian_numbers|default:"-" }}</td>
+                    <td class="table-cell-cargo">{{ shipment.cargo.origin }}</td>
+                    <td class="table-cell-cargo">{{ shipment.cargo.destination }}</td>
+
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Bottom Information Section -->
+        <div class="bottom-section section">
+            <div class="form-field">
+                <label>مبلغ کرایه:</label>
+                <span>
+                    {{ shipment.freight|persian_numbers }}
+                </span>
+            </div>
+
+            <div class="form-field">
+                <label>بیمه:</label>
+                <span>
+                        {{ shipment.insurance|persian_numbers }}
+                </span>
+            </div>
+
+            <div class="form-field">
+                <label>بارگیری:</label>
+                <span>
+                        {{ shipment.loading_fee|persian_numbers }}
+                </span>
+            </div>
+
+            <div class="form-field">
+                <label>تخلیه:</label>
+                <span>
+                        {{ shipment.unloading_fee|persian_numbers }}
+                </span>
+            </div>
+
+            <div class="form-field">
+                <label>باسکول:</label>
+                <span>
+                        {{ shipment.scale_fee|persian_numbers }}
+                </span>
+            </div>
+
+            <div class="form-field">
+                <label>کل کرایه پرداختی در مقصد:</label>
+                <span>
+                        {{ shipment.total_fare|persian_numbers }} ریال
+                </span>
+            </div>
+
+            <div class="form-field">
+                <label>مبلغ به حروف:</label>
+                <span>
+                    {{ shipment.num_in_words }}
+                </span>
+            </div>
+        </div>
+
+        <!-- Caption Section -->
+        <div class="form-field section" style="margin: 10px 5px 5px 5px">
+            <span>
+                {{ shipment.final_description }}
+            </span>
+        </div>
+    </div>
+
+
+    <!-- Signature Section -->
+    <div class="signature-section section">
+        <div class="signature-box">
+            <p>امضاء راننده</p>
+        </div>
+        <div class="signature-box">
+            <p>امضاء تحویل گیرنده</p>
+        </div>
+        <div class="signature-box">
+            <p>مهر و امضاء</p>
+            <p>شرکت حمل و نقل صدرابار خراسان</p>
+            <p style="font-size: 10px;">مدیریت: سید سعید حسینی</p>
+        </div>
+    </div>
+</div>
+
+<script>
+    let isPreview = false;
+
+    function togglePreview() {
+        const formContent = document.getElementById('formContent');
+        const button = event.target;
+
+        if (!isPreview) {
+            formContent.style.transform = 'scale(0.7)';
+            formContent.style.transformOrigin = 'top center';
+            formContent.style.width = '210mm';
+            formContent.style.maxWidth = '210mm';
+            formContent.style.height = '148mm';
+            formContent.style.border = '2px dashed #007bff';
+            formContent.style.margin = '20px auto';
+            button.textContent = 'نمای عادی';
+            isPreview = true;
+        } else {
+            formContent.style.transform = '';
+            formContent.style.transformOrigin = '';
+            formContent.style.width = '';
+            formContent.style.maxWidth = '';
+            formContent.style.height = '';
+            formContent.style.border = '';
+            formContent.style.margin = '';
+            button.textContent = 'پیش‌نمایش A5 افقی';
+            isPreview = false;
+        }
+    }
+
+    function showFormData() {
+        const formData = {
+            operationValue: document.getElementById('operationValue').value,
+            movementTime: document.getElementById('movementTime').value,
+            formNumber: document.getElementById('formNumber').value,
+            date: document.getElementById('date').value,
+            services: document.getElementById('services').value,
+            detailedAmount: document.getElementById('detailedAmount').value,
+            totalCargo: document.getElementById('totalCargo').value,
+            explanation: document.getElementById('explanation').value
+        };
+
+        console.log('Form Data:', formData);
+        alert('اطلاعات فرم در کنسول مرورگر نمایش داده شد');
+    }
+
+    // Add form validation and data collection for all inputs if needed
+    function collectAllFormData() {
+        const inputs = document.querySelectorAll('input');
+        const data = {};
+        inputs.forEach((input, index) => {
+            if (input.id) {
+                data[input.id] = input.value;
+            } else {
+                data[`field_${index}`] = input.value;
+            }
+        });
+        return data;
+    }
+
+    function toWords(num) {
+        return fetch(`/to-words/?num=${num}`)
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById("id_amount_words").value = data.words;
+            });
+    }
+
+    document.getElementById("id_amount").addEventListener("input", function () {
+        let val = this.value;
+        if (val) toWords(val);
+        else document.getElementById("id_amount_words").value = "";
+    });
+</script>
+</body>
+</html>

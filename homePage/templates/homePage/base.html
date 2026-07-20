@@ -1,0 +1,337 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}صدرابار خراسان{% endblock %}</title>
+    <!-- حذف این دو خط -->
+    <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vazirmatn@33.0.2/theme-awesome/vazirmatn-font-face-core.css"> -->
+    <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vazirmatn@33.0.2/theme-awesome/vazirmatn-font-face-extended.css"> -->
+    <link rel="stylesheet" href="{% static 'homePage/css/style.css' %}">
+    {% block extra_head %}{% endblock %}
+    <style>
+        /* استایل‌های قبلی شما در اینجا قرار می‌گیرد */
+        :root {
+            --primary-color: #4CAF50;
+            --text-color-dark: #333;
+            --text-color-light: #f0f0f0;
+            --background-light: #f8f9fa;
+            --background-dark: #212529;
+            --glass-bg: rgba(255, 255, 255, 0.15);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --input-bg: rgba(255, 255, 255, 0.25);
+            --input-border: rgba(255, 255, 255, 0.35);
+            --input-focus-border: #ffffff;
+        }
+
+        body {
+            font-family: 'IRANSansWeb', sans-serif; /* تغییر نام فونت */
+            background-color: var(--background-light);
+            color: var(--text-color-dark);
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* ... سایر استایل‌های base.html ... */
+        /* هدر */
+        header {
+            background-color: var(--background-dark); /* پس‌زمینه تیره برای هدر */
+            padding: 15px 30px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky; /* هدر چسبان */
+            top: 0;
+            z-index: 1000;
+        }
+        header .logo a {
+            color: var(--text-color-light); /* متن روشن */
+            text-decoration: none;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        header nav ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+        }
+        header nav ul li {
+            margin-left: 25px;
+        }
+        header nav ul li a {
+            color: var(--text-color-light); /* متن روشن */
+            text-decoration: none;
+            font-size: 16px;
+            transition: color 0.3s ease;
+        }
+        header nav ul li a:hover {
+            color: var(--primary-color); /* سبز هنگام هاور */
+        }
+
+        /* فوتر */
+        footer {
+            background-color: var(--background-dark); /* پس‌زمینه تیره برای فوتر */
+            color: var(--text-color-light); /* متن روشن */
+            text-align: center;
+            padding: 20px 30px;
+            margin-top: auto; /* چسباندن فوتر به پایین صفحه */
+            box-shadow: 0 -2px 5px rgba(0,0,0,0.2);
+        }
+        footer p {
+            margin: 0;
+            font-size: 14px;
+        }
+        footer a {
+            color: var(--text-color-light);
+            text-decoration: none;
+            font-weight: bold;
+        }
+        footer a:hover {
+            color: var(--primary-color);
+        }
+
+        /* دکمه ها */
+        .btn {
+            background-color: var(--primary-color); /* دکمه اصلی سبز */
+            color: white !important; /* رنگ متن سفید برای دکمه */
+            padding: 12px 25px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            text-decoration: none !important; /* حذف خط زیر لینک ها */
+            display: inline-block; /* برای اعمال padding و margin */
+        }
+        .btn:hover {
+            background-color: #388E3C; /* سبز تیره‌تر هنگام هاور */
+            transform: translateY(-2px);
+        }
+
+        /* دکمه های ثانویه یا دکمه های تب */
+        .btn-secondary {
+            background-color: var(--glass-bg);
+            color: var(--text-color-light) !important;
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(10px);
+            padding: 10px 20px;
+            font-size: 15px;
+        }
+        .btn-secondary:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+            color: var(--text-color-light) !important;
+        }
+
+        /* استایل عمومی محتوا */
+        .container {
+            max-width: 1140px;
+            margin: 40px auto;
+            padding: 0 20px;
+            flex-grow: 1; /* برای اینکه محتوا فضای موجود را پر کند */
+            width: 100%;
+        }
+
+        /* استایل فرم ها در صفحات دیگر (مثل services.html) */
+        .form-container {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(15px);
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            max-width: 600px;
+            margin: 20px auto;
+        }
+        .form-container h2 {
+            color: var(--text-color-dark); /* رنگ عنوان فرم تیره */
+            margin-bottom: 25px;
+            text-align: center;
+        }
+        .form-group {
+            margin-bottom: 20px;
+            text-align: right;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-color-dark); /* رنگ لیبل فرم تیره */
+            font-weight: bold;
+            font-size: 14px;
+        }
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 15px;
+            background: var(--input-bg); /* پس‌زمینه ورودی شیشه‌ای */
+            border: 1px solid var(--input-border); /* حاشیه ورودی */
+            border-radius: 10px;
+            color: var(--text-color-dark); /* رنگ متن ورودی تیره */
+            transition: border-color 0.3s ease, background-color 0.3s ease;
+            box-sizing: border-box; /* برای محاسبه padding و border در width */
+        }
+        .form-group input::placeholder,
+        .form-group textarea::placeholder {
+            color: rgba(51, 51, 51, 0.7); /* رنگ placeholder تیره */
+        }
+        .form-group input:focus,
+        .form-group textarea:focus {
+            border-color: var(--input-focus-border); /* حاشیه سفید */
+            background-color: rgba(255, 255, 255, 0.35); /* پس‌زمینه روشن‌تر */
+            outline: none;
+        }
+         /* styling for the submit button inside form-container */
+        .form-container .btn {
+            width: 100%;
+            padding: 14px;
+            font-size: 17px;
+        }
+
+        /* ---- استایل های صفحه ورود/ثبت نام ---- */
+        .auth-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(15px);
+            padding: 30px 40px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            max-width: 450px;
+            width: 100%;
+            margin: 40px auto;
+            text-align: center;
+        }
+        .auth-header {
+            margin-bottom: 25px;
+        }
+        .auth-header h2 {
+            color: var(--text-color-light); /* متن روشن برای عنوان auth */
+            font-size: 26px;
+            margin: 0;
+            transition: .3s;
+        }
+        .auth-card .form-group {
+            margin-bottom: 20px;
+            text-align: right;
+        }
+        .auth-card .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #eee; /* رنگ لیبل کمی روشن تر */
+            font-weight: bold;
+            font-size: 13px;
+        }
+        .auth-card .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            background: var(--input-bg); /* استفاده از پس‌زمینه ورودی عمومی */
+            border: 1px solid var(--input-border); /* استفاده از حاشیه ورودی عمومی */
+            border-radius: 10px;
+            color: var(--text-color-light); /* رنگ متن ورودی روشن */
+            transition: .2s;
+        }
+        .auth-card .form-group input::placeholder {
+            color: rgba(240, 240, 240, 0.7); /* رنگ placeholder روشن */
+        }
+        .auth-card .form-group input:focus {
+            border-color: var(--input-focus-border); /* حاشیه سفید */
+            background: rgba(255, 255, 255, 0.35); /* پس‌زمینه روشن‌تر */
+            outline: none;
+        }
+        .auth-card .btn {
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            width: 100%; /* دکمه ورود/ثبت نام عرض کامل */
+        }
+        .toggle-auth {
+            margin-top: 20px;
+            color: rgba(255,255,255,0.8);
+            cursor: pointer;
+            transition: .2s;
+            font-size: 14px;
+        }
+        .toggle-auth:hover {
+            color: #fff;
+        }
+
+        /* آیکون ها */
+        .icon {
+            font-size: 20px;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+
+        /* responsive */
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                padding: 10px;
+            }
+            header nav ul {
+                margin-top: 15px;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            header nav ul li {
+                margin: 5px 15px;
+            }
+            .container {
+                padding: 0 15px;
+            }
+            .auth-card, .form-container {
+                padding: 25px;
+                margin: 20px auto;
+            }
+            .auth-header h2 {
+                font-size: 22px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- ... بقیه محتوای base.html ... -->
+     <header>
+        <div class="logo">
+            <a href="{% url 'home' %}">
+                <span class="icon">🚚</span> مؤسسه حمل و نقل صدرابار خراسان
+            </a>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="{% url 'home' %}">صفحه اصلی</a></li>
+                <li><a href="{% url 'services' %}">خدمات</a></li>
+                <li><a href="{% url 'tracking' %}">رهگیری</a></li>
+                <li><a href="{% url 'contact' %}">تماس با ما</a></li>
+                <li><a href="{% url 'login' %}" class="btn btn-secondary">ورود/ثبت‌نام</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="container">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer>
+        <p>&copy; 2024 آژانس باربری. تمامی حقوق محفوظ است.</p>
+        <p>طراحی شده با ❤️ توسط تیم ما</p>
+    </footer>
+
+    <script>
+        // اسکریپت های عمومی (در صورت نیاز)
+        // مثال: باز کردن منوی موبایل
+        function toggleMenu() {
+            const nav = document.querySelector('header nav ul');
+            nav.classList.toggle('active');
+        }
+    </script>
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>

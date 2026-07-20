@@ -1,0 +1,58 @@
+/* حالت عادی برای نمایش ریسپانسیو */
+.container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 15px;
+    box-sizing: border-box;
+}
+
+.form-content {
+    width: 100%;
+    background: #fff;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+/* -------------------
+   حالت چاپ
+------------------- */
+@media print {
+    html, body {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        width: 100%;
+    }
+
+    .no-print {
+        display: none !important; /* دکمه‌ها چاپ نشن */
+    }
+
+    .container {
+        width: 100%;
+        margin: 0;
+        padding: 0;
+    }
+
+    .form-content {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        page-break-inside: avoid;
+    }
+
+    /* برگه A5 افقی، بدون هیچ بوردر خارجی */
+    @page {
+        size: A5 landscape;
+        margin: 0;
+    }
+
+    /* اطمینان از نمایش کل محتوا */
+    .form-content * {
+        visibility: visible !important;
+        overflow: visible !important;
+    }
+}

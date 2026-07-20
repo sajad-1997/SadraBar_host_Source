@@ -1,0 +1,76 @@
+.plate {
+    display: flex;
+    /*align-items: center;*/
+    /*background-color: white;*/
+    border: 3px solid black;
+    border-radius: 8px;
+    padding: 5px 10px;
+    font-weight: bold;
+    direction: rtl;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.4);
+}
+
+/* بخش پرچم و IR */
+.flag-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-right: 3px solid black;
+    padding: 0px 10px;
+    margin-right: 0px;
+    /*background: white;*/
+}
+
+.flag-box img {
+    width: 40px;
+    height: auto;
+    border: 1px solid black;
+}
+
+.flag-box span {
+    font-size: 12px;
+    margin-top: 2px;
+}
+
+/* بخش شماره وسط */
+.number-box {
+    display: flex;
+    align-items: center;
+    font-size: 32px;
+    margin: 0 33px;
+}
+
+.number-box span {
+    margin: 0 3px;
+}
+
+.letter {
+    font-size: 34px;
+    margin: 0 5px;
+}
+
+/* بخش استان */
+.province {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-left: 3px solid black;
+    padding: 0 8px;
+    font-size: 20px;
+}
+
+.checkbox-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 8px;
+}
+
+.checkbox-item {
+    background: #f8f9fa;
+    padding: 5px 10px;
+    border-radius: 6px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}

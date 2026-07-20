@@ -1,0 +1,293 @@
+{% extends "issuance/search/base.html" %}
+{% load static %}
+{% load humanize %}
+{% block content %}
+
+    <div class="container mt-4">
+        <h2 class="mb-4">📊 داشبورد گزارش بارنامه‌ها</h2>
+
+        <!-- 🔹 فیلتر پیشرفته -->
+        <form method="get" class="card p-4 mb-4 shadow-sm">
+            <div class="row g-3">
+
+                <div class="col-md-3">
+                    <label class="form-label">فرستنده</label>
+                    <select name="sender" class="form-select searchable">
+                        <option value="">انتخاب کنید</option>
+                        {% for b in bijaks %}
+                            <option value="{{ b.sender.name }}"
+                                    {% if filters.sender == b.sender.name %}selected{% endif %}>
+                                {{ b.sender.name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label">گیرنده</label>
+                    <select name="receiver" class="form-select searchable">
+                        <option value="">انتخاب کنید</option>
+                        {% for b in bijaks %}
+                            <option value="{{ b.receiver.name }}"
+                                    {% if filters.receiver == b.receiver.name %}selected{% endif %}>
+                                {{ b.receiver.name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label">راننده</label>
+                    <select name="driver" class="form-select searchable">
+                        <option value="">انتخاب کنید</option>
+                        {% for b in bijaks %}
+                            <option value="{{ b.driver.name }}"
+                                    {% if filters.driver == b.driver.name %}selected{% endif %}>
+                                {{ b.driver.name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label">نوع ناوگان</label>
+                    <select name="vehicle" class="form-select">
+                        <option value="">انتخاب کنید</option>
+                        <option value="وانت" {% if filters.vehicle == "وانت" %}selected{% endif %}>وانت</option>
+                        <option value="خاور" {% if filters.vehicle == "خاور" %}selected{% endif %}>خاور</option>
+                    </select>
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label">وضعیت تایید</label>
+                    <select name="approval_status" class="form-select">
+                        <option value="">همه</option>
+                        <option value="approved" {% if filters.approval_status == "approved" %}selected{% endif %}>تایید
+                            شده
+                        </option>
+                        <option value="rejected" {% if filters.approval_status == "rejected" %}selected{% endif %}>رد
+                            شده
+                        </option>
+                        <option value="pending" {% if filters.approval_status == "pending" %}selected{% endif %}>در
+                            انتظار
+                        </option>
+                    </select>
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label">وضعیت نهایی</label>
+                    <select name="type" class="form-select">
+                        <option value="">همه</option>
+                        {% for value, label in TYPE_CHOICES %}
+                            <option value="{{ value }}"
+                                    {% if filters.type_filter == value %}selected{% endif %}>
+                                {{ label }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label">کاربر صادرکننده</label>
+                    <select name="created_by" class="form-select">
+                        <option value="">همه کاربران</option>
+                        {% for user in all_users %}
+                            <option value="{{ user.id }}"
+                                    {% if filters.created_by == user.id|stringformat:"s" %}selected{% endif %}>
+                                {{ user.username }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="col-md-3 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary w-100 me-2">اعمال فیلتر</button>
+                </div>
+
+                <div class="col-md-3 d-flex align-items-end">
+                    <a href="{% url 'report:report_dashboard' %}" class="btn btn-outline-danger w-100">
+                        حذف فیلتر
+                    </a>
+                </div>
+
+            </div>
+        </form>
+
+
+        <!-- 🔹 کارت‌های آماری -->
+        <div class="row text-center mb-4 g-3">
+
+            <div class="col-md-3">
+                <div class="card p-3 shadow-sm">
+                    <strong>۲۴ ساعت اخیر</strong>
+                    <h4>{{ daily_24_count|intcomma }}</h4>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="card p-3 shadow-sm">
+                    <strong>کل امروز</strong>
+                    <h4>{{ today_count|intcomma }}</h4>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="card p-3 shadow-sm">
+                    <strong>داخل ساعت کاری</strong>
+                    <h4>{{ daily_work_count|intcomma }}</h4>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="card p-3 shadow-sm">
+                    <strong>خارج ساعت کاری</strong>
+                    <h4>{{ daily_after_hours_count|intcomma }}</h4>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="card p-3 shadow-sm">
+                    <strong>ماه جاری</strong>
+                    <h4>{{ monthly_count|intcomma }}</h4>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="card p-3 shadow-sm">
+                    <strong>سال جاری</strong>
+                    <h4>{{ yearly_count|intcomma }}</h4>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="card p-3 shadow-sm">
+                    <strong>وانت‌ها</strong>
+                    <h4>{{ vant_count|intcomma }}</h4>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="card p-3 shadow-sm">
+                    <strong>خاورها</strong>
+                    <h4>{{ bari_count|intcomma }}</h4>
+                </div>
+            </div>
+
+        </div>
+
+
+        <!-- 🔹 نمودار -->
+        <div class="card p-4 mb-4 shadow-sm">
+            <canvas id="chart_all" height="100"></canvas>
+        </div>
+
+
+        <!-- 🔹 جدول دسکتاپ -->
+        <table class="desktop-table table table-bordered table-striped">
+            <thead>
+            <tr>
+                <th>ردیف</th>
+                <th>کد رهگیری</th>
+                <th>تاریخ صدور</th>
+                <th>فرستنده</th>
+                <th>گیرنده</th>
+                <th>راننده</th>
+                <th>کرایه کل</th>
+                <th>وضعیت اجرایی</th>
+                <th>وضعیت تایید</th>
+                <th>وضعیت نهایی</th>
+                <th>عملیات</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for b in bijaks %}
+                <tr>
+                    <td>{{ b.id }}</td>
+                    <td>{{ b.tracking_code }}</td>
+                    <td>{{ b.issuance_datetime }}</td>
+                    <td>{{ b.sender.name }}</td>
+                    <td>{{ b.receiver.name }}</td>
+                    <td>{{ b.driver.name }}</td>
+                    <td>{{ b.total_fare|intcomma }}</td>
+                    <td>{{ b.get_status_display }}</td>
+                    <td>{{ b.get_approval_status_display }}</td>
+                    <td>{{ b.get_type_display }}</td>
+                    <td>
+                        <a href="{% url 'issuance:manager:manager_preview' b.pk %}" class="btn btn-sm btn-info">مشاهده</a>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="9" class="text-center">هیچ داده‌ای یافت نشد</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- 🔹 کارت‌های موبایل -->
+        {% for b in bijaks %}
+            <div class="bijak-card">
+                <div class="bijak-header"><b>ردیف:</b> {{ b.id }} | <b>شماره بارنامه:</b> {{ b.tracking_code }}</div>
+                <div class="bijak-row">
+                    <span><b>زمان صدور:</b> {{ b.issuance_datetime }}</span>
+                </div>
+                <div class="bijak-row">
+                    <span><b>فرستنده:</b> {{ b.sender.name }}</span>
+                    <span><b>گیرنده:</b> {{ b.receiver.name }}</span>
+                </div>
+                <div class="bijak-row">
+                    <span><b>کل کرایه:</b> {{ b.total_fare|intcomma }} ریال</span>
+                </div>
+                <div class="bijak-row">
+                    <span><b>ارزش محموله:</b> {{ b.value|intcomma }} ریال</span>
+                </div>
+                <div class="bijak-row">
+                    <span><b>راننده:</b> {{ b.driver.name }}</span>
+                    <span><b>نام محموله:</b> {{ b.cargo.name }}</span>
+                </div>
+                <div class="bijak-row">
+                    <span><b>مبدا:</b> {{ b.cargo.origin }}</span>
+                    <span><b>مقصد:</b> {{ b.cargo.destination }}</span>
+                </div>
+                <div class="bijak-row">
+                    <span><b>وضعیت اجرایی:</b> {{ b.get_status_display }}</span>
+                    <span><b>وضعیت بررسی:</b> {{ b.get_approval_status_display }}</span>
+                    <span><b>وضعیت نهایی:</b> {{ b.get_type_display }}</span>
+                </div>
+                <div class="btn-group-card">
+                    <a href="{% url 'issuance:manager:manager_preview' b.pk %}" class="btn btn-sm btn-info w-100">مشاهده</a>
+                </div>
+            </div>
+        {% empty %}
+            <p class="text-center mt-3">هیچ داده‌ای یافت نشد</p>
+        {% endfor %}
+
+    </div>
+
+
+    <!-- 🔹 Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const dataAll = {{ chart_data_all|safe }};
+        const ctx = document.getElementById('chart_all');
+
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: dataAll.map(d => d.hour),
+                datasets: [{
+                    label: 'تعداد بارنامه‌ها',
+                    data: dataAll.map(d => d.total),
+                    borderColor: 'blue',
+                    fill: false,
+                    tension: 0.3
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {y: {beginAtZero: true, ticks: {precision: 0}}}
+            }
+        });
+    </script>
+
+{% endblock %}

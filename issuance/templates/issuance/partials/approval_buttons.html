@@ -1,0 +1,10 @@
+<form method="post" action="{% url 'approve_bijak' bijak.id %}">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-success">تایید</button>
+</form>
+
+<form method="post" action="{% url 'reject_bijak' bijak.id %}">
+    {% csrf_token %}
+    <input type="text" name="reason" placeholder="علت رد" required>
+    <button type="submit" class="btn btn-danger">رد</button>
+</form>

@@ -1,0 +1,146 @@
+{% extends 'issuance/base.html' %}
+{% block content %}
+    {% load static %}
+    <!DOCTYPE html>
+    <html lang="fa" dir="rtl">
+    <head>
+        <meta charset="UTF-8">
+        <title>فرم بارنامه کامل</title>
+        <link rel="stylesheet"
+              href="https://fonts.googleapis.com/css2?family=Vazirmatn&display=swap">
+        <link rel="stylesheet"
+              href="https://cdn.jsdelivr.net/npm/persian-datepicker@1.2.0/dist/css/persian-datepicker.min.css">
+
+    </head>
+    <body>
+    <div class="container">
+        <h2>فرم ثبت بارنامه جدید</h2>
+        <hr>
+        <hr>
+        <hr>
+        <hr>
+        <!-- shipment_form.html -->
+        <form method="post">
+            {% csrf_token %}
+            <div class="row">
+                <div class="col-md-6">
+                    <label>فرستنده</label>
+                    {{ form.sender }}
+                    <input type="text" id="sender-input" class="form-control" placeholder="جستجوی فرستنده">
+                    <div id="sender-results" class="list-group"></div>
+                </div>
+
+                <div class="col-md-6">
+                    <label>گیرنده</label>
+                    {{ form.receiver }}
+                    <input type="text" id="receiver-input" class="form-control" placeholder="جستجوی گیرنده">
+                    <div id="receiver-results" class="list-group"></div>
+                </div>
+
+                <div class="col-md-6">
+                    <label>راننده</label>
+                    {{ form.driver }}
+                    <input type="text" id="driver-input" class="form-control" placeholder="جستجوی راننده">
+                    <div id="driver-results" class="list-group"></div>
+                </div>
+
+                <div class="col-md-6">
+                    <label>خودرو</label>
+                    {{ form.vehicle }}
+                    <input type="text" id="vehicle-input" class="form-control" placeholder="جستجوی خودرو">
+                    <div id="vehicle-results" class="list-group"></div>
+                </div>
+
+            </div>
+
+            <div class="mt-3">
+                {{ form.cargo_type }} {{ form.cargo_type }}
+                {{ form.weight.label }} {{ form.weight }}
+            </div>
+
+            <button type="submit" class="btn btn-success mt-3">ثبت</button>
+        </form>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/persian-date@1.0.6/dist/persian-date.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/persian-datepicker@1.2.0/dist/js/persian-datepicker.js"></script>
+
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet"/>
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+<script>
+function enableSearch(inputId, resultsId, selectId, searchUrl, labelField="name", extraField=null, extraInputId=null) {
+    let selectedIndex = -1;
+
+    $(`#${inputId}`).on('keyup', function(e){
+        let query = $(this).val().trim();
+
+        if(e.keyCode === 38){ if(selectedIndex > 0) selectedIndex--; highlightItem(); return; }
+        if(e.keyCode === 40){ if(selectedIndex < $(`#${resultsId} .list-group-item`).length - 1) selectedIndex++; highlightItem(); return; }
+        if(e.keyCode === 13){
+            e.preventDefault();
+            let selected = $(`#${resultsId} .list-group-item`).eq(selectedIndex);
+            if(selected.length){ chooseItem(selected); }
+            return;
+        }
+
+        if(query.length === 0){ $(`#${resultsId}`).empty().hide(); selectedIndex = -1; return; }
+
+        $.ajax({
+            url: searchUrl,
+            data: { q: query },
+            success: function(data){
+                let html = "";
+                if(data.results.length > 0){
+                    data.results.forEach(function(item){
+                        html += `<button type="button" class="list-group-item list-group-item-action"
+                                    data-id="${item.id}" data-label="${item[labelField]}" ${extraField ? `data-extra="${item[extraField] || ''}"` : ""}>
+                                    <strong>${item[labelField]}</strong>
+                                    ${item.phone ? " - " + item.phone : ""}
+                                 </button>`;
+                    });
+                } else {
+                    html = `<div class="list-group-item">نتیجه‌ای یافت نشد</div>`;
+                }
+                $(`#${resultsId}`).html(html).show();
+                selectedIndex = -1;
+            }
+        });
+    });
+
+    function highlightItem(){
+        $(`#${resultsId} .list-group-item`).removeClass('active');
+        if(selectedIndex >= 0){
+            $(`#${resultsId} .list-group-item`).eq(selectedIndex).addClass('active');
+        }
+    }
+
+    function chooseItem(item){
+        let id = item.data('id');
+        let label = item.data('label');
+        let extra = item.data('extra');
+        $(`#${selectId}`).val(id);  // مقداردهی به فیلد select فرم
+        $(`#${inputId}`).val(label); // نمایش در input جستجو
+        if(extraField && extraInputId){
+            $(`#${extraInputId}`).val(extra); // شماره پلاک خودرو
+        }
+        $(`#${resultsId}`).empty().hide();
+    }
+
+    $(document).on('click', `#${resultsId} .list-group-item`, function(){
+        chooseItem($(this));
+    });
+}
+
+// فعال‌سازی برای همه فیلدها
+$(document).ready(function(){
+    enableSearch("sender-input", "sender-results", "{{ form.sender.id_for_label }}", "{% url 'search_sender' %}");
+    enableSearch("receiver-input", "receiver-results", "{{ form.receiver.id_for_label }}", "{% url 'search_receiver' %}");
+    enableSearch("driver-input", "driver-results", "{{ form.driver.id_for_label }}", "{% url 'search_driver' %}", "name", "vehicle-input");
+});
+</script>
+    </body>
+    </html>
+{% endblock %}

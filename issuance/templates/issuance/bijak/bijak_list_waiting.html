@@ -1,0 +1,265 @@
+{% extends 'issuance/base.html' %}
+{% load static %}
+
+<link rel="stylesheet" href="{% static 'issuance/css/list_waiting_style.css' %}">
+
+{% block content %}
+    <div class="container mt-4">
+        <h2>بارنامه‌های من</h2>
+        <hr>
+
+        <!-- فرم جستجو -->
+        <form method="get" class="mb-3 row g-2">
+            <div class="col-md-8">
+                <input type="text" name="q" class="form-control"
+                       placeholder="جستجو بر اساس شماره بارنامه، فرستنده، گیرنده، راننده یا پلاک"
+                       value="{{ search_query }}">
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100">جستجو</button>
+            </div>
+            <div class="col-md-2">
+                <a href="{% url 'issuance:crud:pending' %}" class="btn btn-secondary w-100">بازنشانی</a>
+            </div>
+        </form>
+
+        <!-- جدول بارنامه‌ها -->
+        <div class="table-responsive">
+            <table class="table table-striped table-bordered">
+                <thead class="table-dark">
+                <tr>
+                    <th>#</th>
+                    <th>فرستنده</th>
+                    <th>گیرنده</th>
+                    <th>راننده</th>
+                    <th>تلفن</th>
+                    <th>پلاک خودرو</th>
+                    <th>زمان صدور</th>
+                    <th>وضعیت بررسی</th>
+                    <th>زمان بررسی</th>
+                    <th>توضیحات</th>
+                    <th>عملیات</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% if bijaks %}
+                    {% for bijak in bijaks %}
+                        <tr>
+                            <td>{{ bijak.id }}</td>
+                            <td>{{ bijak.sender.name }}</td>
+                            <td>{{ bijak.receiver.name }}</td>
+                            <td>{{ bijak.driver.name }}</td>
+                            <td>{{ bijak.driver.phone }}</td>
+                            <td>
+                                ایران {{ bijak.vehicle.license_plate_series }} ||
+                                {{ bijak.vehicle.license_plate_two_digit }}
+                                {{ bijak.vehicle.license_plate_alphabet }}
+                                {{ bijak.vehicle.license_plate_three_digit }}
+                            </td>
+                            <td>{{ bijak.issuance_datetime|date:"Y/m/d H:i" }}</td>
+                            <td>
+                                {% if bijak.approval_status == 'pending' %}
+                                    <span class="badge bg-warning text-dark">در انتظار بررسی</span>
+                                {% elif bijak.approval_status == 'rejected' %}
+                                    <span class="badge bg-danger">رد شده</span>
+                                {% elif bijak.approval_status == 'approved' %}
+                                    <span class="badge bg-success">تایید شده</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ bijak.approved_at }}</td>
+                            <td>{{ bijak.reject_reason }}</td>
+                            <td>
+                                {% if bijak.approval_status == 'approved' %}
+                                <a href="{% url 'issuance:crud:print' bijak.id %}"
+                                   class="btn btn-success btn-sm">چاپ</a>
+                                    <!--<button type="button" class="btn btn-success btn-sm request-otp-btn"-->
+                                    <!--        data-bijak-id="{{ bijak.id }}"-->
+                                    <!--        data-bijak-number="{{ bijak.tracking_code }}">-->
+                                    <!--    درخواست چاپ-->
+                                    <!--</button>-->
+                                    <!--<a href="{% url 'printing:request_print' %}?waybill_number={{ bijak.waybill_number }}"-->
+                                    <!--   class="btn btn-success btn-sm">-->
+                                    <!--    درخواست چاپ-->
+                                    <!--</a>-->
+                                {% elif bijak.approval_status == 'rejected' %}
+                                    <a href="{% url 'issuance:crud:edit_bijak' bijak.id %}"
+                                       class="btn btn-warning btn-sm">اصلاح</a>
+                                {% else %}
+                                    <span class="text-muted">ناموجود</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="11" class="text-center">هیچ بارنامه‌ای یافت نشد</td>
+                    </tr>
+                {% endif %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- صفحه‌بندی (بدون تغییر) -->
+        {% if bijaks.has_other_pages %}
+            <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-center">
+                    {% if bijaks.has_previous %}
+                        <li class="page-item"><a class="page-link"
+                                                 href="?page=1{% if search_query %}&q={{ search_query }}{% endif %}">اولین</a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled"><span class="page-link">اولین</span></li>
+                    {% endif %}
+                    {% if bijaks.has_previous %}
+                        <li class="page-item"><a class="page-link" href="?page=
+                                {{ bijaks.previous_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}">قبلی</a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled"><span class="page-link">قبلی</span></li>
+                    {% endif %}
+                    {% for page_num in elided_page_range %}
+                        {% if page_num == ELLIPSIS %}
+                            <li class="page-item disabled"><span class="page-link">…</span></li>
+                        {% elif page_num == bijaks.number %}
+                            <li class="page-item active"><span class="page-link">{{ page_num }}</span></li>
+                        {% else %}
+                            <li class="page-item"><a class="page-link" href="?page=
+
+                                    {{ page_num }}{% if search_query %}&q={{ search_query }}{% endif %}">{{ page_num }}</a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                    {% if bijaks.has_next %}
+                        <li class="page-item"><a class="page-link" href="?page=
+
+                                {{ bijaks.next_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}">بعدی</a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled"><span class="page-link">بعدی</span></li>
+                    {% endif %}
+                    {% if bijaks.has_next %}
+                        <li class="page-item"><a class="page-link" href="?page=
+                                {{ bijaks.paginator.num_pages }}{% if search_query %}&q={{ search_query }}{% endif %}">آخرین</a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled"><span class="page-link">آخرین</span></li>
+                    {% endif %}
+                </ul>
+            </nav>
+        {% endif %}
+    </div>
+
+    <!-- Modal برای فرآیند OTP -->
+    <div class="modal fade" id="otpModal" tabindex="-1" aria-labelledby="otpModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="otpModalLabel">تأیید دو مرحله‌ای چاپ بارنامه</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="بستن"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="otpMessage" class="alert alert-info">در حال ارسال درخواست...</div>
+                    <div id="otpStep1" style="display: none;">
+                        <p>کد تأیید برای راننده ارسال شد. لطفاً کد دریافت شده را وارد کنید.</p>
+                        <input type="text" id="otpCodeInput" class="form-control" placeholder="کد ۶ رقمی">
+                        <input type="hidden" id="currentBijakId" value="">
+                        <button id="verifyOtpBtn" class="btn btn-primary mt-2">تأیید کد</button>
+                    </div>
+                    <div id="otpStep2" style="display: none;">
+                        <p id="printLinkContainer"></p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">بستن</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_scripts %}
+{#    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>#}
+{#    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>#}
+    <script>
+        $(document).ready(function () {
+            var otpModal = new bootstrap.Modal(document.getElementById('otpModal'));
+            var currentBijakId = null;
+
+            $('.request-otp-btn').click(function () {
+                var bijakId = $(this).data('bijak-id');
+                currentBijakId = bijakId;
+                $('#otpMessage').removeClass('alert-success alert-danger').addClass('alert-info').text('در حال ارسال درخواست...').show();
+                $('#otpStep1').hide();
+                $('#otpStep2').hide();
+                $('#otpCodeInput').val('');
+                $('#currentBijakId').val(bijakId);
+                otpModal.show();
+
+                $.ajax({
+                    url: "{% url 'printing:api_request_otp' %}",
+                    type: "POST",
+                    contentType: "application/json",
+                    data: JSON.stringify({bijak_id: bijakId}),
+                    headers: {"X-CSRFToken": "{{ csrf_token }}"},
+                    success: function (response) {
+                        if (response.success) {
+                            if (response.need_verification === false) {
+                                $('#otpMessage').removeClass('alert-info').addClass('alert-success').text(response.message);
+                                if (response.print_url) {
+                                    $('#printLinkContainer').html('<a href="' + response.print_url + '" class="btn btn-success" target="_blank">چاپ بارنامه</a>');
+                                    $('#otpStep2').show();
+                                } else {
+                                    $('#otpStep2').html('<p>لطفاً از منوی مربوطه اقدام به چاپ کنید.</p>');
+                                    $('#otpStep2').show();
+                                }
+                            } else {
+                                $('#otpMessage').removeClass('alert-info').addClass('alert-success').text(response.message);
+                                $('#otpStep1').show();
+                            }
+                        } else {
+                            $('#otpMessage').removeClass('alert-info').addClass('alert-danger').text('خطا: ' + response.message);
+                        }
+                    },
+                    error: function () {
+                        $('#otpMessage').removeClass('alert-info').addClass('alert-danger').text('خطا در ارتباط با سرور');
+                    }
+                });
+            });
+
+            $('#verifyOtpBtn').click(function () {
+                var bijakId = $('#currentBijakId').val();
+                var otpCode = $('#otpCodeInput').val();
+                if (!otpCode || otpCode.length !== 6) {
+                    alert('لطفاً کد ۶ رقمی را وارد کنید.');
+                    return;
+                }
+                $('#otpMessage').removeClass('alert-success alert-danger').addClass('alert-info').text('در حال بررسی کد...');
+                $.ajax({
+                    url: "{% url 'printing:api_verify_otp' %}",
+                    type: "POST",
+                    contentType: "application/json",
+                    data: JSON.stringify({bijak_id: bijakId, otp_code: otpCode}),
+                    headers: {"X-CSRFToken": "{{ csrf_token }}"},
+                    success: function (response) {
+                        if (response.success) {
+                            $('#otpMessage').removeClass('alert-info').addClass('alert-success').text(response.message);
+                            $('#otpStep1').hide();
+                            if (response.print_url) {
+                                $('#printLinkContainer').html('<a href="' + response.print_url + '" class="btn btn-success" target="_blank">چاپ بارنامه</a>');
+                                $('#otpStep2').show();
+                            } else {
+                                $('#otpStep2').html('<p>چاپ با موفقیت انجام شد.</p>');
+                                $('#otpStep2').show();
+                            }
+                        } else {
+                            $('#otpMessage').removeClass('alert-info').addClass('alert-danger').text('خطا: ' + response.message);
+                        }
+                    },
+                    error: function () {
+                        $('#otpMessage').removeClass('alert-info').addClass('alert-danger').text('خطا در ارتباط با سرور');
+                    }
+                });
+            });
+        });
+    </script>
+{% endblock %}

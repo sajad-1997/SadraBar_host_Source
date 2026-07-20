@@ -1,0 +1,288 @@
+{% extends "issuance/search/base.html" %}
+{% load humanize %}
+
+{% block content %}
+    <h2>{% block title %}🗂️ مدیریت بررسی بارنامه‌ها{% endblock %}</h2>
+
+    {% if messages %}
+        <div class="mb-3">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <hr>
+    <h3>🔎 بارنامه‌های در انتظار بررسی</h3>
+
+    {% if shipments_pending %}
+        <table class="desktop-table table table-bordered table-striped">
+            <thead>
+            <tr>
+                <th>#</th>
+                <th>زمان صدور</th>
+                <th>فرستنده</th>
+                <th>گیرنده</th>
+                <th>راننده</th>
+                <th>ثبت‌کننده</th>
+                <th>عملیات</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for s in shipments_pending %}
+                <tr>
+                    <td>{{ s.id }}</td>
+                    <td>{{ s.issuance_datetime|date:"Y/m/d H:i" }}</td>
+                    <td>{{ s.sender }}</td>
+                    <td>{{ s.receiver }}</td>
+                    <td>{{ s.driver }}</td>
+                    <td>{{ s.created_by }}</td>
+                    <td>
+                        <a href="{% url 'issuance:manager:manager_preview' s.id %}"
+                           class="btn btn-sm btn-primary">
+                            بررسی و تایید
+                        </a>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p class="text-center text-muted">موردی برای بررسی وجود ندارد.</p>
+    {% endif %}
+
+    <!-- 🔹 کارت‌های موبایل -->
+    {% if shipments_pending %}
+        {% for s in shipments_pending %}
+            <div class="bijak-card">
+                <div class="bijak-header"><b>ردیف:</b> {{ s.id }} | <b>شماره بارنامه:</b> {{ s.tracking_code }}</div>
+                <div class="bijak-row">
+                    <span><b>زمان صدور:</b> {{ s.issuance_datetime }}</span>
+                </div>
+                <div class="bijak-row">
+                    <span><b>فرستنده:</b> {{ s.sender.name }}</span>
+                    <span><b>گیرنده:</b> {{ s.receiver.name }}</span>
+                </div>
+                <div class="bijak-row">
+                    <span><b>کل کرایه:</b> {{ s.total_fare|intcomma }} ریال</span>
+                </div>
+                <div class="bijak-row">
+                    <span><b>ارزش محموله:</b> {{ s.value|intcomma }} ریال</span>
+                </div>
+                <div class="bijak-row">
+                    <span><b>راننده:</b> {{ s.driver.name }}</span>
+                    <span><b>شماره راننده:</b> {{ s.driver.phone }}</span>
+                </div>
+                <div class="bijak-row">
+                    <span><b>نام محموله:</b> {{ s.cargo.name }}</span>
+                    <span><b>وزن محموله:</b> {{ s.cargo.weight }}</span>
+                </div>
+                <div class="bijak-row">
+                    <span><b>مبدا:</b> {{ s.cargo.origin }}</span>
+                    <span><b>مقصد:</b> {{ s.cargo.destination }}</span>
+                </div>
+                <div class="bijak-row">
+                    <span><b>توضیحات:</b>{{ s.final_description }}</span>
+                </div>
+                <div class="bijak-row">
+                    <span><b>وضعیت اجرایی:</b> {{ s.get_status_display }}</span>
+                    <span><b>وضعیت بررسی:</b> {{ s.get_approval_status_display }}</span>
+                    <span><b>وضعیت نهایی:</b> {{ s.get_type_display }}</span>
+                    <span><b>ثبت کننده:</b> {{ s.created_by }}</span>
+                </div>
+                <div class="btn-group-card">
+                    <a href="{% url 'issuance:manager:manager_preview' s.id %}"
+                           class="btn btn-sm btn-primary">
+                            بررسی و تایید
+                    </a>
+                </div>
+            </div>
+        {% empty %}
+            <p class="text-center mt-3">موردی برای بررسی وجود ندارد.</p>
+        {% endfor %}
+    {% endif %}
+
+    <hr>
+    <h3>✅ بارنامه‌های تایید شده</h3>
+
+    {% if shipments_approved %}
+        <table class="desktop-table table table-bordered table-striped">
+            <thead>
+            <tr>
+                <th>#</th>
+                <th>تاریخ صدور</th>
+                <th>فرستنده</th>
+                <th>گیرنده</th>
+                <th>راننده</th>
+                <th>ثبت‌کننده</th>
+                <th>عملیات</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for s in shipments_approved %}
+                <tr>
+                    <td>{{ s.id }}</td>
+                    <td>{{ s.issuance_datetime|date:"Y/m/d H:i" }}</td>
+                    <td>{{ s.sender }}</td>
+                    <td>{{ s.receiver }}</td>
+                    <td>{{ s.driver }}</td>
+                    <td>{{ s.created_by }}</td>
+                    <td>
+                        <a href="{% url 'issuance:crud:print' s.id %}" class="btn btn-sm btn-success">
+                            چاپ بارنامه
+                        </a>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p class="text-center text-muted">بارنامه تایید شده‌ای وجود ندارد.</p>
+    {% endif %}
+
+<!-- 🔹 کارت‌های موبایل -->
+    {% if shipments_approved %}
+        {% for s in shipments_approved %}
+            <div class="bijak-card">
+                <div class="bijak-header"><b>ردیف:</b> {{ s.id }} | <b>شماره بارنامه:</b> {{ s.tracking_code }}</div>
+                <div class="bijak-row">
+                    <span><b>زمان صدور:</b> {{ s.issuance_datetime }}</span>
+                </div>
+                <div class="bijak-row">
+                    <span><b>فرستنده:</b> {{ s.sender.name }}</span>
+                    <span><b>گیرنده:</b> {{ s.receiver.name }}</span>
+                </div>
+                <div class="bijak-row">
+                    <span><b>کل کرایه:</b> {{ s.total_fare|intcomma }} ریال</span>
+                </div>
+                <div class="bijak-row">
+                    <span><b>ارزش محموله:</b> {{ s.value|intcomma }} ریال</span>
+                </div>
+                <div class="bijak-row">
+                    <span><b>راننده:</b> {{ s.driver.name }}</span>
+                    <span><b>شماره راننده:</b> {{ s.driver.phone }}</span>
+                </div>
+                <div class="bijak-row">
+                    <span><b>نام محموله:</b> {{ s.cargo.name }}</span>
+                    <span><b>وزن محموله:</b> {{ s.cargo.weight }}</span>
+                </div>
+                <div class="bijak-row">
+                    <span><b>مبدا:</b> {{ s.cargo.origin }}</span>
+                    <span><b>مقصد:</b> {{ s.cargo.destination }}</span>
+                </div>
+                <div class="bijak-row">
+                    <span><b>توضیحات:</b>{{ s.final_description }}</span>
+                </div>
+                <div class="bijak-row">
+                    <span><b>وضعیت اجرایی:</b> {{ s.get_status_display }}</span>
+                    <span><b>وضعیت بررسی:</b> {{ s.get_approval_status_display }}</span>
+                    <span><b>وضعیت نهایی:</b> {{ s.get_type_display }}</span>
+                    <span><b>ثبت کننده:</b> {{ s.created_by }}</span>
+                </div>
+                <div class="btn-group-card">
+                    <a href="{% url 'issuance:crud:print' s.id %}" class="btn btn-sm btn-success">
+                            چاپ بارنامه
+                    </a>
+                </div>
+            </div>
+        {% empty %}
+            <p class="text-center mt-3">بارنامه تایید شده‌ای وجود ندارد.</p>
+        {% endfor %}
+    {% endif %}
+
+
+    <hr>
+    <h3>❌ بارنامه‌های رد شده</h3>
+
+    {% if shipments_rejected %}
+        <table class="desktop-table table table-bordered table-striped">
+            <thead>
+            <tr>
+                <th>#</th>
+                <th>تاریخ صدور</th>
+                <th>فرستنده</th>
+                <th>گیرنده</th>
+                <th>راننده</th>
+                <th>ثبت کننده</th>
+                <th>علت رد</th>
+                <th>عملیات</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for s in shipments_rejected %}
+                <tr>
+                    <td>{{ s.id }}</td>
+                    <td>{{ s.issuance_datetime|date:"Y/m/d H:i" }}</td>
+                    <td>{{ s.sender }}</td>
+                    <td>{{ s.receiver }}</td>
+                    <td>{{ s.driver }}</td>
+                    <td>{{ s.created_by }}</td>
+                    <td>{{ s.reject_reason }}</td>
+                    <td>
+                        <p class="text-center text-muted">در انتظار اصلاح</p>
+{#                        <a href="{% url 'issuance:crud:print' s.id %}" class="btn btn-sm btn-success">#}
+{#                            چاپ بارنامه#}
+{#                        </a>#}
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p class="text-center text-muted">بارنامه رد شده‌ای وجود ندارد.</p>
+    {% endif %}
+
+    <!-- 🔹 کارت‌های موبایل -->
+    {% if shipments_rejected %}
+        {% for s in shipments_rejected %}
+            <div class="bijak-card">
+                <div class="bijak-header"><b>ردیف:</b> {{ s.id }} | <b>شماره بارنامه:</b> {{ s.tracking_code }}</div>
+                <div class="bijak-row">
+                    <span><b>زمان صدور:</b> {{ s.issuance_datetime }}</span>
+                </div>
+                <div class="bijak-row">
+                    <span><b>فرستنده:</b> {{ s.sender.name }}</span>
+                    <span><b>گیرنده:</b> {{ s.receiver.name }}</span>
+                </div>
+                <div class="bijak-row">
+                    <span><b>کل کرایه:</b> {{ s.total_fare|intcomma }} ریال</span>
+                </div>
+                <div class="bijak-row">
+                    <span><b>ارزش محموله:</b> {{ s.value|intcomma }} ریال</span>
+                </div>
+                <div class="bijak-row">
+                    <span><b>راننده:</b> {{ s.driver.name }}</span>
+                    <span><b>شماره راننده:</b> {{ s.driver.phone }}</span>
+                </div>
+                <div class="bijak-row">
+                    <span><b>نام محموله:</b> {{ s.cargo.name }}</span>
+                    <span><b>وزن محموله:</b> {{ s.cargo.weight }}</span>
+                </div>
+                <div class="bijak-row">
+                    <span><b>مبدا:</b> {{ s.cargo.origin }}</span>
+                    <span><b>مقصد:</b> {{ s.cargo.destination }}</span>
+                </div>
+                <div class="bijak-row">
+                    <span><b>توضیحات:</b>{{ s.final_description }}</span>
+                </div>
+                <div class="bijak-row">
+                    <span><b>وضعیت اجرایی:</b> {{ s.get_status_display }}</span>
+                    <span><b>وضعیت بررسی:</b> {{ s.get_approval_status_display }}</span>
+                    <span><b>وضعیت نهایی:</b> {{ s.get_type_display }}</span>
+                    <span><b>ثبت کننده:</b> {{ s.created_by }}</span>
+                </div>
+                <div class="btn-group-card">
+                    <p class="text-center text-muted">در انتظار اصلاح</p>
+{#                        <a href="{% url 'issuance:crud:print' s.id %}" class="btn btn-sm btn-success">#}
+{#                            چاپ بارنامه#}
+{#                        </a>#}
+                </div>
+            </div>
+        {% empty %}
+            <p class="text-center mt-3">بارنامه رد شده‌ای وجود ندارد.</p>
+        {% endfor %}
+    {% endif %}
+
+
+
+{% endblock %}

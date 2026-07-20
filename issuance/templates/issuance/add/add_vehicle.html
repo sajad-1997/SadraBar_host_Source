@@ -1,0 +1,103 @@
+{% extends "issuance/base.html" %}
+{% block content %}
+
+    <div class="container">
+
+        <h3>افزودن اطلاعات خودرو جدید</h3>
+        <hr>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">ذخیره و ثبت نهایی</button>
+        <button type="button" onclick="parsePlate()">نمایش پلاک</button>
+
+
+    </form>
+</div>
+
+<div id="result" style="margin-top:15px;text-align:center;"></div>
+
+{##}
+{#<h2>ورود شماره پلاک خودرو</h2>#}
+{#<p>مثال: <strong>12الف34567</strong></p>#}
+{##}
+{#<input type="text" id="plateInput" placeholder="شماره پلاک را وارد کنید">#}
+{#<button onclick="parsePlate()">نمایش</button>#}
+{##}
+{#<div class="result" id="result"></div>#}
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+        /* ===== کنترل مجوز خوراک دام ===== */
+        const animalLicenseSelect = document.getElementById('id_animal_license');
+        const veterinaryCodeInput = document.getElementById('id_veterinary_code');
+
+        function toggleVeterinaryCode() {
+            if (animalLicenseSelect.value === 'Yes') {
+                veterinaryCodeInput.disabled = false;
+            } else {
+                veterinaryCodeInput.disabled = true;
+                veterinaryCodeInput.value = '';
+            }
+        }
+
+        if (animalLicenseSelect && veterinaryCodeInput) {
+            animalLicenseSelect.addEventListener('change', toggleVeterinaryCode);
+            toggleVeterinaryCode(); // اجرای اولیه
+        }
+
+        /* ===== نمایش پلاک ===== */
+        window.parsePlate = function () {
+            const part2 = document.getElementById('id_license_plate_two_digit').value.trim();
+            const letter = document.getElementById('id_license_plate_alphabet').value.trim();
+            const part3 = document.getElementById('id_license_plate_three_digit').value.trim();
+            const series = document.getElementById('id_license_plate_series').value.trim();
+
+            const plateRegexLetter = /^[اآبپتثجچحخدذرزسشصضطظعغفقکگلمنوهی]$/;
+
+            if (
+                /^\d{2}$/.test(part2) &&
+                plateRegexLetter.test(letter) &&
+                /^\d{3}$/.test(part3) &&
+                /^\d{2}$/.test(series)
+            ) {
+                document.getElementById('result').innerHTML = `
+                <div style="
+                    display:inline-block;
+                    padding:10px 15px;
+                    border:2px solid #000;
+                    border-radius:6px;
+                    background:#fefefe;
+                    font-weight:bold;
+                    font-size:22px;
+                    letter-spacing:3px;">
+                    ${part2} ${letter} ${part3}
+                    <span style="margin-right:10px;font-size:16px;color:#0d47a1;">
+                        ایران ${series}
+                    </span>
+                </div>
+            `;
+            } else {
+                document.getElementById('result').innerHTML =
+                    "<p style='color:red'>فرمت پلاک معتبر نیست</p>";
+            }
+        };
+        
+        $('#id_driver').select2({
+            width: '100%',
+            placeholder: 'نام راننده را جستجو کنید',
+            allowClear: true,
+            language: {
+                noResults: function () {
+                    return "راننده‌ای پیدا نشد";
+                },
+                searching: function () {
+                    return "در حال جستجو...";
+                }
+            }
+        });
+    });
+</script>
+
+{% endblock %}

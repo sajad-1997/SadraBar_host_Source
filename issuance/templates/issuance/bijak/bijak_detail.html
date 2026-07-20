@@ -1,0 +1,30 @@
+{% if user.is_superuser or user.is_staff %}
+    <h4>تاریخچه تأیید و رد</h4>
+
+    <table class="table table-bordered">
+        <thead>
+        <tr>
+            <th>عملیات</th>
+            <th>کاربر</th>
+            <th>تاریخ</th>
+            <th>دلیل (در صورت رد)</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for log in bijak.approval_logs.all %}
+            <tr>
+                <td>
+                    {% if log.action == 'approved' %}
+                        تأیید
+                    {% else %}
+                        رد
+                    {% endif %}
+                </td>
+                <td>{{ log.user }}</td>
+                <td>{{ log.timestamp|date:"Y/m/d H:i" }}</td>
+                <td>{{ log.reason }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endif %}
