@@ -1,8 +1,8 @@
 import os
 import sys
-# from dotenv import load_dotenv
+from dotenv import load_dotenv
 
-# load_dotenv()
+load_dotenv()
 """
 Django settings for SadraBar project.
 
@@ -17,26 +17,36 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-import issuance.apps
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+
+def env_bool(name, default=False):
+    value = os.getenv(name)
+    if value is None:
+        return default
+    return value.strip().lower() in ("1", "true", "yes", "on")
+
+
+def env_list(name, default=""):
+    value = os.getenv(name, default)
+    return [item.strip() for item in value.split(",") if item.strip()]
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv("SECRET_KEY")
+SECRET_KEY = os.getenv(
+    "SECRET_KEY",
+    "django-insecure-local-development-key-change-me",
+)
 
 # SECURITY WARNING: don't run with debug turned on in production!
-# DEBUG = os.getenv("DEBUG") == "True"
-# DEBUG = os.getenv("DEBUG") == "False"
-
-DEBUG = True
-print("DEBUG STATUS:", DEBUG)
+DEBUG = env_bool("DEBUG", default=True)
 
 
-ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "").split(",")
-PUBLIC_DOMAIN = 'http://sadrabarkhorasan.ir'
+ALLOWED_HOSTS = env_list("ALLOWED_HOSTS", "localhost,127.0.0.1")
+PUBLIC_DOMAIN = os.getenv("PUBLIC_DOMAIN", "http://localhost:8000")
 
 
 CSRF_FAILURE_VIEW = 'issuance.views.error_views.csrf_failure'
@@ -64,8 +74,8 @@ INSTALLED_APPS = [
 
 ]
 
-CELERY_BROKER_URL = 'redis://localhost:6379/0'
-CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL", "redis://localhost:6379/0")
+CELERY_RESULT_BACKEND = os.getenv("CELERY_RESULT_BACKEND", "redis://localhost:6379/0")
 
 AUTH_USER_MODEL = 'accounts.User'
 LOGIN_REDIRECT_URL = 'dashboard'   # صفحه‌ای که بعد از لاگین می‌ره
@@ -177,16 +187,16 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'public_html', 'media')
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-SITE_URL = 'https://sadrabarkhorasan.ir'
+SITE_URL = os.getenv("SITE_URL", PUBLIC_DOMAIN)
 
 
 # ========== تنظیمات SMS.ir ==========
-SMS_IR_API_KEY = 'e7zoyOkllxtTSJ0wPPnlniCc7gvZu8cmzLdxoP3PIYOzlHF6'   # از پنل sms.ir کپی کن
-SMS_IR_PATTERN_CODE = '565000'  # مثلاً "123456"
-SMS_IR_LINE_NUMBER = '50003181890144'  # در صورت نیاز (اختیاری)
+SMS_IR_API_KEY = os.getenv("SMS_IR_API_KEY", "")
+SMS_IR_PATTERN_CODE = os.getenv("SMS_IR_PATTERN_CODE", "")
+SMS_IR_LINE_NUMBER = os.getenv("SMS_IR_LINE_NUMBER", "")
 
 # برای محیط لوکال، ارسال واقعی را غیرفعال می‌کنیم
-SMS_IR_FAKE_MODE = False   # در لوکال True، در سرور False
+SMS_IR_FAKE_MODE = env_bool("SMS_IR_FAKE_MODE", default=True)
 
 
 # تنظیمات لاگینگ

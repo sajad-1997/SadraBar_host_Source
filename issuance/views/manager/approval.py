@@ -17,10 +17,10 @@ def send_for_approval(request, bijak_id):
 
     if bijak.approval_status != "pending":
         messages.warning(request, "این بارنامه قبلاً بررسی شده است.")
-        return redirect(reverse("bijak_detail", args=[bijak.id]))
+        return redirect(reverse("issuance:manager:manager_preview", args=[bijak.id]))
 
     messages.success(request, "بارنامه با موفقیت برای بررسی مدیر ارسال شد.")
-    return redirect(reverse("bijak_detail", args=[bijak.id]))
+    return redirect(reverse("issuance:manager:manager_preview", args=[bijak.id]))
 
 
 @login_required
@@ -30,7 +30,7 @@ def approve_bijak(request, bijak_id):
 
     if bijak.is_approved:
         messages.warning(request, "این بارنامه قبلاً تأیید شده است.")
-        return redirect(reverse("manager_waiting_list"))
+        return redirect(reverse("issuance:manager:waiting_list"))
 
     bijak.approval_status = "approved"
     bijak.status = "issued"
@@ -45,7 +45,7 @@ def approve_bijak(request, bijak_id):
     )
 
     messages.success(request, "بارنامه تأیید شد و مجوز چاپ گرفت.")
-    return redirect(reverse("manager_waiting_list"))
+    return redirect(reverse("issuance:manager:waiting_list"))
 
 
 @login_required
@@ -56,7 +56,7 @@ def reject_bijak(request, bijak_id):
 
     if not reason:
         messages.error(request, "علت رد باید وارد شود.")
-        return redirect(reverse("manager_waiting_list"))
+        return redirect(reverse("issuance:manager:waiting_list"))
 
     bijak.approval_status = "rejected"
     bijak.status = "draft"
@@ -72,4 +72,4 @@ def reject_bijak(request, bijak_id):
     )
 
     messages.error(request, "بارنامه رد شد.")
-    return redirect(reverse("manager_waiting_list"))
+    return redirect(reverse("issuance:manager:waiting_list"))

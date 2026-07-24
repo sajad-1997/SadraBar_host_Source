@@ -1,6 +1,7 @@
 # 3️⃣ vehicle_views.py
 
 from django.contrib.auth.decorators import login_required
+from django.db.models import Q
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from django.views.decorators.cache import never_cache
@@ -22,9 +23,24 @@ def add_vehicle(request):
 @login_required
 def search_vehicle(request):
     q = request.GET.get('q', '')
-    vehicles = Vehicle.objects.filter(plate__icontains=q)[:5]
+    vehicles = Vehicle.objects.filter(
+        Q(license_plate_two_digit__icontains=q) |
+        Q(license_plate_alphabet__icontains=q) |
+        Q(license_plate_three_digit__icontains=q) |
+        Q(license_plate_series__icontains=q) |
+        Q(vehicle_smart_card__icontains=q)
+    )[:5]
     return JsonResponse({
-        'results': list(vehicles.values())
+        'results': list(vehicles.values(
+            'id',
+            'driver_id',
+            'type',
+            'license_plate_two_digit',
+            'license_plate_alphabet',
+            'license_plate_three_digit',
+            'license_plate_series',
+            'vehicle_smart_card',
+        ))
     })
 
 

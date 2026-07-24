@@ -8,7 +8,7 @@ from issuance.models import Bijak
 
 def is_manager(user):
     """فقط مدیر یا ادمین مجاز است"""
-    return user.is_superuser or user.is_staff
+    return user.is_superuser or getattr(user, 'role', None) in ['admin', 'manager']
 
 
 @login_required
@@ -16,7 +16,7 @@ def is_manager(user):
 def bijak_list_waiting_approval(request):
     """نمایش لیست بارنامه‌های در حالت در انتظار تایید"""
     bijaks = Bijak.objects.filter(approval_status="pending").order_by('-id')
-    return render(request, 'issuance/bijak_list_waiting.html', {'bijaks': bijaks})
+    return render(request, 'issuance/bijak/bijak_list_waiting.html', {'bijaks': bijaks})
 
 
 @login_required
@@ -24,7 +24,7 @@ def bijak_list_waiting_approval(request):
 def bijak_approve_view(request, pk):
     """نمایش پیش‌نمایش بارنامه برای تایید یا رد"""
     bijak = get_object_or_404(Bijak, pk=pk)
-    return render(request, 'issuance/bijak_approve.html', {'bijak': bijak})
+    return render(request, 'issuance/bijak/bijak_approve.html', {'bijak': bijak})
 
 
 @login_required
@@ -36,17 +36,17 @@ def bijak_approve_submit(request, pk):
 
     if not action:
         messages.error(request, "عملیات نامعتبر.")
-        return redirect(reverse('bijak_approve', args=[pk]))
+        return redirect(reverse('issuance:bijak_approval:bijak_approve', args=[pk]))
 
     # جلوگیری از تأیید دوباره
     if bijak.is_approved:
         messages.warning(request, "این بارنامه قبلاً تأیید شده است.")
-        return redirect(reverse('bijak_detail', args=[pk]))
+        return redirect(reverse('issuance:crud:preview', args=[pk]))
 
     # جلوگیری از رد دوباره
     if bijak.is_rejected:
         messages.warning(request, "این بارنامه قبلاً رد شده است.")
-        return redirect(reverse('bijak_detail', args=[pk]))
+        return redirect(reverse('issuance:crud:preview', args=[pk]))
 
     # عملیات تأیید
     if action == "approve":
@@ -55,7 +55,7 @@ def bijak_approve_submit(request, pk):
         bijak.save()
 
         messages.success(request, "بارنامه با موفقیت تأیید شد.")
-        return redirect(reverse('bijak_detail', args=[pk]))
+        return redirect(reverse('issuance:crud:preview', args=[pk]))
 
     # عملیات رد
     elif action == "reject":
@@ -63,7 +63,7 @@ def bijak_approve_submit(request, pk):
 
         if not reject_reason.strip():
             messages.error(request, "علت رد بارنامه باید نوشته شود.")
-            return redirect(reverse('bijak_approve', args=[pk]))
+            return redirect(reverse('issuance:bijak_approval:bijak_approve', args=[pk]))
 
         bijak.approval_status = "rejected"
         bijak.rejected_by = request.user
@@ -71,8 +71,8 @@ def bijak_approve_submit(request, pk):
         bijak.save()
 
         messages.error(request, "بارنامه رد شد.")
-        return redirect(reverse('bijak_detail', args=[pk]))
+        return redirect(reverse('issuance:crud:preview', args=[pk]))
 
     else:
         messages.error(request, "درخواست ناشناخته.")
-        return redirect(reverse('bijak_approve', args=[pk]))
+        return redirect(reverse('issuance:bijak_approval:bijak_approve', args=[pk]))

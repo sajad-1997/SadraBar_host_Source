@@ -48,7 +48,7 @@ def edit_bijak(request, pk):
             cargo_form.save()
 
             messages.success(request, "بیجک با موفقیت ویرایش شد ✅")
-            return redirect('preview', pk=bijak.pk)  # صفحه نمایش نهایی
+            return redirect('issuance:crud:preview', pk=bijak.pk)
     else:
         bijak_form = ShipmentForm(instance=bijak)
         sender_form = CustomerForm(prefix='sender', instance=bijak.sender)

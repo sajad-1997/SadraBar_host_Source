@@ -31,7 +31,7 @@ def edit_bijak(request, pk):
             cargo_form.save()
             shipment_form.save()
             messages.success(request, "بارنامه با موفقیت ویرایش شد")
-            return redirect('preview', pk=bijak.id)
+            return redirect('issuance:crud:preview', pk=bijak.id)
 
         show_form_errors(request, shipment_form, "اطلاعات بارنامه")
         show_form_errors(request, cargo_form, "اطلاعات محموله")

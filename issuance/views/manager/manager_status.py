@@ -8,7 +8,7 @@ ALLOWED_UNLOCK_ROLES = ['admin', 'manager']
 
 
 def is_manager(user):
-    return user.is_superuser or user.is_staff or getattr(user, 'is_manager', False)
+    return user.is_superuser or getattr(user, 'role', None) in ALLOWED_UNLOCK_ROLES
 
 
 @login_required
@@ -22,8 +22,7 @@ def manager_set_final_status(request, pk):
 
     can_override_lock = (
             request.user.is_superuser
-            or request.user.is_staff
-            or is_manager
+            or is_manager(request.user)
     )
 
     logs = BijakFinalStatusLog.objects.filter(
