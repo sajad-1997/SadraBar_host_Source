@@ -1,6 +1,9 @@
 # jalali_filters.py
 import jdatetime
 from django import template
+import logging
+
+logger = logging.getLogger(__name__)
 
 register = template.Library()
 
@@ -44,6 +47,6 @@ def jalali_datetime(value, format='%Y/%m/%d %H:%M'):
             else:
                 return to_jalali(value)
         except Exception as e:
-            print(f"Error converting datetime: {e}")
+            logger.error(f"Error converting datetime: {e}")
             return value
     return value

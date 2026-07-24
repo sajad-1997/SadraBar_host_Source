@@ -389,16 +389,10 @@ class ShipmentForm(forms.ModelForm):
             )
 
         except Exception as e:
-            # چاپ مستقیم در کنسول سرور
-            print("=" * 50)
-            print(f"ERROR in ShipmentForm.clean: {e}")
-            print(f"raw_date={raw_date!r} (type={type(raw_date)})")
-            print(f"raw_time={raw_time!r} (type={type(raw_time)})")
-            import traceback
-            traceback.print_exc()
-            print("=" * 50)
-
-            # لاگ نیز ثبت شود
+            # لاگ خطا به جای print
+            logger.error("ERROR in ShipmentForm.clean: %s", e)
+            logger.error("raw_date=%r (type=%s)", raw_date, type(raw_date))
+            logger.error("raw_time=%r (type=%s)", raw_time, type(raw_time))
             logger.exception("Invalid issuance date/time | date=%s time=%s", raw_date, raw_time)
 
             raise forms.ValidationError("تاریخ یا ساعت وارد شده معتبر نیست.")
