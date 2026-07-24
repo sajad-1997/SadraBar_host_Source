@@ -5,6 +5,9 @@ from django.views.generic import TemplateView
 from django.shortcuts import render, redirect
 from django.core.mail import send_mail
 from django.conf import settings
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 # ممکن است نیاز به فرم داشته باشید
@@ -86,7 +89,7 @@ def contact_submit_view(request):
                 return redirect('contact')  # یا به همان صفحه تماس برگردید با پیام موفقیت
             except Exception as e:
                 # مدیریت خطا در صورت بروز مشکل در ارسال ایمیل
-                print(f"Error sending email: {e}")
+                logger.error(f"Error sending email: {e}")
                 # return render(request, 'contact.html', {'error': 'خطا در ارسال پیام.'})
                 return redirect('contact')  # یا به صفحه تماس برگردید با پیام خطا
 

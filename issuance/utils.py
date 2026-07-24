@@ -1,5 +1,8 @@
 import jdatetime
 from num2words import num2words
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 def num_to_word_rial(value):
@@ -48,13 +51,13 @@ def gregorian_to_persian(date_obj):
         return ''
 
     try:
-        print(f"🔍 gregorian_to_persian INPUT: {date_obj}, type: {type(date_obj)}")
+        logger.debug(f"gregorian_to_persian INPUT: {date_obj}, type: {type(date_obj)}")
 
         # اگر از نوع jdatetime.date است (شمسی در پایتون)
         if isinstance(date_obj, jdatetime.date):
             # بررسی: اگر سال خیلی کوچک است (کمتر از 1300)، احتمالاً تاریخ میلادی است که اشتباه تفسیر شده
             if date_obj.year < 1300:
-                print(f"⚠️  WARNING: Year {date_obj.year} is too small. Might be Gregorian mis-converted.")
+                logger.warning(f"WARNING: Year {date_obj.year} is too small. Might be Gregorian mis-converted.")
                 # سعی می‌کنیم فرض کنیم این تاریخ میلادی است
                 try:
                     # فرض می‌کنیم سال میلادی است (مثلاً 1996)
@@ -73,7 +76,7 @@ def gregorian_to_persian(date_obj):
                 date_obj = date_obj.date()
             j_date = jdatetime.date.fromgregorian(date=date_obj)
 
-        print(f"🔍 Jalali date: {j_date}")
+        logger.debug(f"Jalali date: {j_date}")
 
         # تبدیل اعداد به فارسی
         persian_nums = '۰۱۲۳۴۵۶۷۸۹'
@@ -88,9 +91,9 @@ def gregorian_to_persian(date_obj):
         day_fa = ''.join(persian_nums[int(digit)] for digit in day_str)
 
         result = f"{year_fa}/{month_fa}/{day_fa}"
-        print(f"🔍 FINAL RESULT: {result}")
+        logger.debug(f"FINAL RESULT: {result}")
         return result
 
     except Exception as e:
-        print(f"❌ ERROR in gregorian_to_persian: {e}")
+        logger.error(f"ERROR in gregorian_to_persian: {e}")
         return str(date_obj)

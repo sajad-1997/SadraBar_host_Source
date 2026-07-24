@@ -50,7 +50,7 @@ def send_otp_via_smsir(phone_number, code):
 
         # بررسی موفقیت بر اساس ساختار پاسخ sms.ir (status=1 یعنی موفق)
         if data.get("status") == 1:
-            print(f"[DEBUG] پیامک با موفقیت ارسال شد. messageId: {data.get('data', {}).get('messageId')}")
+            logger.info(f"SMS sent successfully. messageId: {data.get('data', {}).get('messageId')}")
             return True, "پیامک با موفقیت ارسال شد"
         else:
             error_msg = data.get("message", "خطای ناشناخته")
