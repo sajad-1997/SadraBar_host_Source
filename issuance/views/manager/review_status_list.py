@@ -12,7 +12,14 @@ def is_manager(user):
 @login_required
 @user_passes_test(is_manager)
 def final_status_list(request):
-    shipments = Bijak.objects.all().order_by('-id')
+    # بهینه‌سازی کوئری با select_related برای کاهش تعداد queryهای دیتابیس
+    shipments = Bijak.objects.select_related(
+        'sender',
+        'receiver',
+        'driver',
+        'vehicle',
+        'cargo'
+    ).all().order_by('-id')
 
     status_groups = [
         ('draft', 'پیش‌نویس'),

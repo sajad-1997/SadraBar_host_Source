@@ -19,8 +19,8 @@ class Bijak(UserTrackingModel):
     # =========================
     # اطلاعات پایه بارنامه
     # =========================
-    tracking_code = models.CharField(max_length=15, unique=True)
-    issuance_datetime = jmodels.jDateTimeField(verbose_name="تاریخ و ساعت صدور بارنامه")
+    tracking_code = models.CharField(max_length=15, unique=True, db_index=True)
+    issuance_datetime = jmodels.jDateTimeField(verbose_name="تاریخ و ساعت صدور بارنامه", db_index=True)
     value = models.DecimalField(max_digits=15, decimal_places=0, verbose_name="ارزش محموله")
     insurance = models.DecimalField(max_digits=15, decimal_places=0, verbose_name="مبلغ بیمه")
     loading_fee = models.DecimalField(max_digits=15, decimal_places=0, blank=True, null=True, verbose_name="هزینه بارگیری")
@@ -29,11 +29,11 @@ class Bijak(UserTrackingModel):
     freight = models.DecimalField(max_digits=15, decimal_places=0, verbose_name="کل کرایه")
     total_fare = models.DecimalField(max_digits=15, decimal_places=0, verbose_name="کرایه پرداختی در مقصد")
 
-    sender = models.ForeignKey('Customer', on_delete=models.CASCADE, related_name='sender_bijaks')
-    receiver = models.ForeignKey('Customer', on_delete=models.CASCADE, related_name='received_bijaks')
-    driver = models.ForeignKey('Driver', on_delete=models.CASCADE, related_name='driver_bijaks')
-    vehicle = models.ForeignKey('Vehicle', on_delete=models.CASCADE, related_name='vehicle_bijaks')
-    cargo = models.ForeignKey('Cargo', on_delete=models.CASCADE, related_name='cargo_bijaks')
+    sender = models.ForeignKey('Customer', on_delete=models.CASCADE, related_name='sender_bijaks', db_index=True)
+    receiver = models.ForeignKey('Customer', on_delete=models.CASCADE, related_name='received_bijaks', db_index=True)
+    driver = models.ForeignKey('Driver', on_delete=models.CASCADE, related_name='driver_bijaks', db_index=True)
+    vehicle = models.ForeignKey('Vehicle', on_delete=models.CASCADE, related_name='vehicle_bijaks', db_index=True)
+    cargo = models.ForeignKey('Cargo', on_delete=models.CASCADE, related_name='cargo_bijaks', db_index=True)
     # insurance_company = models.ForeignKey('insurance.InsuranceCompany', null=True, blank=True, on_delete=models.SET_NULL,
     #                                       default='بیمه ایران', related_name='insurance_bijaks')
 
@@ -50,7 +50,8 @@ class Bijak(UserTrackingModel):
     status = models.CharField(
         max_length=50,
         choices=STATUS_CHOICES,
-        default='draft'
+        default='draft',
+        db_index=True
     )
 
     # =========================
@@ -71,7 +72,8 @@ class Bijak(UserTrackingModel):
     type = models.CharField(
         max_length=50,
         choices=TYPE_CHOICES,
-        default='sent'
+        default='sent',
+        db_index=True
     )
     
     # =========================
@@ -86,7 +88,8 @@ class Bijak(UserTrackingModel):
     approval_status = models.CharField(
         max_length=20,
         choices=APPROVAL_STATUS_CHOICES,
-        default='pending'
+        default='pending',
+        db_index=True
     )
 
     approved_by = models.ForeignKey(

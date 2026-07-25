@@ -10,7 +10,8 @@ class UserTrackingModel(models.Model):
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        related_name="%(class)s_created"
+        related_name="%(class)s_created",
+        db_index=True
     )
     created_by_role = models.CharField(max_length=50, blank=True, null=True)
 
@@ -19,12 +20,13 @@ class UserTrackingModel(models.Model):
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        related_name="%(class)s_updated"
+        related_name="%(class)s_updated",
+        db_index=True
     )
     updated_by_role = models.CharField(max_length=50, blank=True, null=True)
 
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+    updated_at = models.DateTimeField(auto_now=True, db_index=True)
 
     class Meta:
         abstract = True

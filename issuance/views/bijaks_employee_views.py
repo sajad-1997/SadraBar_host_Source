@@ -1,5 +1,3 @@
-# views_employee_pending_bijaks.py
-# views_employee_pending_bijaks.py
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.db.models import Q
@@ -14,7 +12,14 @@ def pending_bijaks(request):
     """
     search_query = request.GET.get('q', '').strip()
 
-    bijaks = Bijak.objects.filter(
+    # بهینه‌سازی کوئری با select_related برای کاهش تعداد queryهای دیتابیس
+    bijaks = Bijak.objects.select_related(
+        'sender',
+        'receiver',
+        'driver',
+        'vehicle',
+        'cargo'
+    ).filter(
         created_by=request.user,
         approval_status__in=['pending', 'rejected', 'approved']
     ).order_by('-id')
