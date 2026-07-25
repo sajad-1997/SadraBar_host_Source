@@ -7,5 +7,11 @@ class Caption(UserTrackingModel):
     name = models.CharField(max_length=100, blank=True, null=True)
     content = models.TextField(blank=True, null=True)
 
+    class Meta:
+        db_table = 'issuance_caption'
+        indexes = [
+            models.Index(fields=['name']),
+        ]
+
     def __str__(self):
         return (self.content or "")[:50]
