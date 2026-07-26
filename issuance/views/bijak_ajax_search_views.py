@@ -16,14 +16,7 @@ def ajax_search_shipment(request):
         # جدا کردن کلمات (تهران احمدی ۱۲۳)
         terms = [t for t in q.split() if len(t) >= 2]
 
-        # بهینه‌سازی کوئری با select_related برای کاهش تعداد queryهای دیتابیس
-        queryset = Bijak.objects.select_related(
-            'sender',
-            'receiver',
-            'driver',
-            'vehicle',
-            'cargo'
-        ).all()
+        queryset = Bijak.objects.all()
 
         # 1️⃣ همه کلمات باید وجود داشته باشند (AND)
         for term in terms:

@@ -11,14 +11,7 @@ def search_shipment(request):
 
     q = request.GET.get('q', '').strip()
 
-    # بهینه‌سازی کوئری با select_related برای کاهش تعداد queryهای دیتابیس
-    bijaks = Bijak.objects.select_related(
-        'sender',
-        'receiver',
-        'driver',
-        'vehicle',
-        'cargo'
-    ).all().order_by('-created_at')
+    bijaks = Bijak.objects.all().order_by('-created_at')
 
     if q:
         words = q.split()
