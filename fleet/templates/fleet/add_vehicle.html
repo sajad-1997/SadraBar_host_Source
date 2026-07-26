@@ -1,0 +1,171 @@
+{% extends "issuance/base.html" %}
+
+{% block title %}افزودن ناوگان جدید{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="mb-0">افزودن اطلاعات ناوگان جدید</h4>
+                </div>
+                <div class="card-body">
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+                        
+                        {% if form.errors %}
+                            <div class="alert alert-danger">
+                                <strong>خطا:</strong> لطفاً خطاهای زیر را اصلاح کنید.
+                            </div>
+                        {% endif %}
+
+                        <!-- انتخاب راننده -->
+                        <div class="mb-3">
+                            <label for="{{ form.driver.id_for_label }}" class="form-label">{{ form.driver.label }}</label>
+                            {{ form.driver }}
+                            {% if form.driver.errors %}
+                                <div class="text-danger">{{ form.driver.errors|join:", " }}</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- نوع ناوگان -->
+                        <div class="mb-3">
+                            <label for="{{ form.type.id_for_label }}" class="form-label">{{ form.type.label }}</label>
+                            {{ form.type }}
+                            {% if form.type.errors %}
+                                <div class="text-danger">{{ form.type.errors|join:", " }}</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- مدل اتاق -->
+                        <div class="mb-3">
+                            <label for="{{ form.room_model.id_for_label }}" class="form-label">{{ form.room_model.label }}</label>
+                            {{ form.room_model }}
+                            {% if form.room_model.errors %}
+                                <div class="text-danger">{{ form.room_model.errors|join:", " }}</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- مجوز حمل خوراک دام -->
+                        <div class="mb-3">
+                            <label for="{{ form.Animal_feed_license.id_for_label }}" class="form-label">{{ form.Animal_feed_license.label }}</label>
+                            {{ form.Animal_feed_license }}
+                            {% if form.Animal_feed_license.errors %}
+                                <div class="text-danger">{{ form.Animal_feed_license.errors|join:", " }}</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- کد دامپزشکی -->
+                        <div class="mb-3">
+                            <label for="{{ form.veterinary_code.id_for_label }}" class="form-label">{{ form.veterinary_code.label }}</label>
+                            {{ form.veterinary_code }}
+                            {% if form.veterinary_code.errors %}
+                                <div class="text-danger">{{ form.veterinary_code.errors|join:", " }}</div>
+                            {% endif %}
+                        </div>
+
+                        <hr>
+                        <h5 class="mb-3">اطلاعات پلاک</h5>
+
+                        <!-- پلاک - دو رقم -->
+                        <div class="mb-3">
+                            <label for="{{ form.license_plate_two_digit.id_for_label }}" class="form-label">{{ form.license_plate_two_digit.label }}</label>
+                            {{ form.license_plate_two_digit }}
+                            {% if form.license_plate_two_digit.errors %}
+                                <div class="text-danger">{{ form.license_plate_two_digit.errors|join:", " }}</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- پلاک - الفبا -->
+                        <div class="mb-3">
+                            <label for="{{ form.license_plate_alphabet.id_for_label }}" class="form-label">{{ form.license_plate_alphabet.label }}</label>
+                            {{ form.license_plate_alphabet }}
+                            {% if form.license_plate_alphabet.errors %}
+                                <div class="text-danger">{{ form.license_plate_alphabet.errors|join:", " }}</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- پلاک - سه رقم -->
+                        <div class="mb-3">
+                            <label for="{{ form.license_plate_three_digit.id_for_label }}" class="form-label">{{ form.license_plate_three_digit.label }}</label>
+                            {{ form.license_plate_three_digit }}
+                            {% if form.license_plate_three_digit.errors %}
+                                <div class="text-danger">{{ form.license_plate_three_digit.errors|join:", " }}</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- پلاک - سری -->
+                        <div class="mb-3">
+                            <label for="{{ form.license_plate_series.id_for_label }}" class="form-label">{{ form.license_plate_series.label }}</label>
+                            {{ form.license_plate_series }}
+                            {% if form.license_plate_series.errors %}
+                                <div class="text-danger">{{ form.license_plate_series.errors|join:", " }}</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- کارت هوشمند -->
+                        <div class="mb-3">
+                            <label for="{{ form.vehicle_smart_card.id_for_label }}" class="form-label">{{ form.vehicle_smart_card.label }}</label>
+                            {{ form.vehicle_smart_card }}
+                            {% if form.vehicle_smart_card.errors %}
+                                <div class="text-danger">{{ form.vehicle_smart_card.errors|join:", " }}</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- شماره بیمه نامه -->
+                        <div class="mb-3">
+                            <label for="{{ form.insurance_policy_number.id_for_label }}" class="form-label">{{ form.insurance_policy_number.label }}</label>
+                            {{ form.insurance_policy_number }}
+                            {% if form.insurance_policy_number.errors %}
+                                <div class="text-danger">{{ form.insurance_policy_number.errors|join:", " }}</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- تاریخ اعتبار بیمه -->
+                        <div class="mb-3">
+                            <label for="{{ form.insurance_policy_expiry.id_for_label }}" class="form-label">{{ form.insurance_policy_expiry.label }}</label>
+                            {{ form.insurance_policy_expiry }}
+                            {% if form.insurance_policy_expiry.errors %}
+                                <div class="text-danger">{{ form.insurance_policy_expiry.errors|join:", " }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{% url 'fleet:vehicle_list' %}" class="btn btn-secondary me-md-2">انصراف</a>
+                            <button type="submit" class="btn btn-primary">ذخیره و ثبت نهایی</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        /* ===== کنترل مجوز خوراک دام ===== */
+        const animalLicenseSelect = document.getElementById('id_animal_license');
+        const veterinaryCodeInput = document.getElementById('id_veterinary_code');
+
+        function toggleVeterinaryCode() {
+            if (animalLicenseSelect && veterinaryCodeInput) {
+                if (animalLicenseSelect.value === 'Yes') {
+                    veterinaryCodeInput.disabled = false;
+                    veterinaryCodeInput.required = true;
+                } else {
+                    veterinaryCodeInput.disabled = true;
+                    veterinaryCodeInput.value = '';
+                    veterinaryCodeInput.required = false;
+                }
+            }
+        }
+
+        if (animalLicenseSelect) {
+            animalLicenseSelect.addEventListener('change', toggleVeterinaryCode);
+            toggleVeterinaryCode(); // اجرای اولیه
+        }
+    });
+</script>
+
+{% endblock %}
