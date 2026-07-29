@@ -30,17 +30,19 @@ class PrintingModelTests(TestCase):
         )
         self.customer = Customer.objects.create(
             name='Test Customer',
-            national_code='1234567890'
+            national_id='1234567890'
         )
         self.driver = Driver.objects.create(
-            first_name='Test',
-            last_name='Driver',
-            national_code='0987654321',
+            name='Test Driver',
+            national_id='0987654321',
             phone='09123456789'
         )
         self.vehicle = Vehicle.objects.create(
-            plate_number='12-345-67',
-            vehicle_type='truck'
+            license_plate_two_digit='12',
+            license_plate_alphabet='A',
+            license_plate_three_digit='345',
+            license_plate_series='67',
+            type='vant pikan mamoli'
         )
         self.cargo = Cargo.objects.create(name='Test Cargo')
         self.bijak = Bijak.objects.create(
@@ -109,17 +111,19 @@ class PrintingSerializerTests(TestCase):
         )
         self.customer = Customer.objects.create(
             name='Test Customer',
-            national_code='1234567890'
+            national_id='1234567890'
         )
         self.driver = Driver.objects.create(
-            first_name='Test',
-            last_name='Driver',
-            national_code='0987654321',
+            name='Test Driver',
+            national_id='0987654321',
             phone='09123456789'
         )
         self.vehicle = Vehicle.objects.create(
-            plate_number='12-345-67',
-            vehicle_type='truck'
+            license_plate_two_digit='12',
+            license_plate_alphabet='A',
+            license_plate_three_digit='345',
+            license_plate_series='67',
+            type='vant pikan mamoli'
         )
         self.cargo = Cargo.objects.create(name='Test Cargo')
         self.bijak = Bijak.objects.create(
@@ -191,17 +195,19 @@ class PrintingViewTests(TestCase):
         )
         self.customer = Customer.objects.create(
             name='Test Customer',
-            national_code='1234567890'
+            national_id='1234567890'
         )
         self.driver = Driver.objects.create(
-            first_name='Test',
-            last_name='Driver',
-            national_code='0987654321',
+            name='Test Driver',
+            national_id='0987654321',
             phone='09123456789'
         )
         self.vehicle = Vehicle.objects.create(
-            plate_number='12-345-67',
-            vehicle_type='truck'
+            license_plate_two_digit='12',
+            license_plate_alphabet='A',
+            license_plate_three_digit='345',
+            license_plate_series='67',
+            type='vant pikan mamoli'
         )
         self.cargo = Cargo.objects.create(name='Test Cargo')
         self.bijak = Bijak.objects.create(
@@ -311,17 +317,19 @@ class PrintingAPITests(TestCase):
         )
         self.customer = Customer.objects.create(
             name='API Customer',
-            national_code='1111111111'
+            national_id='1111111111'
         )
         self.driver = Driver.objects.create(
-            first_name='API',
-            last_name='Driver',
-            national_code='2222222222',
+            name='API Driver',
+            national_id='2222222222',
             phone='09111111111'
         )
         self.vehicle = Vehicle.objects.create(
-            plate_number='11-222-33',
-            vehicle_type='truck'
+            license_plate_two_digit='11',
+            license_plate_alphabet='B',
+            license_plate_three_digit='222',
+            license_plate_series='33',
+            type='vant pikan mamoli'
         )
         self.cargo = Cargo.objects.create(name='API Cargo')
         self.bijak = Bijak.objects.create(
