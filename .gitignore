@@ -1,1 +1,22 @@
-Nothing should be ignored in this case, as the changes only include source code files (.py files) and a configuration file (.py file), with no build artifacts, dependencies, or temporary files present in the change list.
+```gitignore
+# Python cache files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Django specific
+*.pyc
+__pycache__/
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+db.sqlite3
+db.sqlite3-journal
+media/
+staticfiles/
+.env
+```
