@@ -60,6 +60,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.humanize',
+    'rest_framework',
     'accounts',
     'dashboard',
     'homePage',
@@ -221,3 +222,20 @@ LOGGING = {
         'level': 'INFO',
     },
 }
+
+# ========== Django REST Framework Settings ==========
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+    'DEFAULT_RENDERER_CLASSES': [
+        'rest_framework.renderers.JSONRenderer',
+    ],
+    'DEFAULT_PARSER_CLASSES': [
+        'rest_framework.parsers.JSONParser',
+    ],
+}
+
+# ========== Rate Limiting Settings ==========
+RATE_LIMIT_ENABLE = True
+RATE_LIMIT_REQUESTS = 10  # requests per minute per IP/user
