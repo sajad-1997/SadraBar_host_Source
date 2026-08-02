@@ -1,0 +1,242 @@
+{% extends "issuance/base.html" %}
+{% load static %}
+{% block content %}
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} mt-2">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="container">
+
+        <h3>ثبت مشتری (فیلد های ستاره دار الزامی است.)</h3>
+        <hr>
+        <div id="msg"></div>
+
+        <form id="customer-form" method="post">
+            {% csrf_token %}
+
+            <input type="hidden" id="customer-id" name="id">
+
+            <div class="mb-3">
+                <label>*نام مشتری:</label>
+                <input type="text" id="customer-input" name="name">
+                <div id="customer-results" class="list-group" style="display:none; z-index:1000;"></div>
+                <div class="error-msg" id="error_name"></div>
+            </div>
+
+            <div class="mb-3">
+                <label>شناسه / کد ملی:</label>
+                <input type="text" id="customer-national" name="national_id">
+            </div>
+
+            <div class="mb-3">
+                <label>کد پستی:</label>
+                <input type="text" id="customer-postal" name="postal">
+            </div>
+
+            <div class="mb-3">
+                <label>تلفن:</label>
+                <input type="text" id="customer-phone" name="phone">
+            </div>
+
+            <div class="mb-3">
+                <label>*آدرس:</label>
+                <input type="text" id="customer-address" name="address">
+                <div class="error-msg" id="error_address"></div>
+            </div>
+
+            <button type="submit">ذخیره و ایجاد مشتری جدید</button>
+            <button type="button" id="add-to-customer">افزودن اطلاعات به مشتری فعلی</button>
+            <a href="{% url 'customers:customer_list' %}"
+               class="btn btn-secondary mt-3">
+                بازگشت
+            </a>
+        </form>
+
+    </div>
+{% endblock %}
+
+{% block extra_scripts %}
+
+    <script>
+        $(document).ready(function () {
+            const form = $("#customer-form");
+            const nameField = $("#customer-input");
+            const nationalField = $("#customer-national");
+            const postalField = $("#customer-postal");
+            const phoneField = $("#customer-phone");
+            const addressField = $("#customer-address");
+            const customerIdField = $("#customer-id");
+            const duplicateBTN = $("#add-to-customer");
+            const msgDiv = $("#msg");
+            let selectedCustomerAddress = null;
+
+            // =============================
+            // CSRF
+            // =============================
+            function getCookie(name) {
+                let cookieValue = null;
+                if (document.cookie) {
+                    document.cookie.split(";").forEach(cookie => {
+                        cookie = cookie.trim();
+                        if (cookie.startsWith(name + "=")) {
+                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        }
+                    });
+                }
+                return cookieValue;
+            }
+
+            const csrftoken = getCookie("csrftoken");
+
+            // =============================
+            // ولیدیشن فرم
+            // =============================
+            function clearErrors() {
+                $(".error-msg").remove();
+                $("input").removeClass("error-field");
+                msgDiv.html("");
+            }
+
+            function validateForm() {
+                clearErrors();
+                let valid = true;
+
+                if (!nameField.val().trim()) {
+                    nameField.addClass("error-field").after('<div class="error-msg">نام مشتری الزامی است</div>');
+                    valid = false;
+                }
+                if (!addressField.val().trim()) {
+                    addressField.addClass("error-field").after('<div class="error-msg">آدرس الزامی است</div>');
+                    valid = false;
+                }
+
+                if (!valid) {
+                    msgDiv.html("لطفاً فیلدهای اجباری را تکمیل کنید");
+                }
+                return valid;
+            }
+
+            // =============================
+            // Submit اصلی
+            // =============================
+            form.on("submit", function (e) {
+                e.preventDefault();
+                if (!validateForm()) return;
+
+                $.ajax({
+                    url: "/issuance/save-sender/",
+                    type: "POST",
+                    data: form.serialize(),
+                    headers: {"X-CSRFToken": csrftoken},
+                    success: function (resp) {
+                        if (resp.success) {
+                            msgDiv.html("مشتری جدید ایجاد شد");
+                            window.location.href = "{% url 'customers:customer_list' %}";
+                        }
+                    },
+                    error: function () {
+                        msgDiv.html("خطا در ارتباط با سرور");
+                    }
+                });
+            });
+
+            // =============================
+            // Duplicate مشتری با آدرس متفاوت
+            // =============================
+            duplicateBTN.on("click", function () {
+                clearErrors();
+
+                if (!customerIdField.val()) {
+                    msgDiv.html("ابتدا مشتری را انتخاب کنید");
+                    return;
+                }
+
+                if (!validateForm()) return;
+
+                $.ajax({
+                    url: "/issuance/duplicate-customer/",
+                    type: "POST",
+                    data: form.serialize(),
+                    headers: {"X-CSRFToken": csrftoken},
+                    success: function (resp) {
+                        if (resp.success) {
+                            msgDiv.html("آدرس جدید برای مشتری ثبت شد");
+                            selectedCustomerAddress = addressField.val().trim();
+                            customerIdField.val(resp.new_id);
+                        } else if (resp.error) {
+                            msgDiv.html("خطا: " + resp.error);
+                            addressField.addClass("error-field").after('<div class="error-msg">' + resp.error + '</div>');
+                        }
+                    },
+                    error: function () {
+                        msgDiv.html("خطا در ثبت آدرس جدید");
+                    }
+                });
+            });
+
+            // =============================
+            // Autocomplete انتخاب مشتری
+            // =============================
+            $("#customer-input").on("keyup", function () {
+                let query = $(this).val().trim();
+
+                if (!query) {
+                    $("#customer-results").hide();
+                    customerIdField.val("");
+                    selectedCustomerAddress = null;
+                    return;
+                }
+
+                $.get("/customers/search/", {q: query}, function (data) {
+                    let html = "";
+                    if (data.results.length) {
+                        data.results.forEach(item => {
+                            html += `
+                    <button type="button" class="list-group-item"
+                        data-id="${item.id}"
+                        data-name="${item.name}"
+                        data-national="${item.national_id || ''}"
+                        data-postal="${item.postal || ''}"
+                        data-phone="${item.phone || ''}"
+                        data-address="${item.address || ''}">
+                        ${item.name}
+                    </button>`;
+                        });
+                    } else {
+                        html = `<div class="list-group-item">نتیجه‌ای یافت نشد</div>`;
+                    }
+                    $("#customer-results").html(html).show();
+                });
+            });
+
+            // =============================
+            // انتخاب مشتری از نتایج
+            // =============================
+            $(document).on("click", "#customer-results .list-group-item", function () {
+                const btn = $(this);
+                customerIdField.val(btn.data("id"));
+                nameField.val(btn.data("name"));
+                nationalField.val(btn.data("national"));
+                postalField.val(btn.data("postal"));
+                phoneField.val(btn.data("phone"));
+                addressField.val(btn.data("address"));
+                selectedCustomerAddress = btn.data("address") || "";
+                $("#customer-results").hide();
+            });
+
+            // =============================
+            // پاک کردن خطا هنگام تایپ
+            // =============================
+            $("input").on("input", function () {
+                $(this).removeClass("error-field");
+                $(this).next(".error-msg").remove();
+                msgDiv.html("");
+            });
+        });
+    </script>
+{% endblock %}

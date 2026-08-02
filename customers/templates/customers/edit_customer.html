@@ -1,0 +1,114 @@
+{% extends "issuance/base.html" %}
+
+{% block content %}
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} mt-2">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="container">
+        <h3>ویرایش مشتری: {{ customer.name }}</h3>
+        <hr>
+
+        <form method="POST" novalidate>
+            {% csrf_token %}
+
+            <div class="row">
+
+                <small class="text-muted">اطلاعات هویتی</small>
+                <hr>
+
+                <div class="col-md-6">
+                    <label>نام و نام خانوادگی</label>
+                    {{ form.name }}
+                    {% if form.name.errors %}
+                        <div class="text-danger">
+                            {% for error in form.name.errors %}
+                                <small>{{ error }}</small>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="col-md-6">
+                    <label>کد ملی</label>
+                    {{ form.national_id }}
+                    {% if form.national_id.errors %}
+                        <div class="text-danger">
+                            {% for error in form.national_id.errors %}
+                                <small>{{ error }}</small>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <small class="text-muted mt-3">اطلاعات تماس و سکونت</small>
+                <hr>
+
+                <div class="col-md-6">
+                    <label>شماره تلفن</label>
+                    {{ form.phone }}
+                    {% if form.phone.errors %}
+                        <div class="text-danger">
+                            {% for error in form.phone.errors %}
+                                <small>{{ error }}</small>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="col-md-6">
+                    <label>شماره تلفن دوم</label>
+                    {{ form.phone2 }}
+                </div>
+
+                <div class="col-md-6">
+                    <label>کد پستی</label>
+                    {{ form.postal }}
+                    {% if form.postal.errors %}
+                        <div class="text-danger">
+                            {% for error in form.postal.errors %}
+                                <small>{{ error }}</small>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="col-md-12">
+                    <label>آدرس</label>
+                    {{ form.address }}
+                    {% if form.address.errors %}
+                        <div class="text-danger">
+                            {% for error in form.address.errors %}
+                                <small>{{ error }}</small>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <small class="text-muted mt-3">توضیحات تکمیلی</small>
+                <hr>
+
+                <div class="col-md-12">
+                    <label>توضیحات</label>
+                    {{ form.caption }}
+                </div>
+
+            </div>
+
+            <button type="submit" class="btn btn-primary mt-3">
+                ذخیره تغییرات
+            </button>
+
+            <a href="{% url 'customers:customer_list' %}"
+               class="btn btn-secondary mt-3">
+                بازگشت
+            </a>
+        </form>
+    </div>
+
+{% endblock %}
