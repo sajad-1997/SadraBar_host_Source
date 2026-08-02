@@ -31,7 +31,7 @@ class Caption(models.Model):
         return (self.content or "")[:50]
 
     class Meta:
-        db_table = 'captions_caption'
+        db_table = 'caption'
         indexes = [
             models.Index(fields=['name']),
         ]

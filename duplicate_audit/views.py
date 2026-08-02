@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.db.models import Count
-from issuance.models.bijak import Bijak as Waybill
+from issuance.models import Bijak as Waybill
 from .models.cluster import DuplicateCluster
 from .models.snapshot import DuplicateWaybillSnapshot
 

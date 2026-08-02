@@ -1,5 +1,5 @@
 from django.db import models
-from issuance.models.bijak import Bijak as Waybill
+from issuance.models import Bijak as Waybill
 from ..models.cluster import DuplicateCluster
 from ..models.snapshot import DuplicateWaybillSnapshot
 

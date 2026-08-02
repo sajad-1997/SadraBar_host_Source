@@ -43,7 +43,7 @@ class Driver(models.Model):
         return self.name
 
     class Meta:
-        db_table = 'drivers_driver'
+        db_table = 'issuance_driver'
         indexes = [
             models.Index(fields=['name']),
             models.Index(fields=['national_id']),

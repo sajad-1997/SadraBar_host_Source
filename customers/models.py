@@ -36,7 +36,7 @@ class Customer(models.Model):
         return self.name
 
     class Meta:
-        db_table = 'customers_customer'
+        db_table = 'customer'
         indexes = [
             models.Index(fields=['name']),
             models.Index(fields=['national_id']),

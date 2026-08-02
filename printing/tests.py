@@ -8,7 +8,11 @@ from django.contrib.auth import get_user_model
 from django.urls import reverse
 from django.utils import timezone
 
-from issuance.models import Bijak, Driver, Customer, Vehicle, Cargo
+from issuance.models import Bijak
+from drivers.models import Driver
+from customers.models import Customer
+from fleet.models import Vehicle
+from cargo.models import Cargo
 from .models import WaybillPrintOTP
 from .serializers import (
     WaybillPrintOTPSerializer,

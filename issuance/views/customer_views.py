@@ -7,7 +7,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.utils import timezone
 from django.views.decorators.cache import never_cache
 
-from issuance.models import Customer
+from customers.models import Customer
 from ..forms import CustomerForm
 
 

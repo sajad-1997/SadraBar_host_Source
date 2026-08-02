@@ -1,8 +1,8 @@
 # otp_verification/models.py
 from django.db import models
 from django.utils import timezone
-from issuance.models.bijak import Bijak
-from issuance.models.driver import Driver
+from issuance.models import Bijak
+from drivers.models import Driver
 
 
 class OTPCode(models.Model):

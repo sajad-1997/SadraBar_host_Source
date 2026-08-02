@@ -5,14 +5,14 @@ from django.db import models, transaction
 from django.db.models import Max
 from django.utils import timezone
 from django_jalali.db import models as jmodels
-# from persian_tools import digits
+from persian_tools import digits
 
 from .base import UserTrackingModel
-from .caption import Caption
-from .cargo import Cargo
-from .customer import Customer
-from .driver import Driver
-from .vehicle import Vehicle
+from captions.models import Caption
+from cargo.models import Cargo
+from customers.models import Customer
+from drivers.models import Driver
+from fleet.models import Vehicle
 
 
 class Bijak(UserTrackingModel):
@@ -29,11 +29,11 @@ class Bijak(UserTrackingModel):
     freight = models.DecimalField(max_digits=15, decimal_places=0, verbose_name="کل کرایه")
     total_fare = models.DecimalField(max_digits=15, decimal_places=0, verbose_name="کرایه پرداختی در مقصد")
 
-    sender = models.ForeignKey('Customer', on_delete=models.CASCADE, related_name='sender_bijaks', db_index=True)
-    receiver = models.ForeignKey('Customer', on_delete=models.CASCADE, related_name='received_bijaks', db_index=True)
-    driver = models.ForeignKey('Driver', on_delete=models.CASCADE, related_name='driver_bijaks', db_index=True)
-    vehicle = models.ForeignKey('Vehicle', on_delete=models.CASCADE, related_name='vehicle_bijaks', db_index=True)
-    cargo = models.ForeignKey('Cargo', on_delete=models.CASCADE, related_name='cargo_bijaks', db_index=True)
+    sender = models.ForeignKey(Customer, on_delete=models.CASCADE, related_name='sender_bijaks', db_index=True)
+    receiver = models.ForeignKey(Customer, on_delete=models.CASCADE, related_name='received_bijaks', db_index=True)
+    driver = models.ForeignKey(Driver, on_delete=models.CASCADE, related_name='driver_bijaks', db_index=True)
+    vehicle = models.ForeignKey(Vehicle, on_delete=models.CASCADE, related_name='vehicle_bijaks', db_index=True)
+    cargo = models.ForeignKey(Cargo, on_delete=models.CASCADE, related_name='cargo_bijaks', db_index=True)
     # insurance_company = models.ForeignKey('insurance.InsuranceCompany', null=True, blank=True, on_delete=models.SET_NULL,
     #                                       default='بیمه ایران', related_name='insurance_bijaks')
 

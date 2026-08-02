@@ -1,5 +1,5 @@
 from django.db import transaction
-from issuance.models.bijak import Bijak as Waybill
+from issuance.models import Bijak as Waybill
 from ..models.snapshot import DuplicateWaybillSnapshot
 from ..models.apply_log import DuplicateApplyLog
 from ..models.released_code import ReleasedTrackingCode

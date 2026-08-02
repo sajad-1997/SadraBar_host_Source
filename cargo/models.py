@@ -35,7 +35,7 @@ class Cargo(models.Model):
         return self.name
 
     class Meta:
-        db_table = 'cargo_cargo'
+        db_table = 'cargo'
         indexes = [
             models.Index(fields=['name']),
             models.Index(fields=['origin']),
