@@ -38,19 +38,20 @@ class PrintingModelTests(TestCase):
             phone='09123456789'
         )
         self.vehicle = Vehicle.objects.create(
+            driver=self.driver,
             license_plate_two_digit='12',
             license_plate_alphabet='A',
             license_plate_three_digit='345',
             license_plate_series='67',
             type='vant pikan mamoli'
         )
-        self.cargo = Cargo.objects.create(name='Test Cargo')
+        self.cargo = Cargo.objects.create(name='Test Cargo', weight=1000, origin='Tehran', destination='Mashhad')
         self.bijak = Bijak.objects.create(
             tracking_code='123456789',
-            value=1000000,
-            insurance=500000,
-            freight=200000,
-            total_fare=200000,
+            value=Decimal('1000000'),
+            insurance=Decimal('500000'),
+            freight=Decimal('200000'),
+            total_fare=Decimal('200000'),
             sender=self.customer,
             receiver=self.customer,
             driver=self.driver,
@@ -88,15 +89,18 @@ class PrintingModelTests(TestCase):
         )
         self.assertFalse(otp_record.is_otp_expired())
 
-    @patch('django.utils.timezone.now')
-    def test_is_otp_expired_expired(self, mock_now: MagicMock) -> None:
+    def test_is_otp_expired_expired(self) -> None:
         """Test OTP expired after 2 minutes."""
         from datetime import timedelta
         past_time = timezone.now() - timedelta(seconds=121)
         otp_record = WaybillPrintOTP.objects.create(
-            bijak=self.bijak,
+            bijak=self.bijak
+        )
+        # Update using direct SQL to avoid mock issues
+        WaybillPrintOTP.objects.filter(pk=otp_record.pk).update(
             otp_created_at=past_time
         )
+        otp_record.refresh_from_db()
         self.assertTrue(otp_record.is_otp_expired())
 
 
@@ -119,19 +123,20 @@ class PrintingSerializerTests(TestCase):
             phone='09123456789'
         )
         self.vehicle = Vehicle.objects.create(
+            driver=self.driver,
             license_plate_two_digit='12',
             license_plate_alphabet='A',
             license_plate_three_digit='345',
             license_plate_series='67',
             type='vant pikan mamoli'
         )
-        self.cargo = Cargo.objects.create(name='Test Cargo')
+        self.cargo = Cargo.objects.create(name='Test Cargo', weight=1000, origin='Tehran', destination='Mashhad')
         self.bijak = Bijak.objects.create(
             tracking_code='123456789',
-            value=1000000,
-            insurance=500000,
-            freight=200000,
-            total_fare=200000,
+            value=Decimal('1000000'),
+            insurance=Decimal('500000'),
+            freight=Decimal('200000'),
+            total_fare=Decimal('200000'),
             sender=self.customer,
             receiver=self.customer,
             driver=self.driver,
@@ -203,19 +208,20 @@ class PrintingViewTests(TestCase):
             phone='09123456789'
         )
         self.vehicle = Vehicle.objects.create(
+            driver=self.driver,
             license_plate_two_digit='12',
             license_plate_alphabet='A',
             license_plate_three_digit='345',
             license_plate_series='67',
             type='vant pikan mamoli'
         )
-        self.cargo = Cargo.objects.create(name='Test Cargo')
+        self.cargo = Cargo.objects.create(name='Test Cargo', weight=1000, origin='Tehran', destination='Mashhad')
         self.bijak = Bijak.objects.create(
             tracking_code='123456789',
-            value=1000000,
-            insurance=500000,
-            freight=200000,
-            total_fare=200000,
+            value=Decimal('1000000'),
+            insurance=Decimal('500000'),
+            freight=Decimal('200000'),
+            total_fare=Decimal('200000'),
             sender=self.customer,
             receiver=self.customer,
             driver=self.driver,
@@ -272,10 +278,10 @@ class PrintingViewTests(TestCase):
         )
         bijak_other = Bijak.objects.create(
             tracking_code='987654321',
-            value=1000000,
-            insurance=500000,
-            freight=200000,
-            total_fare=200000,
+            value=Decimal('1000000'),
+            insurance=Decimal('500000'),
+            freight=Decimal('200000'),
+            total_fare=Decimal('200000'),
             sender=self.customer,
             receiver=self.customer,
             driver=self.driver,
@@ -325,19 +331,20 @@ class PrintingAPITests(TestCase):
             phone='09111111111'
         )
         self.vehicle = Vehicle.objects.create(
+            driver=self.driver,
             license_plate_two_digit='11',
             license_plate_alphabet='B',
             license_plate_three_digit='222',
             license_plate_series='33',
             type='vant pikan mamoli'
         )
-        self.cargo = Cargo.objects.create(name='API Cargo')
+        self.cargo = Cargo.objects.create(name='API Cargo', weight=500, origin='Isfahan', destination='Shiraz')
         self.bijak = Bijak.objects.create(
             tracking_code='API123456',
-            value=1000000,
-            insurance=500000,
-            freight=200000,
-            total_fare=200000,
+            value=Decimal('1000000'),
+            insurance=Decimal('500000'),
+            freight=Decimal('200000'),
+            total_fare=Decimal('200000'),
             sender=self.customer,
             receiver=self.customer,
             driver=self.driver,
@@ -391,10 +398,10 @@ class PrintingAPITests(TestCase):
         )
         bijak_other = Bijak.objects.create(
             tracking_code='API987654',
-            value=1000000,
-            insurance=500000,
-            freight=200000,
-            total_fare=200000,
+            value=Decimal('1000000'),
+            insurance=Decimal('500000'),
+            freight=Decimal('200000'),
+            total_fare=Decimal('200000'),
             sender=self.customer,
             receiver=self.customer,
             driver=self.driver,

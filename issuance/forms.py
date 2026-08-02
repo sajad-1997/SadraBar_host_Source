@@ -1,32 +1,52 @@
 import logging
-from datetime import datetime
+from datetime import datetime, time
 
 import jdatetime
 from django import forms
-from datetime import time
 from django.utils import timezone
 
 from .models import Customer, Driver, Vehicle, Cargo, Caption, Bijak
 from .utils import persian_to_english_numbers, persian_to_gregorian
 
-# from .mixins import PersianNumberFormMixin
-
 logger = logging.getLogger(__name__)
+
 
 # 🔹 کلاس پایه برای فرم‌ها (اعمال فقط روی فیلدهای مشخص عددی)
 class PersianNumberFormMixin:
     """
-       تبدیل اعداد فارسی به انگلیسی در فیلدهای عددی
-       """
+    تبدیل اعداد فارسی به انگلیسی در فیلدهای عددی
+    و تنظیم widget برای دریافت فقط اعداد انگلیسی
+    """
+    numeric_fields = []  # لیست فیلدهای عددی باید در کلاس‌های فرزند تعریف شود
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # تنظیم widget برای فیلدهای عددی جهت دریافت فقط اعداد
+        for field_name in self.numeric_fields:
+            if field_name in self.fields:
+                field = self.fields[field_name]
+                # اضافه کردن ویژگی‌های HTML5 برای ورودی عددی
+                if hasattr(field, 'widget'):
+                    attrs = field.widget.attrs or {}
+                    attrs.update({
+                        'inputmode': 'numeric',
+                        'pattern': '[0-9]*',
+                        'autocomplete': 'off',
+                    })
+                    field.widget.attrs = attrs
 
     def clean(self):
         cleaned_data = super().clean()
-        numeric_fields = getattr(self, 'numeric_fields', [])
-        for field in numeric_fields:
+        for field in self.numeric_fields:
             value = cleaned_data.get(field)
             if value and isinstance(value, str):
-                from .utils import persian_to_english_numbers
                 cleaned_data[field] = persian_to_english_numbers(value)
+            elif value is not None and not isinstance(value, (int, float)):
+                # اگر مقدار از نوع دیگری است، سعی می‌کنیم به عدد تبدیل کنیم
+                try:
+                    cleaned_data[field] = int(persian_to_english_numbers(str(value)))
+                except (ValueError, TypeError):
+                    pass
         return cleaned_data
 
 
@@ -247,7 +267,9 @@ class CaptionForm(forms.ModelForm):
     )
 
 
-class ShipmentForm(forms.ModelForm):
+class ShipmentForm(PersianNumberFormMixin, forms.ModelForm):
+    numeric_fields = ['total_fare', 'value', 'insurance', 'loading_fee', 'unloading_fee', 'scale_fee', 'freight']
+    
     # =========================
     # تاریخ و ساعت صدور
     # =========================
