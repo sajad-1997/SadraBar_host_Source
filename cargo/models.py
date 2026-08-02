@@ -5,6 +5,7 @@ from django.conf import settings
 class Cargo(models.Model):
     name = models.CharField(max_length=50, verbose_name="نام محموله", db_index=True)
     weight = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="وزن/حجم")
+    weight_2 = models.DecimalField(max_digits=10, decimal_places=2, default='0', verbose_name="وزن/حجم دوم")
     package_type = models.CharField(max_length=10, blank=True, null=True, verbose_name="نوع بسته بندی")
     number_of_packaging = models.IntegerField(blank=True, null=True, verbose_name="تعداد بسته بندی")
     origin = models.CharField(max_length=50, verbose_name="مبدأ بارگیری", db_index=True)
