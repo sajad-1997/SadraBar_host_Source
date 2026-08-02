@@ -94,31 +94,33 @@ class Vehicle(UserTrackingModel):
 
         ])
 
-    # room_model = models.CharField(
-    #     max_length=50,
-    #     verbose_name='مدل اتاق ناوگان',
-    #     choices=[
-    #         ('Normal', 'معمولی'),
-    #         ('flat_floor', 'کف صاف'),
-    #         ('sofa_floor', 'کف مبلی'),
-    #     ],
-    #     default='Normal')
-    # Animal_feed_license = models.CharField(
-    #     max_length=6,
-    #     null=True,
-    #     blank=True,
-    #     verbose_name='مجوز حمل خوراک دام',
-    #     choices=[
-    #         ('No', 'ندارد'),
-    #         ('Yes', 'دارد'),
-    #     ], default='No')
-    # veterinary_code = models.CharField(max_length=7, blank=True, null=True, verbose_name="کد دامپزشکی")
+    room_model = models.CharField(
+        max_length=50,
+        verbose_name='مدل اتاق ناوگان',
+        choices=[
+            ('Normal', 'معمولی'),
+            ('flat_floor', 'کف صاف'),
+            ('sofa_floor', 'کف مبلی'),
+        ],
+        default='Normal')
+    Animal_feed_license = models.CharField(
+        max_length=6,
+        null=True,
+        blank=True,
+        verbose_name='مجوز حمل خوراک دام',
+        choices=[
+            ('No', 'ندارد'),
+            ('Yes', 'دارد'),
+        ], default='No')
+    veterinary_code = models.CharField(max_length=7, blank=True, null=True, verbose_name="کد دامپزشکی")
     license_plate_two_digit = models.CharField(max_length=2, verbose_name="دو رقم پلاک")
     license_plate_alphabet = models.CharField(max_length=1, verbose_name="الفبای پلاک")
     license_plate_three_digit = models.CharField(max_length=3, verbose_name="سه رقم پلاک")
     license_plate_series = models.CharField(max_length=2, verbose_name="سری پلاک")
     vehicle_smart_card = models.CharField(max_length=50, unique=True, blank=True, null=True,
                                           verbose_name="هوشمند ناوگان")
+    insurance_policy_number = models.CharField(max_length=50, blank=True, null=True, verbose_name="شماره بیمه نامه")
+    insurance_policy_expiry = jmodels.jDateField(blank=True, null=True, verbose_name="تاریخ اعتبار بیمه نامه")
 
     def __str__(self):
         return self.type
