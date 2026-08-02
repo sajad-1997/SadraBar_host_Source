@@ -136,18 +136,15 @@
         </form>
     </div>
 
-    <!-- ===== Persian Datepicker (دقیقاً مشابه قالب ویرایش) ===== -->
-
-    <!--<link rel="stylesheet"-->
-    <!--      href="https://cdn.jsdelivr.net/npm/persian-datepicker@1.2.0/dist/css/persian-datepicker.min.css">-->
-
-    <!--<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>-->
-    <!--<script src="https://cdn.jsdelivr.net/npm/persian-date@1.1.0/dist/persian-date.min.js"></script>-->
-    <!--<script src="https://cdn.jsdelivr.net/npm/persian-datepicker@1.2.0/dist/js/persian-datepicker.min.js"></script>-->
+    <!-- ===== Persian Datepicker ===== -->
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/persian-datepicker@1.2.0/dist/css/persian-datepicker.min.css">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/persian-date@1.1.0/dist/persian-date.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/persian-datepicker@1.2.0/dist/js/persian-datepicker.min.js"></script>
 
     <script>
         $(document).ready(function () {
-
             $('.date-picker').persianDatepicker({
                 format: 'YYYY/MM/DD',
                 autoClose: true,
@@ -167,7 +164,6 @@
                 },
                 timePicker: {enabled: false}
             });
-
         });
     </script>
 

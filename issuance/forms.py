@@ -155,19 +155,19 @@ class DriverForm(PersianNumberFormMixin, forms.ModelForm):
         if instance:
             if instance.birth_date:
                 jalali_birth = jdatetime.date.fromgregorian(date=instance.birth_date)
-                self.fields['birth_date'].initial = f"{jalali_birth.year}/{jalali_birth.month:02}/{jalali_birth.day:02}"
+                self.fields['birth_date'].initial = jalali_birth.strftime('%Y/%m/%d')
             if instance.certificate_date:
                 jalali_cert = jdatetime.date.fromgregorian(date=instance.certificate_date)
-                self.fields[
-                    'certificate_date'].initial = f"{jalali_cert.year}/{jalali_cert.month:02}/{jalali_cert.day:02}"
+                self.fields['certificate_date'].initial = jalali_cert.strftime('%Y/%m/%d')
             if instance.insurance_policy_expiry:
                 jalali_cert = jdatetime.date.fromgregorian(date=instance.insurance_policy_expiry)
-                self.fields[
-                    'insurance_policy_expiry'].initial = f"{jalali_cert.year}/{jalali_cert.month:02}/{jalali_cert.day:02}"
+                self.fields['insurance_policy_expiry'].initial = jalali_cert.strftime('%Y/%m/%d')
 
     def clean_birth_date(self):
         data = self.cleaned_data.get('birth_date')
         if data:
+            # تبدیل اعداد فارسی به انگلیسی قبل از پردازش
+            data = persian_to_english_numbers(data)
             g_date = persian_to_gregorian(data)
             if g_date is None:
                 raise forms.ValidationError("تاریخ تولد نامعتبر است")
@@ -177,6 +177,8 @@ class DriverForm(PersianNumberFormMixin, forms.ModelForm):
     def clean_certificate_date(self):
         data = self.cleaned_data.get('certificate_date')
         if data:
+            # تبدیل اعداد فارسی به انگلیسی قبل از پردازش
+            data = persian_to_english_numbers(data)
             g_date = persian_to_gregorian(data)
             if g_date is None:
                 raise forms.ValidationError("تاریخ صدور گواهینامه نامعتبر است")
@@ -186,6 +188,8 @@ class DriverForm(PersianNumberFormMixin, forms.ModelForm):
     def clean_insurance_policy_expiry(self):
         data = self.cleaned_data.get('insurance_policy_expiry')
         if data:
+            # تبدیل اعداد فارسی به انگلیسی قبل از پردازش
+            data = persian_to_english_numbers(data)
             g_date = persian_to_gregorian(data)
             if g_date is None:
                 raise forms.ValidationError("تاریخ اعتبار بیمه نامه نامعتبر است")
@@ -390,9 +394,11 @@ class ShipmentForm(PersianNumberFormMixin, forms.ModelForm):
             raise forms.ValidationError("تاریخ و ساعت صدور الزامی است.")
 
         try:
+            # تبدیل اعداد فارسی به انگلیسی
             date_str = persian_to_english_numbers(raw_date).strip()
             time_str = persian_to_english_numbers(raw_time).strip()
 
+            # جایگزینی / با - برای سازگاری با fromisoformat
             j_date = jdatetime.date.fromisoformat(date_str.replace('/', '-'))
 
             parts = time_str.split(':')
