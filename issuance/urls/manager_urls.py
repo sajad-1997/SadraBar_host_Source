@@ -2,7 +2,7 @@ from django.urls import path
 
 from issuance.views.manager.approval import send_for_approval, approve_bijak, reject_bijak
 from issuance.views.manager.manager_preview import manager_preview_page
-from issuance.views.manager.print import bijak_print
+from issuance.views.manager.bijak_print import bijak_print
 from issuance.views.manager.review_pending_list import waiting_list
 from issuance.views.manager.review_status_list import final_status_list
 from issuance.views.manager.manager_status import manager_set_final_status
