@@ -166,7 +166,7 @@
             <li><a href="#">📈 گزارش‌ها</a></li>
         {% endif %}
         {% if permissions.can_manage_customers %}
-            <li><a href="#">📈 لیست مشتریان</a></li>
+            <li><a href="{% url 'customers:customer_list' %}">📈 لیست مشتریان</a></li>
         {% endif %}
         {% if permissions.can_manage_drivers %}
             <li><a href="{% url 'issuance:manager:driver_list' %}">📈 لیست رانندگان</a></li>

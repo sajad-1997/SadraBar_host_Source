@@ -168,17 +168,17 @@
                     </div>
                     <div class="mb-3">
                         <label for="selected_caption" class="fw-bold mb-2">انتخاب توضیح آماده (اختیاری)</label>
-                        <select id="selected_caption" name="shipment-selected_caption" class="form-select">
-                            <option value="">-- انتخاب کنید --</option>
-                                {% for caption in captions %}
-                                    <option value="{{ caption.id }}"
-                                    {% if selected_caption_id == caption.id|stringformat:"s" %}
-                                    selected
-                                    {% endif %}>
-                                        {{ caption.content|truncatechars:180 }}
-                                    </option>
-                                {% endfor %}
-                        </select>
+{#                        <select id="selected_caption" name="shipment-selected_caption" class="form-select">#}
+{#                            <option value="">-- انتخاب کنید --</option>#}
+{#                                {% for caption in captions %}#}
+{#                                    <option value="{{ caption.id }}"#}
+{#                                    {% if selected_caption_id == caption.id|stringformat:"s" %}#}
+{#                                    selected#}
+{#                                    {% endif %}>#}
+{#                                        {{ caption.content|truncatechars:180 }}#}
+{#                                    </option>#}
+{#                                {% endfor %}#}
+{#                        </select>#}
                     </div>
                     <div class="mb-3">
                         <label for="custom_caption" class="fw-bold">توضیح دستی (اختیاری)</label>
