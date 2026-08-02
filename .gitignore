@@ -1,26 +1,12 @@
-<<<<<<< HEAD
-```gitignore
-# Python cache files
-=======
-```
 # Python
->>>>>>> تقسیم-پروژه-به-ماژول‌های-مستقل-362c7
 __pycache__/
 *.pyc
-*.pyo
-*.pyd
-
-# Django specific
-*.pyc
-__pycache__/
 *.pyo
 *.pyd
 .Python
 env/
 venv/
 .venv/
-<<<<<<< HEAD
-=======
 .ENV
 .pipenv
 .pytest_cache/
@@ -31,15 +17,10 @@ htmlcov/
 # Django
 *.log
 local_settings.py
->>>>>>> تقسیم-پروژه-به-ماژول‌های-مستقل-362c7
 db.sqlite3
 db.sqlite3-journal
 media/
 staticfiles/
-<<<<<<< HEAD
-.env
-=======
-.DS_Store
 
 # Build and distribution artifacts
 build/
@@ -65,5 +46,3 @@ dist/
 # OS
 .DS_Store
 Thumbs.db
->>>>>>> تقسیم-پروژه-به-ماژول‌های-مستقل-362c7
-```
