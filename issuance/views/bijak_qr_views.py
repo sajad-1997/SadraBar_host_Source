@@ -28,8 +28,13 @@ def bijak_qr(request, pk):
 
     # اگر فایل QR وجود ندارد، تولید شود
     if not os.path.exists(file_path):
-        # URL چاپ بارنامه بر اساس PK
-        print_url = reverse('issuance:crud:print', args=[pk])
+        # URL چاپ بارنامه بر اساس توکن (برای دسترسی عمومی)
+        if bijak.access_token:
+            print_url = reverse('issuance:token:bijak_print_token', args=[bijak.access_token])
+        else:
+            # فال‌بک به PK اگر توکن وجود نداشت
+            print_url = reverse('issuance:crud:print', args=[pk])
+        
         absolute_url = request.build_absolute_uri(print_url)
 
         # تولید QR
