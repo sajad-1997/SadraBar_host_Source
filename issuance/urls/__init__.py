@@ -10,6 +10,9 @@ urlpatterns = [
     # مسیرهای مربوط به QR بارنامه
     path('', include('issuance.urls.qr_urls')),
 
+    # مسیرهای دسترسی عمومی با توکن به بارنامه
+    path('token/', include('issuance.urls.token_urls', namespace='token')),
+
     # مسیرهای تایید و رد بارنامه توسط مدیریت
     path('', include('issuance.urls.bijak_approval_urls')),
 

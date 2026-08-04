@@ -3,6 +3,7 @@ from .bijak_create_views import *
 from .bijak_manage_views import *
 from .bijak_print_views import *
 from .bijak_qr_views import *
+from .bijak_token_views import *
 from .bijak_search_views import *
 from .bijaks_employee_views import *
 from .caption_views import *
