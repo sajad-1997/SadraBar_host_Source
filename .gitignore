@@ -1,48 +1,71 @@
-# Python
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-.Python
-env/
-venv/
-.venv/
-.ENV
-.pipenv
-.pytest_cache/
-.mypy_cache/
-.coverage
-htmlcov/
+```
+# Dependencies
+node_modules/
 
-# Django
-*.log
-local_settings.py
-db.sqlite3
-db.sqlite3-journal
-media/
-staticfiles/
-
-# Build and distribution artifacts
-build/
+# Build outputs
 dist/
-*.egg
-*.egg-info/
-*.so
-*.dylib
-*.dll
-
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-*.tmp
+build/
+target/
 
 # Environment variables
 .env
 .env.local
-*.env.*
+.env.*
 
-# OS
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Logs
+*.log
+
+# IDE specific
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS generated files
 .DS_Store
 Thumbs.db
+
+# Coverage reports
+coverage/
+htmlcov/
+.coverage
+
+# Temporary files
+*.tmp
+*.temp
+
+# MyPy cache
+.mypy_cache/
+# Pytest cache
+.pytest_cache/
+
+# Compressed files
+*.zip
+*.gz
+*.tar
+*.tgz
+*.bz2
+*.xz
+*.7z
+*.rar
+*.zst
+*.lz4
+*.lzh
+*.cab
+*.arj
+*.rpm
+*.deb
+*.Z
+*.lz
+*.lzo
+*.tar.gz
+*.tar.bz2
+*.tar.xz
+*.tar.zst
+```
