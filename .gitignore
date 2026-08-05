@@ -1,48 +1,48 @@
-# Python
-__pycache__/
+```
+# Compiled and build artifacts
 *.pyc
-*.pyo
-*.pyd
-.Python
-env/
-venv/
+__pycache__/
+
+# Dependencies
 .venv/
-.ENV
-.pipenv
-.pytest_cache/
-.mypy_cache/
-.coverage
-htmlcov/
-
-# Django
-*.log
-local_settings.py
-db.sqlite3
-db.sqlite3-journal
-media/
-staticfiles/
-
-# Build and distribution artifacts
-build/
+venv/
+node_modules/
 dist/
-*.egg
+build/
 *.egg-info/
-*.so
-*.dylib
-*.dll
 
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
+# Logs and temp files
+*.log
 *.tmp
+*.swp
 
-# Environment variables
+# Environment
 .env
 .env.local
 *.env.*
 
-# OS
+# Editors
+.vscode/
+.idea/
+
+# Coverage
+.coverage
+coverage/
+htmlcov/
+
+# Python specific
+*.pyo
+*.pyd
+.Python
+*.so
+*.egg
+
+# Backup files
+*~
+*.bak
+*.orig
+
+# OS generated files
 .DS_Store
 Thumbs.db
+```
