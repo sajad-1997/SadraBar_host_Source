@@ -4,20 +4,41 @@
 {% block content %}
 
     <div class="container mt-4">
-        <h2 class="mb-4">📊 داشبورد گزارش بارنامه‌ها</h2>
+        <h2 class="mb-4">📊 داشبورد گزارش و آمارگیری بارنامه‌ها</h2>
 
         <!-- 🔹 فیلتر پیشرفته -->
         <form method="get" class="card p-4 mb-4 shadow-sm">
             <div class="row g-3">
+                
+                <!-- بازه زمانی -->
+                <div class="col-md-3">
+                    <label class="form-label">تاریخ از</label>
+                    <input type="date" name="date_from" class="form-control" value="{{ filters.date_from }}">
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label">تاریخ تا</label>
+                    <input type="date" name="date_to" class="form-control" value="{{ filters.date_to }}">
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label">مبدا</label>
+                    <input type="text" name="origin" class="form-control" placeholder="جستجوی مبدا" value="{{ filters.origin }}">
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label">مقصد</label>
+                    <input type="text" name="destination" class="form-control" placeholder="جستجوی مقصد" value="{{ filters.destination }}">
+                </div>
 
                 <div class="col-md-3">
                     <label class="form-label">فرستنده</label>
                     <select name="sender" class="form-select searchable">
                         <option value="">انتخاب کنید</option>
-                        {% for b in bijaks %}
-                            <option value="{{ b.sender.name }}"
-                                    {% if filters.sender == b.sender.name %}selected{% endif %}>
-                                {{ b.sender.name }}
+                        {% for sender in all_senders %}
+                            <option value="{{ sender.id }}"
+                                    {% if filters.sender == sender.id|stringformat:"s" %}selected{% endif %}>
+                                {{ sender.name }}
                             </option>
                         {% endfor %}
                     </select>
@@ -27,10 +48,10 @@
                     <label class="form-label">گیرنده</label>
                     <select name="receiver" class="form-select searchable">
                         <option value="">انتخاب کنید</option>
-                        {% for b in bijaks %}
-                            <option value="{{ b.receiver.name }}"
-                                    {% if filters.receiver == b.receiver.name %}selected{% endif %}>
-                                {{ b.receiver.name }}
+                        {% for receiver in all_receivers %}
+                            <option value="{{ receiver.id }}"
+                                    {% if filters.receiver == receiver.id|stringformat:"s" %}selected{% endif %}>
+                                {{ receiver.name }}
                             </option>
                         {% endfor %}
                     </select>
@@ -40,10 +61,23 @@
                     <label class="form-label">راننده</label>
                     <select name="driver" class="form-select searchable">
                         <option value="">انتخاب کنید</option>
-                        {% for b in bijaks %}
-                            <option value="{{ b.driver.name }}"
-                                    {% if filters.driver == b.driver.name %}selected{% endif %}>
-                                {{ b.driver.name }}
+                        {% for driver in all_drivers %}
+                            <option value="{{ driver.id }}"
+                                    {% if filters.driver == driver.id|stringformat:"s" %}selected{% endif %}>
+                                {{ driver.name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label">نوع محموله</label>
+                    <select name="cargo" class="form-select searchable">
+                        <option value="">انتخاب کنید</option>
+                        {% for cargo in all_cargos %}
+                            <option value="{{ cargo.id }}"
+                                    {% if filters.cargo == cargo.id|stringformat:"s" %}selected{% endif %}>
+                                {{ cargo.name }}
                             </option>
                         {% endfor %}
                     </select>
@@ -80,7 +114,7 @@
                         <option value="">همه</option>
                         {% for value, label in TYPE_CHOICES %}
                             <option value="{{ value }}"
-                                    {% if filters.type_filter == value %}selected{% endif %}>
+                                    {% if filters.type == value %}selected{% endif %}>
                                 {{ label }}
                             </option>
                         {% endfor %}
@@ -175,10 +209,122 @@
 
         </div>
 
+        <!-- 🔹 بخش آمارهای تفکیکی با نمودار -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <h4 class="mb-3">📈 آمار تفکیکی بارنامه‌ها</h4>
+            </div>
+            
+            <!-- نمودار نوع ناوگان -->
+            <div class="col-md-6 mb-4">
+                <div class="card p-3 shadow-sm h-100">
+                    <h5 class="text-center mb-3">نمودار نوع ناوگان</h5>
+                    <canvas id="chart_vehicle"></canvas>
+                </div>
+            </div>
+            
+            <!-- نمودار کاربران صادر کننده -->
+            <div class="col-md-6 mb-4">
+                <div class="card p-3 shadow-sm h-100">
+                    <h5 class="text-center mb-3">نمودار کاربران صادر کننده</h5>
+                    <canvas id="chart_user"></canvas>
+                </div>
+            </div>
+            
+            <!-- نمودار فرستندگان -->
+            <div class="col-md-6 mb-4">
+                <div class="card p-3 shadow-sm h-100">
+                    <h5 class="text-center mb-3">نمودار فرستندگان برتر</h5>
+                    <canvas id="chart_sender"></canvas>
+                </div>
+            </div>
+            
+            <!-- نمودار گیرندگان -->
+            <div class="col-md-6 mb-4">
+                <div class="card p-3 shadow-sm h-100">
+                    <h5 class="text-center mb-3">نمودار گیرندگان برتر</h5>
+                    <canvas id="chart_receiver"></canvas>
+                </div>
+            </div>
+            
+            <!-- نمودار رانندگان -->
+            <div class="col-md-6 mb-4">
+                <div class="card p-3 shadow-sm h-100">
+                    <h5 class="text-center mb-3">نمودار رانندگان پرکار</h5>
+                    <canvas id="chart_driver"></canvas>
+                </div>
+            </div>
+            
+            <!-- نمودار محموله‌ها -->
+            <div class="col-md-6 mb-4">
+                <div class="card p-3 shadow-sm h-100">
+                    <h5 class="text-center mb-3">نمودار انواع محموله</h5>
+                    <canvas id="chart_cargo"></canvas>
+                </div>
+            </div>
+            
+            <!-- نمودار مبدا -->
+            <div class="col-md-6 mb-4">
+                <div class="card p-3 shadow-sm h-100">
+                    <h5 class="text-center mb-3">نمودار مبادی بارگیری</h5>
+                    <canvas id="chart_origin"></canvas>
+                </div>
+            </div>
+            
+            <!-- نمودار مقصد -->
+            <div class="col-md-6 mb-4">
+                <div class="card p-3 shadow-sm h-100">
+                    <h5 class="text-center mb-3">نمودار مقاصد تخلیه</h5>
+                    <canvas id="chart_destination"></canvas>
+                </div>
+            </div>
+            
+            <!-- نمودار وضعیت تایید -->
+            <div class="col-md-6 mb-4">
+                <div class="card p-3 shadow-sm h-100">
+                    <h5 class="text-center mb-3">نمودار وضعیت تأیید</h5>
+                    <canvas id="chart_approval"></canvas>
+                </div>
+            </div>
+            
+            <!-- نمودار وضعیت نهایی -->
+            <div class="col-md-6 mb-4">
+                <div class="card p-3 shadow-sm h-100">
+                    <h5 class="text-center mb-3">نمودار وضعیت نهایی</h5>
+                    <canvas id="chart_type"></canvas>
+                </div>
+            </div>
+        </div>
 
-        <!-- 🔹 نمودار -->
-        <div class="card p-4 mb-4 shadow-sm">
-            <canvas id="chart_all" height="100"></canvas>
+        <!-- 🔹 نمودارهای زمانی -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <h4 class="mb-3">📊 نمودارهای زمانی</h4>
+            </div>
+            
+            <!-- نمودار ساعتی -->
+            <div class="col-md-6 mb-4">
+                <div class="card p-3 shadow-sm">
+                    <h5 class="text-center mb-3">نمودار ساعتی بارنامه‌ها (۲۴ ساعت اخیر)</h5>
+                    <canvas id="chart_hourly"></canvas>
+                </div>
+            </div>
+            
+            <!-- نمودار روزانه -->
+            <div class="col-md-6 mb-4">
+                <div class="card p-3 shadow-sm">
+                    <h5 class="text-center mb-3">نمودار روزانه بارنامه‌ها</h5>
+                    <canvas id="chart_daily"></canvas>
+                </div>
+            </div>
+            
+            <!-- نمودار ماهانه -->
+            <div class="col-12 mb-4">
+                <div class="card p-3 shadow-sm">
+                    <h5 class="text-center mb-3">نمودار ماهانه بارنامه‌ها</h5>
+                    <canvas id="chart_monthly"></canvas>
+                </div>
+            </div>
         </div>
 
 
@@ -268,25 +414,324 @@
     <!-- 🔹 Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        const dataAll = {{ chart_data_all|safe }};
-        const ctx = document.getElementById('chart_all');
+        // داده‌های نمودارها از بک‌اند
+        const vehicleStats = {{ vehicle_stats|safe }};
+        const userStats = {{ user_stats|safe }};
+        const senderStats = {{ sender_stats|safe }};
+        const receiverStats = {{ receiver_stats|safe }};
+        const driverStats = {{ driver_stats|safe }};
+        const cargoStats = {{ cargo_stats|safe }};
+        const originStats = {{ origin_stats|safe }};
+        const destinationStats = {{ destination_stats|safe }};
+        const approvalStats = {{ approval_stats|safe }};
+        const typeStats = {{ type_stats|safe }};
+        
+        const chartDataHourly = {{ chart_data_all|safe }};
+        const chartDataDaily = {{ chart_data_daily|safe }};
+        const chartDataMonthly = {{ chart_data_monthly|safe }};
 
-        new Chart(ctx, {
-            type: 'line',
+        // تنظیمات مشترک برای نمودارها
+        const commonOptions = {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'bottom',
+                    labels: {
+                        font: { size: 10 },
+                        maxRotation: 45,
+                        minRotation: 45
+                    }
+                }
+            },
+            scales: {
+                y: { beginAtZero: true, ticks: { precision: 0 } }
+            }
+        };
+
+        // تابع کمکی برای ایجاد رنگ‌های تصادفی
+        function generateColors(count) {
+            const colors = [];
+            const palette = [
+                'rgba(54, 162, 235, 0.7)',
+                'rgba(255, 99, 132, 0.7)',
+                'rgba(75, 192, 192, 0.7)',
+                'rgba(255, 206, 86, 0.7)',
+                'rgba(153, 102, 255, 0.7)',
+                'rgba(255, 159, 64, 0.7)',
+                'rgba(199, 199, 199, 0.7)',
+                'rgba(83, 102, 255, 0.7)',
+                'rgba(255, 99, 255, 0.7)',
+                'rgba(99, 255, 132, 0.7)'
+            ];
+            for (let i = 0; i < count; i++) {
+                colors.push(palette[i % palette.length]);
+            }
+            return colors;
+        }
+
+        // تابع کمکی برای آماده‌سازی داده‌ها
+        function prepareChartData(stats, keyField) {
+            const limitedStats = stats.slice(0, 10); // محدود کردن به ۱۰ مورد اول
+            return {
+                labels: limitedStats.map(s => s[keyField] || 'نامشخص'),
+                data: limitedStats.map(s => s.count)
+            };
+        }
+
+        // نمودار نوع ناوگان
+        const vehicleData = prepareChartData(vehicleStats, 'vehicle__type');
+        new Chart(document.getElementById('chart_vehicle'), {
+            type: 'bar',
             data: {
-                labels: dataAll.map(d => d.hour),
+                labels: vehicleData.labels,
                 datasets: [{
-                    label: 'تعداد بارنامه‌ها',
-                    data: dataAll.map(d => d.total),
-                    borderColor: 'blue',
-                    fill: false,
-                    tension: 0.3
+                    label: 'تعداد بارنامه',
+                    data: vehicleData.data,
+                    backgroundColor: generateColors(vehicleData.labels.length),
+                    borderColor: generateColors(vehicleData.labels.length).map(c => c.replace('0.7', '1')),
+                    borderWidth: 1
+                }]
+            },
+            options: commonOptions
+        });
+
+        // نمودار کاربران صادر کننده
+        const userData = prepareChartData(userStats, 'created_by__username');
+        new Chart(document.getElementById('chart_user'), {
+            type: 'pie',
+            data: {
+                labels: userData.labels,
+                datasets: [{
+                    data: userData.data,
+                    backgroundColor: generateColors(userData.labels.length)
                 }]
             },
             options: {
                 responsive: true,
-                scales: {y: {beginAtZero: true, ticks: {precision: 0}}}
+                plugins: {
+                    legend: { position: 'right', labels: { font: { size: 10 } } }
+                }
             }
+        });
+
+        // نمودار فرستندگان
+        const senderData = prepareChartData(senderStats, 'sender__name');
+        new Chart(document.getElementById('chart_sender'), {
+            type: 'bar',
+            data: {
+                labels: senderData.labels,
+                datasets: [{
+                    label: 'تعداد بارنامه',
+                    data: senderData.data,
+                    backgroundColor: 'rgba(54, 162, 235, 0.7)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: commonOptions
+        });
+
+        // نمودار گیرندگان
+        const receiverData = prepareChartData(receiverStats, 'receiver__name');
+        new Chart(document.getElementById('chart_receiver'), {
+            type: 'bar',
+            data: {
+                labels: receiverData.labels,
+                datasets: [{
+                    label: 'تعداد بارنامه',
+                    data: receiverData.data,
+                    backgroundColor: 'rgba(255, 99, 132, 0.7)',
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: commonOptions
+        });
+
+        // نمودار رانندگان
+        const driverData = prepareChartData(driverStats, 'driver__name');
+        new Chart(document.getElementById('chart_driver'), {
+            type: 'bar',
+            data: {
+                labels: driverData.labels,
+                datasets: [{
+                    label: 'تعداد بارنامه',
+                    data: driverData.data,
+                    backgroundColor: 'rgba(75, 192, 192, 0.7)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: commonOptions
+        });
+
+        // نمودار محموله‌ها
+        const cargoData = prepareChartData(cargoStats, 'cargo__name');
+        new Chart(document.getElementById('chart_cargo'), {
+            type: 'doughnut',
+            data: {
+                labels: cargoData.labels,
+                datasets: [{
+                    data: cargoData.data,
+                    backgroundColor: generateColors(cargoData.labels.length)
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { position: 'right', labels: { font: { size: 10 } } }
+                }
+            }
+        });
+
+        // نمودار مبدا
+        const originData = prepareChartData(originStats, 'cargo__origin');
+        new Chart(document.getElementById('chart_origin'), {
+            type: 'bar',
+            data: {
+                labels: originData.labels,
+                datasets: [{
+                    label: 'تعداد بارنامه',
+                    data: originData.data,
+                    backgroundColor: 'rgba(255, 206, 86, 0.7)',
+                    borderColor: 'rgba(255, 206, 86, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: commonOptions
+        });
+
+        // نمودار مقصد
+        const destinationData = prepareChartData(destinationStats, 'cargo__destination');
+        new Chart(document.getElementById('chart_destination'), {
+            type: 'bar',
+            data: {
+                labels: destinationData.labels,
+                datasets: [{
+                    label: 'تعداد بارنامه',
+                    data: destinationData.data,
+                    backgroundColor: 'rgba(153, 102, 255, 0.7)',
+                    borderColor: 'rgba(153, 102, 255, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: commonOptions
+        });
+
+        // نمودار وضعیت تأیید
+        const approvalLabels = {
+            'pending': 'در انتظار',
+            'approved': 'تأیید شده',
+            'rejected': 'رد شده'
+        };
+        const approvalData = {
+            labels: approvalStats.map(s => approvalLabels[s.approval_status] || s.approval_status),
+            data: approvalStats.map(s => s.count)
+        };
+        new Chart(document.getElementById('chart_approval'), {
+            type: 'pie',
+            data: {
+                labels: approvalData.labels,
+                datasets: [{
+                    data: approvalData.data,
+                    backgroundColor: [
+                        'rgba(255, 206, 86, 0.7)',
+                        'rgba(75, 192, 192, 0.7)',
+                        'rgba(255, 99, 132, 0.7)'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { position: 'bottom', labels: { font: { size: 10 } } }
+                }
+            }
+        });
+
+        // نمودار وضعیت نهایی
+        const typeLabels = {
+            'draft': 'پیش‌نویس',
+            'sent': 'ارسال شده',
+            'Sent-Customer Version': 'ارسال-نسخه مشتری',
+            'Sent-Driver Version': 'ارسال-نسخه راننده',
+            'delivered': 'تحویل شده',
+            'Delivered-Customer Version': 'تحویل-نسخه مشتری',
+            'Delivered-Driver Version': 'تحویل-نسخه راننده',
+            'canceled': 'لغو شده',
+            'inactive': 'تکراری-غیر فعال'
+        };
+        const typeData = {
+            labels: typeStats.map(s => typeLabels[s.type] || s.type),
+            data: typeStats.map(s => s.count)
+        };
+        new Chart(document.getElementById('chart_type'), {
+            type: 'doughnut',
+            data: {
+                labels: typeData.labels,
+                datasets: [{
+                    data: typeData.data,
+                    backgroundColor: generateColors(typeData.labels.length)
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { position: 'bottom', labels: { font: { size: 9 } } }
+                }
+            }
+        });
+
+        // نمودار ساعتی
+        new Chart(document.getElementById('chart_hourly'), {
+            type: 'line',
+            data: {
+                labels: chartDataHourly.map(d => d.hour),
+                datasets: [{
+                    label: 'تعداد بارنامه‌ها',
+                    data: chartDataHourly.map(d => d.total),
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    fill: true,
+                    tension: 0.3
+                }]
+            },
+            options: commonOptions
+        });
+
+        // نمودار روزانه
+        new Chart(document.getElementById('chart_daily'), {
+            type: 'bar',
+            data: {
+                labels: chartDataDaily.map(d => d.day),
+                datasets: [{
+                    label: 'تعداد بارنامه‌ها',
+                    data: chartDataDaily.map(d => d.total),
+                    backgroundColor: 'rgba(75, 192, 192, 0.7)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: commonOptions
+        });
+
+        // نمودار ماهانه
+        new Chart(document.getElementById('chart_monthly'), {
+            type: 'line',
+            data: {
+                labels: chartDataMonthly.map(d => d.month),
+                datasets: [{
+                    label: 'تعداد بارنامه‌ها',
+                    data: chartDataMonthly.map(d => d.total),
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                    fill: true,
+                    tension: 0.3
+                }]
+            },
+            options: commonOptions
         });
     </script>
 
