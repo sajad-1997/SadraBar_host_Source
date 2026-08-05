@@ -14,9 +14,8 @@ class Driver(models.Model):
     driver_smart_card = models.CharField(max_length=50, unique=True, blank=True, null=True, verbose_name="شماره هوشمند راننده", db_index=True)
     phone = models.CharField(max_length=15, verbose_name="شماره تلفن راننده", db_index=True)
     phone2 = models.CharField(max_length=15, blank=True, null=True, verbose_name="شماره تلفن دوم")
+    phone3 = models.CharField(max_length=15, blank=True, null=True, verbose_name="شماره تلفن سوم")
     address = models.TextField(blank=True, null=True, verbose_name="آدرس")
-    insurance_policy_number = models.CharField(max_length=50, blank=True, null=True, verbose_name="شماره بیمه نامه")
-    insurance_policy_expiry = jmodels.jDateField(blank=True, null=True, verbose_name="تاریخ اعتبار بیمه نامه")
 
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -43,7 +42,7 @@ class Driver(models.Model):
         return self.name
 
     class Meta:
-        db_table = 'issuance_driver'
+        db_table = 'driver'
         indexes = [
             models.Index(fields=['name']),
             models.Index(fields=['national_id']),

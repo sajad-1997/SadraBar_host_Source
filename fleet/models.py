@@ -185,7 +185,7 @@ class Vehicle(UserTrackingModel):
         return f"{self.license_plate_two_digit}{self.license_plate_alphabet}{self.license_plate_three_digit}{self.license_plate_series}"
 
     class Meta:
-        db_table = 'issuance_vehicle'
+        db_table = 'vehicle'
         verbose_name = 'ناوگان'
         verbose_name_plural = 'ناوگان‌ها'
         indexes = [
