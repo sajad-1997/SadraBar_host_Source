@@ -3,7 +3,15 @@
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#4CAF50">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="صدرابار">
+    <meta name="mobile-web-app-capable" content="yes">
+    <link rel="manifest" href="{% static 'pwa/manifest.json' %}">
+    <link rel="icon" type="image/png" sizes="192x192" href="{% static 'pwa/icons/icon-192x192.png' %}">
+    <link rel="apple-touch-icon" href="{% static 'pwa/icons/icon-192x192.png' %}">
     <title>{% block title %}صدرابار خراسان{% endblock %}</title>
     <!-- حذف این دو خط -->
     <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vazirmatn@33.0.2/theme-awesome/vazirmatn-font-face-core.css"> -->
@@ -35,6 +43,108 @@
             display: flex;
             flex-direction: column;
             min-height: 100vh;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        /* PWA Mobile-first styles */
+        @media (max-width: 768px) {
+            body {
+                font-size: 14px;
+            }
+            
+            header {
+                padding: 12px 16px;
+            }
+            
+            .container {
+                padding: 16px;
+            }
+            
+            /* Bottom navigation for mobile app feel */
+            .mobile-nav {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                background: var(--background-dark);
+                display: flex;
+                justify-content: space-around;
+                padding: 8px 0;
+                box-shadow: 0 -2px 10px rgba(0,0,0,0.2);
+                z-index: 1000;
+            }
+            
+            .mobile-nav a {
+                color: var(--text-color-light);
+                text-decoration: none;
+                font-size: 12px;
+                text-align: center;
+                padding: 4px 8px;
+                border-radius: 8px;
+                transition: all 0.3s ease;
+            }
+            
+            .mobile-nav a.active {
+                color: var(--primary-color);
+                background: rgba(76, 175, 80, 0.2);
+            }
+            
+            .mobile-nav span {
+                display: block;
+                font-size: 20px;
+                margin-bottom: 2px;
+            }
+        }
+        
+        /* Hide mobile nav on desktop */
+        @media (min-width: 769px) {
+            .mobile-nav {
+                display: none;
+            }
+        }
+        
+        /* Splash screen animation */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .pwa-splash {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, #4CAF50 0%, #2E7D32 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 99999;
+            animation: fadeIn 0.3s ease-out;
+        }
+        
+        .pwa-splash img {
+            width: 120px;
+            height: 120px;
+            border-radius: 24px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            animation: pulse 2s infinite;
+        }
+        
+        .pwa-splash h1 {
+            color: white;
+            margin-top: 24px;
+            font-size: 24px;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
         }
 
         /* ... سایر استایل‌های base.html ... */
@@ -332,6 +442,41 @@
             nav.classList.toggle('active');
         }
     </script>
+    
+    <!-- PWA Scripts -->
+    <script src="{% static 'pwa/pwa.js' %}"></script>
+    
+    <!-- Mobile Navigation Bar (App-like) -->
+    <nav class="mobile-nav" id="mobileNav">
+        <a href="/" class="{% if request.path == '/' %}active{% endif %}">
+            <span>🏠</span>
+            خانه
+        </a>
+        <a href="{% url 'reserve' %}" class="{% if 'reserve' in request.path %}active{% endif %}">
+            <span>📦</span>
+            رزرو
+        </a>
+        <a href="{% url 'tracking' %}" class="{% if 'tracking' in request.path %}active{% endif %}">
+            <span>🔍</span>
+            پیگیری
+        </a>
+        <a href="{% url 'contact' %}" class="{% if 'contact' in request.path %}active{% endif %}">
+            <span>📞</span>
+            تماس
+        </a>
+        {% if user.is_authenticated %}
+        <a href="{% url 'dashboard' %}" class="{% if 'dashboard' in request.path %}active{% endif %}">
+            <span>👤</span>
+            پروفایل
+        </a>
+        {% else %}
+        <a href="{% url 'login' %}" class="{% if 'login' in request.path %}active{% endif %}">
+            <span>🔐</span>
+            ورود
+        </a>
+        {% endif %}
+    </nav>
+
     {% block extra_scripts %}{% endblock %}
 </body>
 </html>
