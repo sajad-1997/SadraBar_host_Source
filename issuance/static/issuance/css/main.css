@@ -285,9 +285,9 @@ button, .btn {
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-/* ========================= */
+/* =============================== */
 /* === ریسپانسیو قوی (موبایل) === */
-/* ========================= */
+/* =============================== */
 @media (max-width: 768px) {
 
     /* جلوگیری از اسکرول افقی */
@@ -363,4 +363,53 @@ button, .btn {
     .btn.btn-lg {
         padding: 12px !important;
     }
+}
+
+/* =============================== */
+/* === استایل‌های ولیدیشن فرم === */
+/* =============================== */
+
+/* کلاس برای فیلدهای دارای خطا */
+.error-field {
+    border-color: #dc3545 !important;
+    border-width: 2px !important;
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
+    background-color: #fff8f8 !important;
+}
+
+/* پیام خطا زیر فیلدها */
+.error-msg {
+    color: #dc3545;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+    font-weight: 500;
+}
+
+/* استایل برای لیبل‌های فیلدهای اجباری */
+label.required::after {
+    content: " *";
+    color: #dc3545;
+    font-weight: bold;
+}
+
+/* انیمیشن لرزش برای فیلد خطا دار */
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+    20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
+
+.error-field.shake {
+    animation: shake 0.5s ease-in-out;
+}
+
+/* استایل پیام خطای کلی فرم */
+.form-error-alert {
+    background-color: #fdecea;
+    border: 1px solid #dc3545;
+    color: #c62828;
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    font-size: 0.95rem;
 }
