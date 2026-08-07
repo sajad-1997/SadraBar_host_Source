@@ -49,6 +49,28 @@
                 <div class="error-msg" id="error_address"></div>
             </div>
 
+            <!-- بخش افزودن اطلاعات به مشتری فعلی -->
+            <div class="mb-3" style="border: 1px solid #ddd; padding: 15px; border-radius: 5px; margin-top: 20px;">
+                <h4 style="display: flex; align-items: center; gap: 10px;">
+                    افزودن اطلاعات به مشتری فعلی
+                    <button type="button" id="toggle-extra-fields" style="background: none; border: none; font-size: 20px; cursor: pointer;">+</button>
+                </h4>
+                <div id="extra-fields" style="display: none; margin-top: 15px;">
+                    <div class="mb-3">
+                        <label>کد پستی:</label>
+                        <input type="text" id="extra-postal" name="extra_postal" class="form-control">
+                    </div>
+                    <div class="mb-3">
+                        <label>شماره تلفن:</label>
+                        <input type="text" id="extra-phone" name="extra_phone" class="form-control">
+                    </div>
+                    <div class="mb-3">
+                        <label>آدرس:</label>
+                        <input type="text" id="extra-address" name="extra_address" class="form-control">
+                    </div>
+                </div>
+            </div>
+
             <button type="submit">ذخیره و ایجاد مشتری جدید</button>
             <button type="button" id="add-to-customer">افزودن اطلاعات به مشتری فعلی</button>
             <a href="{% url 'customers:customer_list' %}"
@@ -73,7 +95,25 @@
             const customerIdField = $("#customer-id");
             const duplicateBTN = $("#add-to-customer");
             const msgDiv = $("#msg");
+            const toggleExtraFieldsBtn = $("#toggle-extra-fields");
+            const extraFieldsDiv = $("#extra-fields");
+            const extraPostalField = $("#extra-postal");
+            const extraPhoneField = $("#extra-phone");
+            const extraAddressField = $("#extra-address");
             let selectedCustomerAddress = null;
+
+            // =============================
+            // نمایش/مخفی کردن فیلدهای اضافی
+            // =============================
+            toggleExtraFieldsBtn.on("click", function () {
+                if (extraFieldsDiv.is(":visible")) {
+                    extraFieldsDiv.slideUp();
+                    $(this).text("+");
+                } else {
+                    extraFieldsDiv.slideDown();
+                    $(this).text("-");
+                }
+            });
 
             // =============================
             // CSRF
@@ -158,15 +198,27 @@
 
                 if (!validateForm()) return;
 
+                // استفاده از فیلدهای اضافی اگر پر شده باشند
+                let postalToUse = extraPostalField.val().trim() || postalField.val().trim();
+                let phoneToUse = extraPhoneField.val().trim() || phoneField.val().trim();
+                let addressToUse = extraAddressField.val().trim() || addressField.val().trim();
+
                 $.ajax({
                     url: "/issuance/duplicate-customer/",
                     type: "POST",
-                    data: form.serialize(),
+                    data: {
+                        csrfmiddlewaretoken: csrftoken,
+                        name: nameField.val().trim(),
+                        national_id: nationalField.val().trim(),
+                        postal: postalToUse,
+                        phone: phoneToUse,
+                        address: addressToUse
+                    },
                     headers: {"X-CSRFToken": csrftoken},
                     success: function (resp) {
                         if (resp.success) {
                             msgDiv.html("آدرس جدید برای مشتری ثبت شد");
-                            selectedCustomerAddress = addressField.val().trim();
+                            selectedCustomerAddress = addressToUse;
                             customerIdField.val(resp.new_id);
                         } else if (resp.error) {
                             msgDiv.html("خطا: " + resp.error);

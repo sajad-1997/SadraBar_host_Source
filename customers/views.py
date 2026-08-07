@@ -6,7 +6,7 @@ from django.utils import timezone
 from django.views.decorators.cache import never_cache
 
 from .forms import CustomerForm
-from .models import Customer
+from .models import Customer, CustomerAddress
 
 
 @login_required
@@ -42,8 +42,37 @@ def add_customer(request):
 
     if request.method == 'POST':
         if form.is_valid():
-            form.save()
-            messages.success(request, 'مشتری جدید با موفقیت ثبت شد')
+            name = form.cleaned_data.get('name')
+            national_id = form.cleaned_data.get('national_id')
+            postal = form.cleaned_data.get('postal')
+            phone = form.cleaned_data.get('phone')
+            address = form.cleaned_data.get('address')
+            
+            # بررسی وجود مشتری بر اساس کد ملی یا نام
+            existing_customer = None
+            if national_id:
+                existing_customer = Customer.objects.filter(national_id=national_id).first()
+            
+            if not existing_customer and name:
+                existing_customer = Customer.objects.filter(name=name).first()
+            
+            if existing_customer:
+                # مشتری وجود دارد، آدرس جدید را در جدول CustomerAddress ذخیره کن
+                CustomerAddress.objects.create(
+                    customer=existing_customer,
+                    postal=postal,
+                    phone=phone,
+                    address=address,
+                    created_by=request.user
+                )
+                messages.success(request, f'اطلاعات جدید برای مشتری با نام {existing_customer.name} ذخیره شد')
+            else:
+                # مشتری جدید است، در جدول Customer ذخیره کن
+                customer = form.save(commit=False)
+                customer.created_by = request.user
+                customer.save()
+                messages.success(request, 'مشتری جدید با موفقیت ثبت شد')
+            
             return redirect('customers:customer_list')
 
     return render(request, 'customers/add_customer.html', {
