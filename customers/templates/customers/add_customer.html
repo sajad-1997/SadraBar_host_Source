@@ -49,10 +49,10 @@
                 <div class="error-msg" id="error_address"></div>
             </div>
 
-            <!-- بخش افزودن اطلاعات به مشتری فعلی -->
+            <!-- بخش افزودن اطلاعات اضافی -->
             <div class="mb-3" style="border: 1px solid #ddd; padding: 15px; border-radius: 5px; margin-top: 20px;">
                 <h4 style="display: flex; align-items: center; gap: 10px;">
-                    افزودن اطلاعات به مشتری فعلی
+                    افزودن اطلاعات اضافی (کد پستی، تلفن، آدرس)
                     <button type="button" id="toggle-extra-fields" style="background: none; border: none; font-size: 20px; cursor: pointer;">+</button>
                 </h4>
                 <div id="extra-fields" style="display: none; margin-top: 15px;">
@@ -72,7 +72,6 @@
             </div>
 
             <button type="submit">ذخیره و ایجاد مشتری جدید</button>
-            <button type="button" id="add-to-customer">افزودن اطلاعات به مشتری فعلی</button>
             <a href="{% url 'customers:customer_list' %}"
                class="btn btn-secondary mt-3">
                 بازگشت
@@ -92,15 +91,12 @@
             const postalField = $("#customer-postal");
             const phoneField = $("#customer-phone");
             const addressField = $("#customer-address");
-            const customerIdField = $("#customer-id");
-            const duplicateBTN = $("#add-to-customer");
             const msgDiv = $("#msg");
             const toggleExtraFieldsBtn = $("#toggle-extra-fields");
             const extraFieldsDiv = $("#extra-fields");
             const extraPostalField = $("#extra-postal");
             const extraPhoneField = $("#extra-phone");
             const extraAddressField = $("#extra-address");
-            let selectedCustomerAddress = null;
 
             // =============================
             // نمایش/مخفی کردن فیلدهای اضافی
@@ -162,73 +158,41 @@
             }
 
             // =============================
-            // Submit اصلی
+            // Submit اصلی - ارسال به سرور برای بررسی و ذخیره
             // =============================
             form.on("submit", function (e) {
-                e.preventDefault();
-                if (!validateForm()) return;
-
-                $.ajax({
-                    url: "/issuance/save-sender/",
-                    type: "POST",
-                    data: form.serialize(),
-                    headers: {"X-CSRFToken": csrftoken},
-                    success: function (resp) {
-                        if (resp.success) {
-                            msgDiv.html("مشتری جدید ایجاد شد");
-                            window.location.href = "{% url 'customers:customer_list' %}";
-                        }
-                    },
-                    error: function () {
-                        msgDiv.html("خطا در ارتباط با سرور");
-                    }
-                });
-            });
-
-            // =============================
-            // Duplicate مشتری با آدرس متفاوت
-            // =============================
-            duplicateBTN.on("click", function () {
-                clearErrors();
-
-                if (!customerIdField.val()) {
-                    msgDiv.html("ابتدا مشتری را انتخاب کنید");
+                if (!validateForm()) {
+                    e.preventDefault();
                     return;
                 }
-
-                if (!validateForm()) return;
-
-                // استفاده از فیلدهای اضافی اگر پر شده باشند
-                let postalToUse = extraPostalField.val().trim() || postalField.val().trim();
-                let phoneToUse = extraPhoneField.val().trim() || phoneField.val().trim();
-                let addressToUse = extraAddressField.val().trim() || addressField.val().trim();
-
-                $.ajax({
-                    url: "/issuance/duplicate-customer/",
-                    type: "POST",
-                    data: {
-                        csrfmiddlewaretoken: csrftoken,
-                        name: nameField.val().trim(),
-                        national_id: nationalField.val().trim(),
-                        postal: postalToUse,
-                        phone: phoneToUse,
-                        address: addressToUse
-                    },
-                    headers: {"X-CSRFToken": csrftoken},
-                    success: function (resp) {
-                        if (resp.success) {
-                            msgDiv.html("آدرس جدید برای مشتری ثبت شد");
-                            selectedCustomerAddress = addressToUse;
-                            customerIdField.val(resp.new_id);
-                        } else if (resp.error) {
-                            msgDiv.html("خطا: " + resp.error);
-                            addressField.addClass("error-field").after('<div class="error-msg">' + resp.error + '</div>');
-                        }
-                    },
-                    error: function () {
-                        msgDiv.html("خطا در ثبت آدرس جدید");
-                    }
-                });
+                
+                // اگر فیلدهای اضافی پر شده باشند، آنها را به فرم اضافه کن
+                if (extraPostalField.val().trim()) {
+                    $('<input>').attr({
+                        type: 'hidden',
+                        id: 'postal_extra',
+                        name: 'postal_extra',
+                        value: extraPostalField.val().trim()
+                    }).appendTo(form);
+                }
+                if (extraPhoneField.val().trim()) {
+                    $('<input>').attr({
+                        type: 'hidden',
+                        id: 'phone_extra',
+                        name: 'phone_extra',
+                        value: extraPhoneField.val().trim()
+                    }).appendTo(form);
+                }
+                if (extraAddressField.val().trim()) {
+                    $('<input>').attr({
+                        type: 'hidden',
+                        id: 'address_extra',
+                        name: 'address_extra',
+                        value: extraAddressField.val().trim()
+                    }).appendTo(form);
+                }
+                
+                // فرم به صورت عادی submit می‌شود
             });
 
             // =============================
@@ -239,8 +203,6 @@
 
                 if (!query) {
                     $("#customer-results").hide();
-                    customerIdField.val("");
-                    selectedCustomerAddress = null;
                     return;
                 }
 
@@ -250,7 +212,6 @@
                         data.results.forEach(item => {
                             html += `
                     <button type="button" class="list-group-item"
-                        data-id="${item.id}"
                         data-name="${item.name}"
                         data-national="${item.national_id || ''}"
                         data-postal="${item.postal || ''}"
@@ -267,17 +228,15 @@
             });
 
             // =============================
-            // انتخاب مشتری از نتایج
+            // انتخاب مشتری از نتایج - فقط پر کردن فیلدها
             // =============================
             $(document).on("click", "#customer-results .list-group-item", function () {
                 const btn = $(this);
-                customerIdField.val(btn.data("id"));
                 nameField.val(btn.data("name"));
                 nationalField.val(btn.data("national"));
                 postalField.val(btn.data("postal"));
                 phoneField.val(btn.data("phone"));
                 addressField.val(btn.data("address"));
-                selectedCustomerAddress = btn.data("address") || "";
                 $("#customer-results").hide();
             });
 
