@@ -62,9 +62,6 @@
 
 {% block extra_scripts %}
 
-    <!--<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>-->
-    <!--<script src="{% static 'issuance/jquery.js' %}"></script>-->
-
     <script>
         $(document).ready(function () {
             const form = $("#customer-form");
@@ -97,28 +94,32 @@
             const csrftoken = getCookie("csrftoken");
 
             // =============================
-            // ولیدیشن فرم
+            // ولیدیشن فرم با استفاده از FormValidation
             // =============================
             function clearErrors() {
                 $(".error-msg").remove();
-                $("input").removeClass("error-field");
+                $("input").removeClass("error-field shake");
                 msgDiv.html("");
             }
 
             function validateForm() {
                 clearErrors();
                 let valid = true;
+                let firstErrorField = null;
 
                 if (!nameField.val().trim()) {
-                    nameField.addClass("error-field").after('<div class="error-msg">نام مشتری الزامی است</div>');
+                    FormValidation.addErrorClass(nameField, 'نام مشتری الزامی است');
                     valid = false;
+                    if (!firstErrorField) firstErrorField = nameField;
                 }
                 if (!addressField.val().trim()) {
-                    addressField.addClass("error-field").after('<div class="error-msg">آدرس الزامی است</div>');
+                    FormValidation.addErrorClass(addressField, 'آدرس الزامی است');
                     valid = false;
+                    if (!firstErrorField) firstErrorField = addressField;
                 }
 
                 if (!valid) {
+                    FormValidation.scrollToElement(firstErrorField, 100);
                     msgDiv.html("لطفاً فیلدهای اجباری را تکمیل کنید");
                 }
                 return valid;
@@ -173,7 +174,7 @@
                             customerIdField.val(resp.new_id);
                         } else if (resp.error) {
                             msgDiv.html("خطا: " + resp.error);
-                            addressField.addClass("error-field").after('<div class="error-msg">' + resp.error + '</div>');
+                            FormValidation.addErrorClass(addressField, resp.error);
                         }
                     },
                     error: function () {
@@ -236,7 +237,7 @@
             // پاک کردن خطا هنگام تایپ
             // =============================
             $("input").on("input", function () {
-                $(this).removeClass("error-field");
+                $(this).removeClass("error-field shake");
                 $(this).next(".error-msg").remove();
                 msgDiv.html("");
             });
