@@ -42,3 +42,35 @@ class Customer(models.Model):
             models.Index(fields=['national_id']),
             models.Index(fields=['phone']),
         ]
+
+
+class CustomerAddress(models.Model):
+    """مدل برای ذخیره آدرس‌های متعدد هر مشتری"""
+    customer = models.ForeignKey(
+        Customer,
+        on_delete=models.CASCADE,
+        related_name='addresses',
+        db_index=True
+    )
+    postal = models.CharField(max_length=10, blank=True, null=True, verbose_name="کد پستی")
+    phone = models.CharField(max_length=15, blank=True, null=True, verbose_name="شماره تلفن")
+    address = models.TextField(verbose_name="آدرس")
+    
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="customer_address_created",
+        db_index=True
+    )
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+
+    def __str__(self):
+        return f"{self.customer.name} - {self.address[:30]}"
+
+    class Meta:
+        db_table = 'customer_address'
+        indexes = [
+            models.Index(fields=['customer']),
+        ]
