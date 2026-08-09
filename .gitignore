@@ -2,6 +2,7 @@
 # Python
 __pycache__/
 <<<<<<< HEAD
+<<<<<<< HEAD
 *.pyc
 *.pyo
 *.pyd
@@ -25,6 +26,8 @@ local_settings.py
 db.sqlite3
 db.sqlite3-journal
 =======
+=======
+>>>>>>> origin/مدیریت-اطلاعات-مشتریان-8fb5c
 *.py[cod]
 *$py.class
 *.so
@@ -45,6 +48,7 @@ wheels/
 .installed.cfg
 *.egg
 
+<<<<<<< HEAD
 # Environment
 .env
 .env.local
@@ -53,13 +57,40 @@ wheels/
 venv/
 ENV/
 >>>>>>> origin/سیستم-حسابداری-یکپارچه-باربری-df137
+=======
+# Virtual environments
+venv/
+env/
+ENV/
+.venv/
+.env/
+>>>>>>> origin/مدیریت-اطلاعات-مشتریان-8fb5c
 
 # IDE
 .vscode/
 .idea/
 *.swp
 *.swo
+<<<<<<< HEAD
 *~
+=======
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Coverage
+.coverage
+htmlcov/
+coverage/
+
+# Temporary files
+*.tmp
+*.temp
+>>>>>>> origin/مدیریت-اطلاعات-مشتریان-8fb5c
 
 # Virtual environments
 venv/
@@ -97,6 +128,7 @@ target/
 .env.prod
 .env.*
 
+<<<<<<< HEAD
 # Coverage
 htmlcov/
 coverage/
@@ -131,6 +163,25 @@ wheels/
 ehthumbs.db
 Thumbs.db
 desktop.ini
+=======
+# MyPy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# PyTest
+.pytest_cache/
+
+# Django specific
+*.sqlite3
+media/
+staticfiles/
+*.pot
+*.po
+MANIFEST
+.settings/
+logs/
+>>>>>>> origin/مدیریت-اطلاعات-مشتریان-8fb5c
 
 # Compressed files
 *.zip
@@ -154,6 +205,7 @@ desktop.ini
 *.tar.gz
 *.tar.bz2
 *.tar.xz
+<<<<<<< HEAD
 *.tar.zst
 =======
 # Logs
@@ -165,3 +217,6 @@ coverage/
 htmlcov/
 ```
 >>>>>>> origin/سیستم-حسابداری-یکپارچه-باربری-df137
+=======
+*.tar.zst
+>>>>>>> origin/مدیریت-اطلاعات-مشتریان-8fb5c
