@@ -1,44 +1,103 @@
 {% load humanize %}
 
+<!-- جدول دسکتاپ -->
+<table class="desktop-table">
+    <thead>
+    <tr>
+        <th>کد رهگیری</th>
+        <th>تاریخ صدور</th>
+        <th>فرستنده</th>
+        <th>گیرنده</th>
+        <th>کل کرایه</th>
+        <th>ارزش محموله</th>
+        <th>نام محموله</th>
+        <th>مبدا</th>
+        <th>مقصد</th>
+        <th>راننده</th>
+        <th>عملیات</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for b in bijaks %}
+        <tr>
+            <td>{{ b.tracking_code }}</td>
+            <td>{{ b.issuance_datetime }}</td>
+            <td>{{ b.sender.name }}</td>
+            <td>{{ b.receiver.name }}</td>
+            <td>{{ b.total_fare|intcomma }} ریال</td>
+            <td>{{ b.value|intcomma }} ریال</td>
+            <td>{{ b.cargo.name }}</td>
+            <td>{{ b.cargo.origin }}</td>
+            <td>{{ b.cargo.destination }}</td>
+            <td>{{ b.driver.name }}</td>
+            <td>
+                {% if b.approval_status == 'pending' %}
+                    <a href="{% url 'issuance:crud:preview' b.pk %}" class="btn btn-sm btn-info">مشاهده</a>
+                {% elif b.approval_status == 'approved' %}
+                    <a href="{% url 'issuance:crud:print' b.pk %}" class="btn btn-sm btn-primary">چاپ</a>
+                    <a href="{% url 'issuance:manager:manager_preview' b.pk %}" class="btn btn-sm btn-info">مشاهده</a>
+                    <a href="{% url 'issuance:crud:preview' b.pk %}" class="btn btn-sm btn-info">مشاهده</a>
+                {% elif b.approval_status == 'rejected' %}
+                    <a href="{% url 'issuance:crud:edit_bijak' b.pk %}" class="btn btn-sm btn-warning">ویرایش</a>
+                    <a href="{% url 'issuance:manager:manager_preview' b.pk %}" class="btn btn-sm btn-info">مشاهده</a>
+                    <a href="{% url 'issuance:crud:preview' b.pk %}" class="btn btn-sm btn-info">مشاهده</a>
+                {% endif %}
+            </td>
+        </tr>
+    {% empty %}
+        <tr>
+            <td colspan="11" class="text-center text-muted">نتیجه‌ای یافت نشد</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+<!-- کارت موبایل -->
 {% for b in bijaks %}
     <div class="bijak-card">
-        <div class="bijak-header">
-            کد رهگیری: {{ b.tracking_code }} |
-            تاریخ صدور: {{ b.issuance_datetime }}
-        </div>
-
-        <div class="bijak-row">
-            <span>فرستنده: {{ b.sender.name }}</span>
-            <span>گیرنده: {{ b.receiver.name }}</span>
-        </div>
-
-        <div class="bijak-row">
-            <span>مبدا: {{ b.cargo.origin }}</span>
-            <span>مقصد: {{ b.cargo.destination }}</span>
-        </div>
-
-        <div class="bijak-row">
-            <span>راننده: {{ b.driver.name }}</span>
-            <span>پلاک:
-                {{ b.vehicle.license_plate_two_digit }}
-                {{ b.vehicle.license_plate_alphabet }}
-                {{ b.vehicle.license_plate_three_digit }}
-                | ایران {{ b.vehicle.license_plate_series }}
-            </span>
-        </div>
-
-        <div class="bijak-row">
-            <span>کل کرایه: {{ b.total_fare|intcomma }} ریال</span>
-            <span>ارزش محموله: {{ b.value|intcomma }} ریال</span>
-        </div>
-
+        <div class="bijak-header"><b>ردیف:</b> {{ b.id }} | <b>شماره بارنامه:</b> {{ b.tracking_code }} | <b>زمان صدور:</b> {{ b.issuance_datetime }}</div>
+            <div class="bijak-row">
+                <span></span>
+            </div>
+            <div class="bijak-row">
+                <span><b>فرستنده:</b> {{ b.sender.name }}</span>
+                <span><b>گیرنده:</b> {{ b.receiver.name }}</span>
+            </div>
+            <div class="bijak-row">
+                <span><b>کل کرایه:</b> {{ b.total_fare|intcomma }} ریال</span>
+            </div>
+            <div class="bijak-row">
+                <span><b>ارزش محموله:</b> {{ b.value|intcomma }} ریال</span>
+            </div>
+            <div class="bijak-row">
+                <span><b>راننده:</b> {{ b.driver.name }}</span>
+                <span><b>شماره راننده:</b> {{ b.driver.phone }}</span>
+            </div>
+            <div class="bijak-row">
+                <span><b>نام محموله:</b> {{ b.cargo.name }}</span>
+                <span><b>وزن محموله:</b> {{ b.cargo.weight }}</span>
+            </div>
+            <div class="bijak-row">
+                <span><b>مبدا:</b> {{ b.cargo.origin }}</span>
+                <span><b>مقصد:</b> {{ b.cargo.destination }}</span>
+            </div>
+            <div class="bijak-row">
+                <span><b>توضیحات:</b>{{ b.final_description }}</span>
+            </div>
+            <div class="bijak-row">
+                <span><b>وضعیت اجرایی:</b> {{ b.get_status_display }}</span>
+                <span><b>وضعیت بررسی:</b> {{ b.get_approval_status_display }}</span>
+                <span><b>وضعیت نهایی:</b> {{ b.get_type_display }}</span>
+                <span><b>ثبت کننده:</b> {{ b.created_by }}</span>
+            </div>
         <div class="btn-group-card">
-            <a href="{% url 'issuance:crud:preview' b.pk %}" class="btn btn-sm btn-info w-100">مشاهده</a>
             <a href="{% url 'issuance:crud:print' b.pk %}" class="btn btn-sm btn-primary w-100">چاپ</a>
+            <a href="{% url 'issuance:manager:manager_preview' b.pk %}" class="btn btn-sm btn-info w-100">مشاهده</a>
+            <a href="{% url 'issuance:crud:edit_bijak' b.pk %}" class="btn btn-sm btn-warning w-100">ویرایش</a>
         </div>
     </div>
 {% empty %}
-    <p class="text-center text-muted mt-4">
+    <p class="text-center mt-4 text-muted">
         نتیجه‌ای یافت نشد
     </p>
 {% endfor %}
