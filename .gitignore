@@ -1,10 +1,5 @@
-```
-<<<<<<< HEAD
 # Python
 __pycache__/
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
 *.pyc
 *.pyo
 *.pyd
@@ -21,31 +16,6 @@ __pycache__/
 *.dll
 *.a
 *.out
-=======
-# Compiled and build artifacts
-*.pyc
-__pycache__/
-
-# Dependencies
-.venv/
-venv/
-node_modules/
->>>>>>> origin/نمایش-پیام‌های-سیستمی-موقت-84c4a
-
-# Logs and temp files
-*.log
-<<<<<<< HEAD
-local_settings.py
-db.sqlite3
-db.sqlite3-journal
-=======
-=======
->>>>>>> origin/مدیریت-اطلاعات-مشتریان-8fb5c
-=======
->>>>>>> origin/مدیریت-بارنامه‌های-تکراری-83f66
-*.py[cod]
-*$py.class
-*.so
 .Python
 build/
 develop-eggs/
@@ -63,10 +33,16 @@ wheels/
 .installed.cfg
 *.egg
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> origin/مدیریت-بارنامه‌های-تکراری-83f66
+# Dependencies
+.venv/
+venv/
+node_modules/
+
+# Logs and temp files
+*.log
+*.tmp
+*.swp
+
 # Environment
 .env
 .env.local
@@ -74,32 +50,17 @@ wheels/
 .venv/
 venv/
 ENV/
-<<<<<<< HEAD
->>>>>>> origin/سیستم-حسابداری-یکپارچه-باربری-df137
-=======
-# Virtual environments
-venv/
 env/
-ENV/
 .venv/
 .env/
->>>>>>> origin/مدیریت-اطلاعات-مشتریان-8fb5c
-=======
->>>>>>> origin/مدیریت-بارنامه‌های-تکراری-83f66
 
 # IDE
 .vscode/
 .idea/
 *.swp
 *.swo
-<<<<<<< HEAD
 *~
-=======
 
-# Logs
-*.log
-
-<<<<<<< HEAD
 # OS
 .DS_Store
 Thumbs.db
@@ -108,11 +69,10 @@ Thumbs.db
 .coverage
 htmlcov/
 coverage/
+.coverage.*
 
 # Temporary files
-*.tmp
 *.temp
->>>>>>> origin/مدیریت-اطلاعات-مشتریان-8fb5c
 
 # Virtual environments
 venv/
@@ -122,33 +82,22 @@ env/
 .env
 env.bak/
 venv.bak/
-node_modules/
 
 # Dependencies
 pip-log.txt
 pip-delete-this-directory.txt
 .tox/
-.coverage
-.coverage.*
 .cache
 nosetests.xml
 coverage.xml
 *.cover
-*.tmp
 *.bak
 *.orig
 *.rej
 target/
 .gradle/
 
-<<<<<<< HEAD
 # Environment variables
-=======
-*.tmp
-*.swp
-
-# Environment
->>>>>>> origin/نمایش-پیام‌های-سیستمی-موقت-84c4a
 .env
 .env.local
 .env.dev
@@ -156,60 +105,16 @@ target/
 .env.prod
 .env.*
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-# Coverage
-htmlcov/
-coverage/
-.coverage.*
-=======
-# Coverage
-.coverage
-coverage/
-htmlcov/
->>>>>>> origin/مدیریت-بارنامه‌های-تکراری-83f66
-
 # Testing
 .pytest_cache/
 .mypy_cache/
-<<<<<<< HEAD
-
-# Build and distribution artifacts
-.Python
-build/
-dist/
-*.egg
-*.egg-info/
-.eggs/
-develop-eggs/
-.installed.cfg
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-
-# OS generated files
-.DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Thumbs.db
-desktop.ini
-=======
-# MyPy
-.mypy_cache/
 .dmypy.json
 dmypy.json
-
-# PyTest
-.pytest_cache/
+.hypothesis/
 
 # Django specific
 *.sqlite3
+*.sqlite3-journal
 media/
 staticfiles/
 *.pot
@@ -217,7 +122,15 @@ staticfiles/
 MANIFEST
 .settings/
 logs/
->>>>>>> origin/مدیریت-اطلاعات-مشتریان-8fb5c
+local_settings.py
+
+# OS generated files
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+desktop.ini
 
 # Compressed files
 *.zip
@@ -241,62 +154,11 @@ logs/
 *.tar.gz
 *.tar.bz2
 *.tar.xz
-<<<<<<< HEAD
 *.tar.zst
-=======
-# Logs
-*.log
-
-# Coverage
-.coverage
-coverage/
-htmlcov/
-```
->>>>>>> origin/سیستم-حسابداری-یکپارچه-باربری-df137
-=======
-*.tar.zst
->>>>>>> origin/مدیریت-اطلاعات-مشتریان-8fb5c
-=======
-.hypothesis/
-
-# Django specific
-*.sqlite3
-*.sqlite3-journal
-media/
-staticfiles/
-```
->>>>>>> origin/مدیریت-بارنامه‌های-تکراری-83f66
-=======
-# Editors
-.vscode/
-.idea/
-
-# Coverage reports
-coverage/
-htmlcov/
-.coverage
-
-# Python specific
-*.pyo
-*.pyd
-*.so
-*.egg-info/
-dist/
-build/
-*.egg
 
 # Web artifacts
-staticfiles/
-media/
 *.min.js
 *.min.css
 
 # Database
 *.db
-*.sqlite3
-
-# OS generated files
-.DS_Store
-Thumbs.db
-```
->>>>>>> origin/نمایش-پیام‌های-سیستمی-موقت-84c4a
