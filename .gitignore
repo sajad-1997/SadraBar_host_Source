@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Python
 __pycache__/
 *.pyc
@@ -123,3 +124,6 @@ desktop.ini
 *.tar.bz2
 *.tar.xz
 *.tar.zst
+=======
+Nothing should be ignored since only a Python source file (`dashboard/views.py`) was modified and there are no build artifacts, dependencies, or temporary files in the changes.
+>>>>>>> origin/بهبود-داشبورد-مدیریت-باربری-a267b
