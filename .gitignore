@@ -42,6 +42,7 @@ node_modules/
 *.log
 *.tmp
 *.swp
+*.log.*
 
 # Environment
 .env
@@ -53,6 +54,7 @@ ENV/
 env/
 .venv/
 .env/
+!.env.example
 
 # IDE
 .vscode/
@@ -73,6 +75,7 @@ coverage/
 
 # Temporary files
 *.temp
+*~
 
 # Virtual environments
 venv/
