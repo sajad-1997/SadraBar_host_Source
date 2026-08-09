@@ -4,18 +4,20 @@
 
     <h2>{% block title %}🔍 جستجوی سراسری بارنامه‌ها{% endblock %}</h2>
 
-    <!-- فرم جستجوی سراسری -->
+    <!-- فرم جستجوی سراسری با قابلیت AJAX -->
     <div class="card filter-card shadow-sm">
-        <form method="get">
+        <form method="get" id="search-form">
             <div class="row g-2 align-items-center">
                 <div class="col-12 col-md-9">
                     <input
                         type="text"
                         name="q"
+                        id="search-input"
                         value="{{ search_query }}"
                         class="form-control"
-                        placeholder="جستجو بر اساس کد رهگیری، نام فرستنده، گیرنده، راننده، پلاک، مبدا یا مقصد..."
+                        placeholder="جستجو بر اساس کد رهگیری، نام فرستنده، گیرنده، راننده، پلاک، مبدا، مقصد، کد ملی، آدرس..."
                         autofocus
+                        autocomplete="off"
                     >
                 </div>
                 <div class="col-6 col-md-2">
@@ -29,8 +31,11 @@
         </form>
     </div>
 
+    <!-- نمایش تعداد نتایج -->
+    <div id="search-results-count" class="mb-2 text-muted"></div>
+
     <!-- جدول دسکتاپ -->
-    <table class="desktop-table">
+    <table class="desktop-table" id="desktop-results">
         <thead>
         <tr>
             <th>کد رهگیری</th>
@@ -42,13 +47,11 @@
             <th>نام محموله</th>
             <th>مبدا</th>
             <th>مقصد</th>
-            <!--<th>توضیحات</th>-->
             <th>راننده</th>
-            <!--<th>پلاک خودرو</th>-->
             <th>عملیات</th>
         </tr>
         </thead>
-        <tbody>
+        <tbody id="desktop-tbody">
         {% for b in bijaks %}
             <tr>
                 <td>{{ b.tracking_code }}</td>
@@ -60,14 +63,7 @@
                 <td>{{ b.cargo.name }}</td>
                 <td>{{ b.cargo.origin }}</td>
                 <td>{{ b.cargo.destination }}</td>
-                <!--<td>{{ b.custom_caption}}</td>-->
                 <td>{{ b.driver.name }}</td>
-                <!--<td>-->
-                <!--    {{ b.vehicle.license_plate_two_digit }}-->
-                <!--    {{ b.vehicle.license_plate_alphabet }}-->
-                <!--    {{ b.vehicle.license_plate_three_digit }}-->
-                <!--    | ایران {{ b.vehicle.license_plate_series }}-->
-                <!--</td>-->
                 <td>
                     {% if b.approval_status == 'pending' %}
                         <a href="{% url 'issuance:crud:preview' b.pk %}" class="btn btn-sm btn-info">مشاهده</a>
@@ -82,11 +78,16 @@
                     {% endif %}
                 </td>
             </tr>
+        {% empty %}
+            <tr>
+                <td colspan="11" class="text-center text-muted">نتیجه‌ای یافت نشد</td>
+            </tr>
         {% endfor %}
         </tbody>
     </table>
     
-     <!-- کارت موبایل -->
+    <!-- کارت موبایل -->
+    <div id="mobile-results">
     {% for b in bijaks %}
         <div class="bijak-card">
             <div class="bijak-header"><b>ردیف:</b> {{ b.id }} | <b>شماره بارنامه:</b> {{ b.tracking_code }} | <b>زمان صدور:</b> {{ b.issuance_datetime }}</div>
@@ -132,10 +133,80 @@
         </div>
     {% empty %}
         <p class="text-center mt-4 text-muted">
-            نتیجه‌ای برای
-            <strong>{{ search_query }}</strong>
-            یافت نشد
+            نتیجه‌ای یافت نشد
         </p>
     {% endfor %}
+    </div>
 
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(document).ready(function() {
+    let searchTimeout = null;
+    const searchInput = $('#search-input');
+    const desktopTbody = $('#desktop-tbody');
+    const mobileResults = $('#mobile-results');
+    const resultsCount = $('#search-results-count');
+    
+    // تابع به‌روزرسانی نتایج
+    function updateResults(html, count) {
+        // استخراج محتوای جدول و کارت‌ها از HTML دریافتی
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+        
+        // به‌روزرسانی جدول دسکتاپ
+        const desktopRows = $(doc).find('.desktop-table tbody tr').length ? 
+            $(doc).find('.desktop-table tbody').html() : 
+            '<tr><td colspan="11" class="text-center text-muted">نتیجه‌ای یافت نشد</td></tr>';
+        desktopTbody.html(desktopRows);
+        
+        // به‌روزرسانی کارت‌های موبایل
+        const mobileCards = $(doc).find('.bijak-card');
+        if (mobileCards.length > 0) {
+            mobileResults.html(mobileCards.toArray().map(el => el.outerHTML).join(''));
+        } else {
+            mobileResults.html('<p class="text-center mt-4 text-muted">نتیجه‌ای یافت نشد</p>');
+        }
+        
+        // نمایش تعداد نتایج
+        if (count > 0) {
+            resultsCount.text(count + ' نتیجه یافت شد');
+        } else {
+            resultsCount.text('');
+        }
+    }
+    
+    // رویداد تایپ در فیلد جستجو - جستجوی زنده
+    searchInput.on('input', function() {
+        const query = $(this).val().trim();
+        
+        // پاک کردن تایمر قبلی
+        if (searchTimeout) {
+            clearTimeout(searchTimeout);
+        }
+        
+        // اگر خالی بود
+        if (query.length === 0) {
+            resultsCount.text('');
+            return;
+        }
+        
+        // تأخیر 300 میلی‌ثانیه برای جلوگیری از درخواست‌های زیاد
+        searchTimeout = setTimeout(function() {
+            $.ajax({
+                url: "{% url 'issuance:search:ajax_search_shipment' %}",
+                data: { q: query },
+                success: function(response) {
+                    updateResults(response.html, response.count);
+                },
+                error: function() {
+                    console.error('خطا در جستجو');
+                }
+            });
+        }, 300);
+    });
+});
+</script>
 {% endblock %}
