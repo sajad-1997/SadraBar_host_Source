@@ -2,238 +2,591 @@
 {% load static %}
 
 {% block content %}
-<div class="container my-4">
-    <div class="text-center my-4">
-        <h3>ویرایش بیجک شماره {{ bijak.tracking_code }}</h3>
-        <p class="text-muted">در این صفحه می‌توانید اطلاعات بیجک را به‌روزرسانی کنید.</p>
+<form method="post" action="" id="editBijakForm">
+    <div class="container">
+        <h2>ویرایش بارنامه شماره {{ bijak.tracking_code }}</h2>
         
         {% if bijak.approval_status == 'rejected' %}
-            <div class="alert alert-warning">
-                <strong>توجه:</strong> این بارنامه توسط مدیریت رد شده است. تنها بخش‌هایی که مجوز ویرایش دارند قابل تغییر هستند.
+            <div class="alert alert-warning text-center mt-3">
+                <strong>⚠️ توجه:</strong> این بارنامه توسط مدیریت رد شده است.
+                {% if bijak.reject_reason %}
+                    <br><strong>علت رد:</strong> {{ bijak.reject_reason }}
+                {% endif %}
+                <br>
+                <small>تنها بخش‌هایی که مجوز ویرایش دارند قابل تغییر هستند.</small>
             </div>
         {% endif %}
-    </div>
 
-    <form method="post" class="bijak-form">
         {% csrf_token %}
-
-        <!-- دکمه‌های بالا -->
-        <div class="text-center mb-4">
-            <button type="submit" class="btn btn-success px-4">ذخیره تغییرات</button>
-            <a href="{% url 'issuance:crud:preview' bijak.pk %}" class="btn btn-secondary px-4">بازگشت</a>
-        </div>
-
-        <!-- کارت اصلی -->
-        <div class="card shadow-sm mb-4">
-            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-                <span><strong>کد رهگیری:</strong> {{ bijak.tracking_code }}</span>
-                <h4 class="m-0">ویرایش بیجک</h4>
+        <!-- بخش نمایش پیام‌ها -->
+        <hr>
+        {% if messages %}
+            <div class="mt-3">
+                {% for message in messages %}
+                    <div class="alert
+                    {% if message.tags == 'error' %}alert-danger
+                    {% elif message.tags == 'success' %}alert-success
+                    {% else %}alert-info{% endif %}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
             </div>
-            <div class="card-body p-4">
+        {% endif %}
+        <hr>
 
-                <!-- اطلاعات کلی -->
-                <h5 class="section-title mb-3">اطلاعات کلی بارنامه</h5>
-                <div class="table-responsive">
-                    <table class="table table-bordered text-center align-middle">
-                        <thead class="table-light">
-                            <tr>
-                                <th>تاریخ صدور</th>
-                                <th>کرایه پرداختی</th>
-                                <th>ارزش محموله</th>
-                                <th>مبدا بارگیری</th>
-                                <th>مقصد تخلیه</th>
-                                <th>مبلغ بیمه</th>
-                                <th>هزینه خدمات</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>{{ bijak.issuance_datetime|date:"Y/m/d H:i" }}</td>
-                                <td>{% if can_edit_financial %}{{ bijak_form.total_fare }}{% else %}{{ bijak.total_fare }}{% endif %}</td>
-                                <td>{% if can_edit_financial %}{{ bijak_form.value }}{% else %}{{ bijak.value }}{% endif %}</td>
-                                <td>{{ cargo_form.origin }}</td>
-                                <td>{{ cargo_form.destination }}</td>
-                                <td>{% if can_edit_financial %}{{ bijak_form.insurance }}{% else %}{{ bijak.insurance }}{% endif %}</td>
-                                <td>{% if can_edit_financial %}{{ bijak_form.loading_fee }}{% else %}{{ bijak.loading_fee|default:"—" }}{% endif %}</td>
-                            </tr>
-                        </tbody>
-                    </table>
+        <!-- === ROW: فرستنده و گیرنده === -->
+        <div class="row">
+            <!-- فرستنده -->
+            <div class="col-md-6">
+                <div class="section sender">
+                    <h3>
+                        اطلاعات فرستنده
+                        {% if can_edit_sender %}
+                            <span class="badge bg-success">قابل ویرایش</span>
+                        {% else %}
+                            <span class="badge bg-secondary">فقط مشاهده</span>
+                        {% endif %}
+                    </h3>
+                    <hr>
+                    <div class="search-wrapper">
+                        <div class="input-with-add">
+                            {% if can_edit_sender %}
+                                <input type="text" id="sender-input" class="form-control"
+                                       placeholder="جستجوی فرستنده..." value="{{ bijak.sender.name }}">
+                                <a href="{% url 'add_customer' %}" class="add-btn" title="افزودن فرستنده">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor">
+                                        <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+                                    </svg>
+                                </a>
+                            {% else %}
+                                <input type="text" class="form-control" value="{{ bijak.sender.name }}" disabled>
+                            {% endif %}
+                        </div>
+                        {% if can_edit_sender %}
+                            <input type="hidden" id="sender-id" name="sender" value="{{ bijak.sender.id }}">
+                            <div id="sender-results" class="results-box" aria-live="polite"></div>
+                        {% else %}
+                            <input type="hidden" name="sender" value="{{ bijak.sender.id }}">
+                        {% endif %}
+                    </div>
+                    
+                    {% if can_edit_sender %}
+                    <div class="mt-3">
+                        <label class="form-label">شناسه/کد ملی:</label>
+                        {{ sender_form.national_id }}
+                    </div>
+                    <div class="mt-2">
+                        <label class="form-label">کد پستی:</label>
+                        {{ sender_form.postal }}
+                    </div>
+                    <div class="mt-2">
+                        <label class="form-label">آدرس:</label>
+                        {{ sender_form.address }}
+                    </div>
+                    <div class="mt-2">
+                        <label class="form-label">تلفن:</label>
+                        {{ sender_form.phone }}
+                    </div>
+                    <div class="mt-2">
+                        <label class="form-label">تلفن دوم:</label>
+                        {{ sender_form.phone2 }}
+                    </div>
+                    {% else %}
+                    <div class="mt-3">
+                        <label class="form-label">شناسه/کد ملی:</label>
+                        <input type="text" class="form-control" value="{{ bijak.sender.national_id|default:'—' }}" disabled>
+                    </div>
+                    <div class="mt-2">
+                        <label class="form-label">کد پستی:</label>
+                        <input type="text" class="form-control" value="{{ bijak.sender.postal|default:'—' }}" disabled>
+                    </div>
+                    <div class="mt-2">
+                        <label class="form-label">آدرس:</label>
+                        <input type="text" class="form-control" value="{{ bijak.sender.address }}" disabled>
+                    </div>
+                    <div class="mt-2">
+                        <label class="form-label">تلفن:</label>
+                        <input type="text" class="form-control" value="{{ bijak.sender.phone|default:'—' }}" disabled>
+                    </div>
+                    <div class="mt-2">
+                        <label class="form-label">تلفن دوم:</label>
+                        <input type="text" class="form-control" value="{{ bijak.sender.phone2|default:'—' }}" disabled>
+                    </div>
+                    {% endif %}
                 </div>
+            </div>
 
-                <!-- فرستنده -->
-                <h5 class="section-title mb-3 mt-4">اطلاعات فرستنده</h5>
-                <div class="table-responsive">
-                    <table class="table table-bordered align-middle text-center">
-                        <thead class="table-light">
-                            <tr>
-                                <th>نام و نام خانوادگی</th>
-                                <th>شناسه/کد ملی</th>
-                                <th>کد پستی</th>
-                                <th>آدرس</th>
-                                <th>تلفن</th>
-                                <th>تلفن دوم</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>{% if can_edit_sender %}{{ sender_form.name }}{% else %}{{ bijak.sender.name }}{% endif %}</td>
-                                <td>{% if can_edit_sender %}{{ sender_form.national_id }}{% else %}{{ bijak.sender.national_id|default:"—" }}{% endif %}</td>
-                                <td>{% if can_edit_sender %}{{ sender_form.postal }}{% else %}{{ bijak.sender.postal|default:"—" }}{% endif %}</td>
-                                <td>{% if can_edit_sender %}{{ sender_form.address }}{% else %}{{ bijak.sender.address }}{% endif %}</td>
-                                <td>{% if can_edit_sender %}{{ sender_form.phone }}{% else %}{{ bijak.sender.phone|default:"—" }}{% endif %}</td>
-                                <td>{% if can_edit_sender %}{{ sender_form.phone2 }}{% else %}{{ bijak.sender.phone2|default:"—" }}{% endif %}</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <!-- گیرنده -->
-                <h5 class="section-title mb-3 mt-4">اطلاعات گیرنده</h5>
-                <div class="table-responsive">
-                    <table class="table table-bordered align-middle text-center">
-                        <thead class="table-light">
-                            <tr>
-                                <th>نام و نام خانوادگی</th>
-                                <th>شناسه/کد ملی</th>
-                                <th>کد پستی</th>
-                                <th>آدرس</th>
-                                <th>تلفن</th>
-                                <th>تلفن دوم</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>{% if can_edit_receiver %}{{ receiver_form.name }}{% else %}{{ bijak.receiver.name }}{% endif %}</td>
-                                <td>{% if can_edit_receiver %}{{ receiver_form.national_id }}{% else %}{{ bijak.receiver.national_id|default:"—" }}{% endif %}</td>
-                                <td>{% if can_edit_receiver %}{{ receiver_form.postal }}{% else %}{{ bijak.receiver.postal|default:"—" }}{% endif %}</td>
-                                <td>{% if can_edit_receiver %}{{ receiver_form.address }}{% else %}{{ bijak.receiver.address }}{% endif %}</td>
-                                <td>{% if can_edit_receiver %}{{ receiver_form.phone }}{% else %}{{ bijak.receiver.phone|default:"—" }}{% endif %}</td>
-                                <td>{% if can_edit_receiver %}{{ receiver_form.phone2 }}{% else %}{{ bijak.receiver.phone2|default:"—" }}{% endif %}</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <!-- راننده -->
-                <h5 class="section-title mb-3 mt-4">اطلاعات راننده</h5>
-                <div class="table-responsive">
-                    <table class="table table-bordered align-middle text-center">
-                        <thead class="table-light">
-                            <tr>
-                                <th>نام و نام خانوادگی</th>
-                                <th>کد ملی</th>
-                                <th>تاریخ تولد</th>
-                                <th>شماره گواهی‌نامه</th>
-                                <th>تاریخ صدور</th>
-                                <th>موبایل</th>
-                                <th>تلفن دوم</th>
-                                <th>آدرس منزل</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>{% if can_edit_driver %}{{ driver_form.name }}{% else %}{{ bijak.driver.name }}{% endif %}</td>
-                                <td>{% if can_edit_driver %}{{ driver_form.national_id }}{% else %}{{ bijak.driver.national_id }}{% endif %}</td>
-                                <td>{% if can_edit_driver %}{{ driver_form.birth_date }}{% else %}{{ bijak.driver.birth_date|date:"Y/m/d" }}{% endif %}</td>
-                                <td>{% if can_edit_driver %}{{ driver_form.certificate }}{% else %}{{ bijak.driver.certificate }}{% endif %}</td>
-                                <td>{% if can_edit_driver %}{{ driver_form.certificate_date }}{% else %}{{ bijak.driver.certificate_date|date:"Y/m/d" }}{% endif %}</td>
-                                <td>{% if can_edit_driver %}{{ driver_form.phone }}{% else %}{{ bijak.driver.phone }}{% endif %}</td>
-                                <td>{% if can_edit_driver %}{{ driver_form.phone2 }}{% else %}{{ bijak.driver.phone2|default:"—" }}{% endif %}</td>
-                                <td>{% if can_edit_driver %}{{ driver_form.address }}{% else %}{{ bijak.driver.address }}{% endif %}</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <!-- خودرو -->
-                <h5 class="section-title mb-3 mt-4">اطلاعات خودرو</h5>
-                <div class="table-responsive">
-                    <table class="table table-bordered text-center align-middle">
-                        <thead class="table-light">
-                            <tr>
-                                <th>پلاک</th>
-                                <th>نوع وسیله</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>
-                                    ایران {{ bijak.vehicle.license_plate_series }} ||
-                                    {{ bijak.vehicle.license_plate_two_digit }}
-                                    {{ bijak.vehicle.license_plate_alphabet }}
-                                    {{ bijak.vehicle.license_plate_three_digit }}
-                                </td>
-                                <td>{{ bijak.vehicle.get_type_display }}</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <!-- محموله -->
-                <h5 class="section-title mb-3 mt-4">اطلاعات محموله</h5>
-                <div class="table-responsive">
-                    <table class="table table-bordered text-center align-middle">
-                        <thead class="table-light">
-                            <tr>
-                                <th>شرح محموله</th>
-                                <th>وزن/حجم</th>
-                                <th>نوع بسته‌بندی</th>
-                                <th>تعداد بسته</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>{% if can_edit_cargo %}{{ cargo_form.name }}{% else %}{{ bijak.cargo.name }}{% endif %}</td>
-                                <td>{% if can_edit_cargo %}{{ cargo_form.weight }}{% else %}{{ bijak.cargo.weight }}{% endif %}</td>
-                                <td>{% if can_edit_cargo %}{{ cargo_form.package_type }}{% else %}{{ bijak.cargo.package_type }}{% endif %}</td>
-                                <td>{% if can_edit_cargo %}{{ cargo_form.number_of_packaging }}{% else %}{{ bijak.cargo.number_of_packaging }}{% endif %}</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <!-- توضیحات -->
-                <h5 class="section-title mb-3 mt-4">توضیحات پاورقی</h5>
-                <div class="table-responsive">
-                    <table class="table table-bordered text-center align-middle">
-                        <thead class="table-light">
-                            <tr>
-                                <th>شرح توضیحات</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>{{ bijak.final_description }}</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <!-- دکمه‌های پایین -->
-                <div class="text-center mt-4">
-                    <button type="submit" class="btn btn-success px-4">ذخیره تغییرات</button>
-                    <a href="{% url 'issuance:crud:preview' bijak.pk %}" class="btn btn-secondary px-4">انصراف</a>
+            <!-- گیرنده -->
+            <div class="col-md-6">
+                <div class="section receiver">
+                    <h3>
+                        اطلاعات گیرنده
+                        {% if can_edit_receiver %}
+                            <span class="badge bg-success">قابل ویرایش</span>
+                        {% else %}
+                            <span class="badge bg-secondary">فقط مشاهده</span>
+                        {% endif %}
+                    </h3>
+                    <hr>
+                    <div class="search-wrapper">
+                        <div class="input-with-add">
+                            {% if can_edit_receiver %}
+                                <input type="text" id="receiver-input" class="form-control"
+                                       placeholder="جستجوی گیرنده..." value="{{ bijak.receiver.name }}">
+                                <a href="{% url 'add_customer' %}" class="add-btn" title="افزودن گیرنده">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor">
+                                        <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+                                    </svg>
+                                </a>
+                            {% else %}
+                                <input type="text" class="form-control" value="{{ bijak.receiver.name }}" disabled>
+                            {% endif %}
+                        </div>
+                        {% if can_edit_receiver %}
+                            <input type="hidden" id="receiver-id" name="receiver" value="{{ bijak.receiver.id }}">
+                            <div id="receiver-results" class="results-box" aria-live="polite"></div>
+                        {% else %}
+                            <input type="hidden" name="receiver" value="{{ bijak.receiver.id }}">
+                        {% endif %}
+                    </div>
+                    
+                    {% if can_edit_receiver %}
+                    <div class="mt-3">
+                        <label class="form-label">شناسه/کد ملی:</label>
+                        {{ receiver_form.national_id }}
+                    </div>
+                    <div class="mt-2">
+                        <label class="form-label">کد پستی:</label>
+                        {{ receiver_form.postal }}
+                    </div>
+                    <div class="mt-2">
+                        <label class="form-label">آدرس:</label>
+                        {{ receiver_form.address }}
+                    </div>
+                    <div class="mt-2">
+                        <label class="form-label">تلفن:</label>
+                        {{ receiver_form.phone }}
+                    </div>
+                    <div class="mt-2">
+                        <label class="form-label">تلفن دوم:</label>
+                        {{ receiver_form.phone2 }}
+                    </div>
+                    {% else %}
+                    <div class="mt-3">
+                        <label class="form-label">شناسه/کد ملی:</label>
+                        <input type="text" class="form-control" value="{{ bijak.receiver.national_id|default:'—' }}" disabled>
+                    </div>
+                    <div class="mt-2">
+                        <label class="form-label">کد پستی:</label>
+                        <input type="text" class="form-control" value="{{ bijak.receiver.postal|default:'—' }}" disabled>
+                    </div>
+                    <div class="mt-2">
+                        <label class="form-label">آدرس:</label>
+                        <input type="text" class="form-control" value="{{ bijak.receiver.address }}" disabled>
+                    </div>
+                    <div class="mt-2">
+                        <label class="form-label">تلفن:</label>
+                        <input type="text" class="form-control" value="{{ bijak.receiver.phone|default:'—' }}" disabled>
+                    </div>
+                    <div class="mt-2">
+                        <label class="form-label">تلفن دوم:</label>
+                        <input type="text" class="form-control" value="{{ bijak.receiver.phone2|default:'—' }}" disabled>
+                    </div>
+                    {% endif %}
                 </div>
             </div>
         </div>
-    </form>
-</div>
+
+        <!-- === ROW: راننده و خودرو === -->
+        <div class="row">
+            <!-- راننده -->
+            <div class="col-md-6">
+                <div class="section driver">
+                    <h3>
+                        اطلاعات راننده
+                        {% if can_edit_driver %}
+                            <span class="badge bg-success">قابل ویرایش</span>
+                        {% else %}
+                            <span class="badge bg-secondary">فقط مشاهده</span>
+                        {% endif %}
+                    </h3>
+                    <hr>
+                    <div class="search-wrapper">
+                        <div class="input-with-add">
+                            {% if can_edit_driver %}
+                                <input type="text" id="driver-input" class="form-control"
+                                       placeholder="جستجوی راننده..." value="{{ bijak.driver.name }}">
+                                <a href="{% url 'add_driver' %}" class="add-btn" title="افزودن راننده">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor">
+                                        <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+                                    </svg>
+                                </a>
+                            {% else %}
+                                <input type="text" class="form-control" value="{{ bijak.driver.name }}" disabled>
+                            {% endif %}
+                        </div>
+                        {% if can_edit_driver %}
+                            <input type="hidden" id="driver-id" name="driver" value="{{ bijak.driver.id }}">
+                            <div id="driver-results" class="results-box" aria-live="polite"></div>
+                        {% else %}
+                            <input type="hidden" name="driver" value="{{ bijak.driver.id }}">
+                        {% endif %}
+                    </div>
+                    
+                    {% if can_edit_driver %}
+                    <div class="mt-3">
+                        <label class="form-label">کد ملی:</label>
+                        {{ driver_form.national_id }}
+                    </div>
+                    <div class="mt-2">
+                        <label class="form-label">تاریخ تولد:</label>
+                        {{ driver_form.birth_date }}
+                    </div>
+                    <div class="mt-2">
+                        <label class="form-label">شماره گواهی‌نامه:</label>
+                        {{ driver_form.certificate }}
+                    </div>
+                    <div class="mt-2">
+                        <label class="form-label">تاریخ صدور:</label>
+                        {{ driver_form.certificate_date }}
+                    </div>
+                    <div class="mt-2">
+                        <label class="form-label">موبایل:</label>
+                        {{ driver_form.phone }}
+                    </div>
+                    <div class="mt-2">
+                        <label class="form-label">تلفن دوم:</label>
+                        {{ driver_form.phone2 }}
+                    </div>
+                    <div class="mt-2">
+                        <label class="form-label">آدرس منزل:</label>
+                        {{ driver_form.address }}
+                    </div>
+                    {% else %}
+                    <div class="mt-3">
+                        <label class="form-label">کد ملی:</label>
+                        <input type="text" class="form-control" value="{{ bijak.driver.national_id }}" disabled>
+                    </div>
+                    <div class="mt-2">
+                        <label class="form-label">تاریخ تولد:</label>
+                        <input type="text" class="form-control" value="{{ bijak.driver.birth_date|date:'Y/m/d' }}" disabled>
+                    </div>
+                    <div class="mt-2">
+                        <label class="form-label">شماره گواهی‌نامه:</label>
+                        <input type="text" class="form-control" value="{{ bijak.driver.certificate }}" disabled>
+                    </div>
+                    <div class="mt-2">
+                        <label class="form-label">تاریخ صدور:</label>
+                        <input type="text" class="form-control" value="{{ bijak.driver.certificate_date|date:'Y/m/d' }}" disabled>
+                    </div>
+                    <div class="mt-2">
+                        <label class="form-label">موبایل:</label>
+                        <input type="text" class="form-control" value="{{ bijak.driver.phone }}" disabled>
+                    </div>
+                    <div class="mt-2">
+                        <label class="form-label">تلفن دوم:</label>
+                        <input type="text" class="form-control" value="{{ bijak.driver.phone2|default:'—' }}" disabled>
+                    </div>
+                    <div class="mt-2">
+                        <label class="form-label">آدرس منزل:</label>
+                        <input type="text" class="form-control" value="{{ bijak.driver.address }}" disabled>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- خودروی راننده (پلاک) -->
+            <div class="col-md-6">
+                <div class="section vehicle">
+                    <h3>اطلاعات خودروی راننده</h3>
+                    <hr>
+                    <!-- نمایش پلاک بصورت کارت -->
+                    <div class="plate" style="display:flex; flex-direction:column; gap:8px; align-items:center;">
+                        <div class="province" style="font-weight:700;">ایران <span
+                                id="province">{{ bijak.vehicle.license_plate_series }}</span></div>
+
+                        <div class="number-box"
+                             style="display:flex; gap:8px; align-items:center; justify-content:center;">
+                            <span id="second-number">{{ bijak.vehicle.license_plate_three_digit }}</span>
+                            <span class="letter" id="letter">{{ bijak.vehicle.license_plate_alphabet }}</span>
+                            <span id="first-number">{{ bijak.vehicle.license_plate_two_digit }}</span>
+                        </div>
+
+                        <div class="flag-box" style="display:flex; gap:8px; align-items:center;">
+                            <img src="{% static 'issuance/images/icons8-iran-100.png' %}" alt="Iran"
+                                 style="width:40px;height:auto;">
+                            <span style="font-weight:600;">I.R. IRAN</span>
+                        </div>
+
+                        <div style="width:100%; display:flex; gap:10px; align-items:center; justify-content:center;">
+                            <input type="hidden" id="vehicle-id" name="vehicle" value="{{ bijak.vehicle.id }}">
+                            <span class="badge bg-info">غیر قابل ویرایش</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- === بخش‌های بارنامه و محموله === -->
+        <div class="row">
+            <!-- اطلاعات بارنامه (مالی) -->
+            <div class="col-md-6">
+                <div class="section shipment">
+                    <h3>
+                        اطلاعات بارنامه (مالی)
+                        {% if can_edit_financial %}
+                            <span class="badge bg-success">قابل ویرایش</span>
+                        {% else %}
+                            <span class="badge bg-secondary">فقط مشاهده</span>
+                        {% endif %}
+                    </h3>
+                    <hr>
+                    {% if can_edit_financial %}
+                        {{ bijak_form.as_p }}
+                    {% else %}
+                    <div class="mb-2">
+                        <label class="form-label">کرایه پرداختی:</label>
+                        <input type="text" class="form-control" value="{{ bijak.total_fare }}" disabled>
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label">ارزش محموله:</label>
+                        <input type="text" class="form-control" value="{{ bijak.value }}" disabled>
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label">مبلغ بیمه:</label>
+                        <input type="text" class="form-control" value="{{ bijak.insurance }}" disabled>
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label">هزینه بارگیری:</label>
+                        <input type="text" class="form-control" value="{{ bijak.loading_fee|default:'—' }}" disabled>
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label">هزینه تخلیه:</label>
+                        <input type="text" class="form-control" value="{{ bijak.unloading_fee|default:'—' }}" disabled>
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label">هزینه باسکول:</label>
+                        <input type="text" class="form-control" value="{{ bijak.scale_fee|default:'—' }}" disabled>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- محموله -->
+            <div class="col-md-6">
+                <div class="section cargo">
+                    <h3>
+                        اطلاعات محموله
+                        {% if can_edit_cargo %}
+                            <span class="badge bg-success">قابل ویرایش</span>
+                        {% else %}
+                            <span class="badge bg-secondary">فقط مشاهده</span>
+                        {% endif %}
+                    </h3>
+                    <hr>
+                    {% if can_edit_cargo %}
+                        {{ cargo_form.as_p }}
+                    {% else %}
+                    <div class="mb-2">
+                        <label class="form-label">شرح محموله:</label>
+                        <input type="text" class="form-control" value="{{ bijak.cargo.name }}" disabled>
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label">وزن/حجم:</label>
+                        <input type="text" class="form-control" value="{{ bijak.cargo.weight }}" disabled>
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label">نوع بسته‌بندی:</label>
+                        <input type="text" class="form-control" value="{{ bijak.cargo.package_type }}" disabled>
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label">تعداد بسته:</label>
+                        <input type="text" class="form-control" value="{{ bijak.cargo.number_of_packaging }}" disabled>
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label">مبدا بارگیری:</label>
+                        <input type="text" class="form-control" value="{{ bijak.cargo.origin }}" disabled>
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label">مقصد تخلیه:</label>
+                        <input type="text" class="form-control" value="{{ bijak.cargo.destination }}" disabled>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- توضیحات و دکمه‌ها -->
+        <div class="row">
+            <div class="col-12">
+                <div class="section notes">
+                    <h3>توضیحات پاورقی</h3>
+                    <hr>
+                    <div class="alert alert-info text-center mb-3">
+                        <strong>توضیح پیش‌فرض:</strong>
+                        <span>{{ bijak.default_description }}</span>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">توضیحات نهایی:</label>
+                        <textarea rows="3" class="form-control" disabled>{{ bijak.final_description }}</textarea>
+                    </div>
+
+                    <div style="text-align:center; margin-top:16px;">
+                        <button type="submit" name="action" value="save" class="btn btn-success">
+                            <i class="fas fa-save"></i> ذخیره تغییرات
+                        </button>
+                        <a href="{% url 'issuance:crud:preview' bijak.pk %}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> بازگشت
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</form>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/persian-date@1.0.6/dist/persian-date.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/persian-datepicker@1.2.0/dist/js/persian-datepicker.min.js"></script>
+
+<script>
+    const urls = {
+        searchCustomer: "{% url 'search_customer' %}",
+        searchDriver: "{% url 'search_driver' %}",
+        getVehicleByDriver: "{% url 'get_vehicle_by_driver' %}",
+        searchVehicle: "{% url 'search_vehicle' %}"
+    };
+    
+    // فعال‌سازی جستجو فقط برای بخش‌های قابل ویرایش
+    {% if can_edit_sender %}
+    $(document).ready(function() {
+        // کدهای جستجوی مشتری برای فرستنده
+        $('#sender-input').on('input', function() {
+            var query = $(this).val();
+            if (query.length > 2) {
+                $.ajax({
+                    url: urls.searchCustomer,
+                    data: { 'q': query },
+                    success: function(data) {
+                        $('#sender-results').html(data).show();
+                    }
+                });
+            } else {
+                $('#sender-results').hide();
+            }
+        });
+    });
+    {% endif %}
+    
+    {% if can_edit_receiver %}
+    $(document).ready(function() {
+        // کدهای جستجوی مشتری برای گیرنده
+        $('#receiver-input').on('input', function() {
+            var query = $(this).val();
+            if (query.length > 2) {
+                $.ajax({
+                    url: urls.searchCustomer,
+                    data: { 'q': query },
+                    success: function(data) {
+                        $('#receiver-results').html(data).show();
+                    }
+                });
+            } else {
+                $('#receiver-results').hide();
+            }
+        });
+    });
+    {% endif %}
+    
+    {% if can_edit_driver %}
+    $(document).ready(function() {
+        // کدهای جستجوی راننده
+        $('#driver-input').on('input', function() {
+            var query = $(this).val();
+            if (query.length > 2) {
+                $.ajax({
+                    url: urls.searchDriver,
+                    data: { 'q': query },
+                    success: function(data) {
+                        $('#driver-results').html(data).show();
+                    }
+                });
+            } else {
+                $('#driver-results').hide();
+            }
+        });
+    });
+    {% endif %}
+</script>
 
 <style>
-    .section-title {
-        font-weight: bold;
+    .section {
+        background: #fff;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .section h3 {
         color: #0d6efd;
-        border-right: 4px solid #0d6efd;
-        padding-right: 10px;
-    }
-    
-    .table th {
-        background-color: #f8f9fa;
         font-weight: bold;
+        margin-bottom: 15px;
     }
     
-    input, select, textarea {
-        text-align: center !important;
+    .badge {
+        font-size: 0.75rem;
+        margin-right: 10px;
+    }
+    
+    .input-with-add {
+        position: relative;
+        display: flex;
+        align-items: center;
+    }
+    
+    .input-with-add input {
+        flex: 1;
+        padding-left: 40px;
+    }
+    
+    .add-btn {
+        position: absolute;
+        left: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: #0d6efd;
+        color: white;
+        border-radius: 50%;
+        width: 28px;
+        height: 28px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+    }
+    
+    .add-btn:hover {
+        background: #0b5ed7;
+    }
+    
+    .results-box {
+        max-height: 200px;
+        overflow-y: auto;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        margin-top: 5px;
+        background: white;
+        display: none;
+    }
+    
+    .plate {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 20px;
+        border-radius: 10px;
+        color: white;
     }
 </style>
 {% endblock %}
