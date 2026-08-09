@@ -1,12 +1,32 @@
 ```
 # Python
 __pycache__/
+<<<<<<< HEAD
 *.pyc
 *.pyo
 *.pyd
 *.py~
 *.py.class
 *.py.backup
+=======
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+*.egg
+
+# Django
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+
+# IDE
+.vscode/
+.idea/
+>>>>>>> origin/تقسیم-پروژه-به-ماژول‌های-مستقل-362c7
 *.swp
 *.swo
 
@@ -41,6 +61,7 @@ coverage.xml
 .env.prod
 .env.*
 
+<<<<<<< HEAD
 # IDE specific
 .vscode/
 .idea/
@@ -49,6 +70,33 @@ coverage.xml
 *~
 
 # OS generated files
+=======
+# Environment
+.env
+.env.local
+*.env.*
+
+# Coverage
+.coverage
+htmlcov/
+.coverage.*
+.coverage.*
+
+# Testing
+.pytest_cache/
+.mypy_cache/
+
+# Distribution / packaging
+.Python
+env/
+venv/
+ENV/
+.venv/
+env.bak/
+venv.bak/
+
+# System
+>>>>>>> origin/تقسیم-پروژه-به-ماژول‌های-مستقل-362c7
 .DS_Store
 .DS_Store?
 ._*

@@ -1,6 +1,6 @@
 from django.db import models
-from django.conf import settings
 
+<<<<<<< HEAD
 
 class Customer(models.Model):
     name = models.CharField(max_length=50, verbose_name="نام و نام خانوادگی فرستنده", db_index=True)
@@ -42,3 +42,6 @@ class Customer(models.Model):
             models.Index(fields=['national_id']),
             models.Index(fields=['phone']),
         ]
+=======
+# Create your models here.
+>>>>>>> origin/تقسیم-پروژه-به-ماژول‌های-مستقل-362c7

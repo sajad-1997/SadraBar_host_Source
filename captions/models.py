@@ -1,6 +1,6 @@
 from django.db import models
-from django.conf import settings
 
+<<<<<<< HEAD
 
 class Caption(models.Model):
     name = models.CharField(max_length=100, blank=True, null=True)
@@ -35,3 +35,6 @@ class Caption(models.Model):
         indexes = [
             models.Index(fields=['name']),
         ]
+=======
+# Create your models here.
+>>>>>>> origin/تقسیم-پروژه-به-ماژول‌های-مستقل-362c7

@@ -1,6 +1,6 @@
 from django.db import models
-from django.conf import settings
 
+<<<<<<< HEAD
 
 class Cargo(models.Model):
     name = models.CharField(max_length=50, verbose_name="نام محموله", db_index=True)
@@ -42,3 +42,6 @@ class Cargo(models.Model):
             models.Index(fields=['origin']),
             models.Index(fields=['destination']),
         ]
+=======
+# Create your models here.
+>>>>>>> origin/تقسیم-پروژه-به-ماژول‌های-مستقل-362c7
