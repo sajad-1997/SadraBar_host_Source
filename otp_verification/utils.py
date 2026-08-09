@@ -1,6 +1,7 @@
 import random
 from django.core.cache import cache
 from django.conf import settings
+from issuance.utils import persian_to_english_numbers
 
 OTP_EXPIRE_SECONDS = 120  # 2 دقیقه
 OTP_CACHE_PREFIX = "otp_"

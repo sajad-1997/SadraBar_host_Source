@@ -1,32 +1,52 @@
 import logging
-from datetime import datetime
+from datetime import datetime, time
 
 import jdatetime
 from django import forms
-from datetime import time
 from django.utils import timezone
 
 from .models import Customer, Driver, Vehicle, Cargo, Caption, Bijak
 from .utils import persian_to_english_numbers, persian_to_gregorian
 
-# from .mixins import PersianNumberFormMixin
-
 logger = logging.getLogger(__name__)
+
 
 # 🔹 کلاس پایه برای فرم‌ها (اعمال فقط روی فیلدهای مشخص عددی)
 class PersianNumberFormMixin:
     """
-       تبدیل اعداد فارسی به انگلیسی در فیلدهای عددی
-       """
+    تبدیل اعداد فارسی به انگلیسی در فیلدهای عددی
+    و تنظیم widget برای دریافت فقط اعداد انگلیسی
+    """
+    numeric_fields = []  # لیست فیلدهای عددی باید در کلاس‌های فرزند تعریف شود
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # تنظیم widget برای فیلدهای عددی جهت دریافت فقط اعداد
+        for field_name in self.numeric_fields:
+            if field_name in self.fields:
+                field = self.fields[field_name]
+                # اضافه کردن ویژگی‌های HTML5 برای ورودی عددی
+                if hasattr(field, 'widget'):
+                    attrs = field.widget.attrs or {}
+                    attrs.update({
+                        'inputmode': 'numeric',
+                        'pattern': '[0-9]*',
+                        'autocomplete': 'off',
+                    })
+                    field.widget.attrs = attrs
 
     def clean(self):
         cleaned_data = super().clean()
-        numeric_fields = getattr(self, 'numeric_fields', [])
-        for field in numeric_fields:
+        for field in self.numeric_fields:
             value = cleaned_data.get(field)
             if value and isinstance(value, str):
-                from .utils import persian_to_english_numbers
                 cleaned_data[field] = persian_to_english_numbers(value)
+            elif value is not None and not isinstance(value, (int, float)):
+                # اگر مقدار از نوع دیگری است، سعی می‌کنیم به عدد تبدیل کنیم
+                try:
+                    cleaned_data[field] = int(persian_to_english_numbers(str(value)))
+                except (ValueError, TypeError):
+                    pass
         return cleaned_data
 
 
@@ -135,19 +155,19 @@ class DriverForm(PersianNumberFormMixin, forms.ModelForm):
         if instance:
             if instance.birth_date:
                 jalali_birth = jdatetime.date.fromgregorian(date=instance.birth_date)
-                self.fields['birth_date'].initial = f"{jalali_birth.year}/{jalali_birth.month:02}/{jalali_birth.day:02}"
+                self.fields['birth_date'].initial = jalali_birth.strftime('%Y/%m/%d')
             if instance.certificate_date:
                 jalali_cert = jdatetime.date.fromgregorian(date=instance.certificate_date)
-                self.fields[
-                    'certificate_date'].initial = f"{jalali_cert.year}/{jalali_cert.month:02}/{jalali_cert.day:02}"
+                self.fields['certificate_date'].initial = jalali_cert.strftime('%Y/%m/%d')
             if instance.insurance_policy_expiry:
                 jalali_cert = jdatetime.date.fromgregorian(date=instance.insurance_policy_expiry)
-                self.fields[
-                    'insurance_policy_expiry'].initial = f"{jalali_cert.year}/{jalali_cert.month:02}/{jalali_cert.day:02}"
+                self.fields['insurance_policy_expiry'].initial = jalali_cert.strftime('%Y/%m/%d')
 
     def clean_birth_date(self):
         data = self.cleaned_data.get('birth_date')
         if data:
+            # تبدیل اعداد فارسی به انگلیسی قبل از پردازش
+            data = persian_to_english_numbers(data)
             g_date = persian_to_gregorian(data)
             if g_date is None:
                 raise forms.ValidationError("تاریخ تولد نامعتبر است")
@@ -157,6 +177,8 @@ class DriverForm(PersianNumberFormMixin, forms.ModelForm):
     def clean_certificate_date(self):
         data = self.cleaned_data.get('certificate_date')
         if data:
+            # تبدیل اعداد فارسی به انگلیسی قبل از پردازش
+            data = persian_to_english_numbers(data)
             g_date = persian_to_gregorian(data)
             if g_date is None:
                 raise forms.ValidationError("تاریخ صدور گواهینامه نامعتبر است")
@@ -166,6 +188,8 @@ class DriverForm(PersianNumberFormMixin, forms.ModelForm):
     def clean_insurance_policy_expiry(self):
         data = self.cleaned_data.get('insurance_policy_expiry')
         if data:
+            # تبدیل اعداد فارسی به انگلیسی قبل از پردازش
+            data = persian_to_english_numbers(data)
             g_date = persian_to_gregorian(data)
             if g_date is None:
                 raise forms.ValidationError("تاریخ اعتبار بیمه نامه نامعتبر است")
@@ -247,7 +271,9 @@ class CaptionForm(forms.ModelForm):
     )
 
 
-class ShipmentForm(forms.ModelForm):
+class ShipmentForm(PersianNumberFormMixin, forms.ModelForm):
+    numeric_fields = ['total_fare', 'value', 'insurance', 'loading_fee', 'unloading_fee', 'scale_fee', 'freight']
+    
     # =========================
     # تاریخ و ساعت صدور
     # =========================
@@ -368,9 +394,11 @@ class ShipmentForm(forms.ModelForm):
             raise forms.ValidationError("تاریخ و ساعت صدور الزامی است.")
 
         try:
+            # تبدیل اعداد فارسی به انگلیسی
             date_str = persian_to_english_numbers(raw_date).strip()
             time_str = persian_to_english_numbers(raw_time).strip()
 
+            # جایگزینی / با - برای سازگاری با fromisoformat
             j_date = jdatetime.date.fromisoformat(date_str.replace('/', '-'))
 
             parts = time_str.split(':')

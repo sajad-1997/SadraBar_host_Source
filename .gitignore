@@ -5,6 +5,7 @@ __pycache__/
 *.pyc
 *.pyo
 *.pyd
+<<<<<<< HEAD
 *.py~
 *.py.class
 *.py.backup
@@ -120,4 +121,21 @@ sdist/
 var/
 wheels/
 *.egg
+=======
+
+# Environment
+.venv/
+venv/
+.env
+.env.local
+*.env.*
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+*.swp
+*~
+>>>>>>> origin/بهبود-کیفیت-کد-پایه-75bf8
 ```
