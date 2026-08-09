@@ -71,6 +71,13 @@ def bijak_approve_submit(request, pk):
                 messages.error(request, "علت رد بارنامه باید نوشته شود.")
                 return redirect(reverse('issuance:bijak_approval:bijak_approve', args=[pk]))
 
+            # دریافت مجوزهای ویرایش از فرم
+            bijak.can_edit_sender = request.POST.get("can_edit_sender") == "on"
+            bijak.can_edit_receiver = request.POST.get("can_edit_receiver") == "on"
+            bijak.can_edit_driver = request.POST.get("can_edit_driver") == "on"
+            bijak.can_edit_cargo = request.POST.get("can_edit_cargo") == "on"
+            bijak.can_edit_financial = request.POST.get("can_edit_financial") == "on"
+
             bijak.approval_status = "rejected"
             bijak.rejected_by = request.user
             bijak.reject_reason = reject_reason
