@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ```
 # Python
 __pycache__/
@@ -139,3 +140,6 @@ venv/
 *~
 >>>>>>> origin/بهبود-کیفیت-کد-پایه-75bf8
 ```
+=======
+Nothing should be ignored in this case, as the changes only involve source code files (.html template and .py file) without any build artifacts, dependencies, or temporary files.
+>>>>>>> origin/آمارگیری-بارنامه‌های-صادر-شده-0b247
