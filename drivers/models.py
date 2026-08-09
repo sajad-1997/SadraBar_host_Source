@@ -1,6 +1,6 @@
 from django.db import models
 from django.conf import settings
-import jmodels
+from django_jalali.db import models as jmodels
 
 class Driver(models.Model):
     name = models.CharField(max_length=200, verbose_name="نام و نام خانوادگی", db_index=True)
