@@ -1,75 +1,76 @@
 ```
 # Python
 __pycache__/
-*.pyc
-*.pyo
-*.pyd
-*.py~
-*.py.class
-*.py.backup
-*.swp
-*.swo
-
-# Virtual environments
-venv/
-.venv/
-env/
-.ENV/
-.env
-
-# Dependencies
-pip-log.txt
-pip-delete-this-directory.txt
-.tox/
-.coverage
-.coverage.*
-.cache
-nosetests.xml
-coverage.xml
-*.cover
-*.log
-*.tmp
-*.bak
-*.orig
-*.rej
-
-# Environment variables
-.env
-.env.local
-.env.dev
-.env.test
-.env.prod
-.env.*
-
-# IDE specific
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
-
-# OS generated files
-.DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Thumbs.db
-desktop.ini
-
-# Build and distribution artifacts
-dist/
+*.py[cod]
+*$py.class
+*.so
+.Python
 build/
-*.egg-info/
-.eggs/
 develop-eggs/
-.installed.cfg
+dist/
+downloads/
+eggs/
+.eggs/
 lib/
 lib64/
 parts/
 sdist/
 var/
 wheels/
+*.egg-info/
+.installed.cfg
 *.egg
+
+# Virtual environments
+venv/
+env/
+ENV/
+.venv/
+.env/
+
+# Django/PWA specific
+staticfiles/
+media/
+
+# Logs
+*.log
+*.log.*
+
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# IDE specific
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Coverage
+.coverage
+coverage/
+htmlcov/
+
+# Temporary files
+*.tmp
+*~
+```
+
+Wait, let me reconsider the input more carefully. The added files are mostly source code and static assets, not build artifacts. The only potential artifact might be if there are compiled Python files, but I don't see any in the changes.
+
+Looking at the changes again:
+- Python template tags (source code)
+- Static PWA icons (images)
+- PWA manifest and service worker (config/assets)
+- HTML template modification
+
+Actually, since these are mostly source files and static assets, and no clear build artifacts are present, the output should be empty per rule #6.
+
+```
+
 ```
