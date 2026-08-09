@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 ```
 # Python
 __pycache__/
@@ -54,8 +55,38 @@ coverage.xml
 *.bak
 *.orig
 *.rej
+=======
+# Compiled and build artifacts
+*.pyc
+__pycache__/
+*.o
+*.obj
+*.class
+*.exe
+*.dll
+*.so
+*.a
+*.out
 
-# Environment variables
+# Dependencies
+.venv/
+venv/
+node_modules/
+dist/
+build/
+target/
+.gradle/
+.mypy_cache/
+.pytest_cache/
+
+# Logs and temp files
+*.log
+*.tmp
+*.swp
+*.swo
+>>>>>>> origin/بررسی-فیلدهای-اجباری-در-سیستم-32d22
+
+# Environment
 .env
 .env.local
 .env.dev
@@ -78,6 +109,7 @@ coverage.xml
 .env.local
 *.env.*
 
+<<<<<<< HEAD
 # Coverage
 .coverage
 htmlcov/
@@ -143,3 +175,43 @@ venv/
 =======
 Nothing should be ignored in this case, as the changes only involve source code files (.html template and .py file) without any build artifacts, dependencies, or temporary files.
 >>>>>>> origin/آمارگیری-بارنامه‌های-صادر-شده-0b247
+=======
+# Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Coverage
+coverage/
+htmlcov/
+.coverage
+
+# Compressed files
+*.zip
+*.gz
+*.tar
+*.tgz
+*.bz2
+*.xz
+*.7z
+*.rar
+*.zst
+*.lz4
+*.lzh
+*.cab
+*.arj
+*.rpm
+*.deb
+*.Z
+*.lz
+*.lzo
+*.tar.gz
+*.tar.bz2
+*.tar.xz
+*.tar.zst
+>>>>>>> origin/بررسی-فیلدهای-اجباری-در-سیستم-32d22
