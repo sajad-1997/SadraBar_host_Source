@@ -1,37 +1,19 @@
 ```
 # Python
 __pycache__/
-*.pyc
-*.pyo
-*.pyd
+*.py[cod]
+*$py.class
+*.so
 .Python
-env/
-venv/
-.venv/
-.ENV
-.pipenv
-.pytest_cache/
-.mypy_cache/
-.coverage
-htmlcov/
+build/
+dist/
+*.egg
 
 # Django
 *.log
 local_settings.py
 db.sqlite3
 db.sqlite3-journal
-media/
-staticfiles/
-.DS_Store
-
-# Build and distribution artifacts
-build/
-dist/
-*.egg
-*.egg-info/
-*.so
-*.dylib
-*.dll
 
 # IDE
 .vscode/
@@ -45,7 +27,31 @@ dist/
 .env.local
 *.env.*
 
-# OS
+# Environment
+.env
+.env.local
+*.env.*
+
+# Coverage
+.coverage
+htmlcov/
+.coverage.*
+.coverage.*
+
+# Testing
+.pytest_cache/
+.mypy_cache/
+
+# Distribution / packaging
+.Python
+env/
+venv/
+ENV/
+.venv/
+env.bak/
+venv.bak/
+
+# System
 .DS_Store
 Thumbs.db
 ```
