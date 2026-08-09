@@ -1,24 +1,21 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
-```
 # Python
 __pycache__/
-<<<<<<< HEAD
 *.pyc
 *.pyo
 *.pyd
-<<<<<<< HEAD
 *.py~
 *.py.class
 *.py.backup
-=======
 *.py[cod]
 *$py.class
 *.so
-.Python
-build/
-dist/
-*.egg
+*.o
+*.obj
+*.class
+*.exe
+*.dll
+*.a
+*.out
 
 # Django
 *.log
@@ -29,9 +26,9 @@ db.sqlite3-journal
 # IDE
 .vscode/
 .idea/
->>>>>>> origin/تقسیم-پروژه-به-ماژول‌های-مستقل-362c7
 *.swp
 *.swo
+*~
 
 # Virtual environments
 venv/
@@ -39,6 +36,9 @@ venv/
 env/
 .ENV/
 .env
+env.bak/
+venv.bak/
+node_modules/
 
 # Dependencies
 pip-log.txt
@@ -50,43 +50,14 @@ pip-delete-this-directory.txt
 nosetests.xml
 coverage.xml
 *.cover
-*.log
 *.tmp
 *.bak
 *.orig
 *.rej
-=======
-# Compiled and build artifacts
-*.pyc
-__pycache__/
-*.o
-*.obj
-*.class
-*.exe
-*.dll
-*.so
-*.a
-*.out
-
-# Dependencies
-.venv/
-venv/
-node_modules/
-dist/
-build/
 target/
 .gradle/
-.mypy_cache/
-.pytest_cache/
 
-# Logs and temp files
-*.log
-*.tmp
-*.swp
-*.swo
->>>>>>> origin/بررسی-فیلدهای-اجباری-در-سیستم-32d22
-
-# Environment
+# Environment variables
 .env
 .env.local
 .env.dev
@@ -94,55 +65,20 @@ target/
 .env.prod
 .env.*
 
-<<<<<<< HEAD
-# IDE specific
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
-
-# OS generated files
-=======
-# Environment
-.env
-.env.local
-*.env.*
-
-<<<<<<< HEAD
 # Coverage
-.coverage
 htmlcov/
-.coverage.*
+coverage/
 .coverage.*
 
 # Testing
 .pytest_cache/
 .mypy_cache/
 
-# Distribution / packaging
-.Python
-env/
-venv/
-ENV/
-.venv/
-env.bak/
-venv.bak/
-
-# System
->>>>>>> origin/تقسیم-پروژه-به-ماژول‌های-مستقل-362c7
-.DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Thumbs.db
-desktop.ini
-
 # Build and distribution artifacts
-dist/
+.Python
 build/
+dist/
+*.egg
 *.egg-info/
 .eggs/
 develop-eggs/
@@ -153,43 +89,16 @@ parts/
 sdist/
 var/
 wheels/
-*.egg
-=======
 
-# Environment
-.venv/
-venv/
-.env
-.env.local
-*.env.*
-
-# Logs
-*.log
-
-# Temporary files
-*.tmp
-*.swp
-*~
->>>>>>> origin/بهبود-کیفیت-کد-پایه-75bf8
-```
-=======
-Nothing should be ignored in this case, as the changes only involve source code files (.html template and .py file) without any build artifacts, dependencies, or temporary files.
->>>>>>> origin/آمارگیری-بارنامه‌های-صادر-شده-0b247
-=======
-# Editors
-.vscode/
-.idea/
-*.swp
-*.swo
-
-# System files
+# OS generated files
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
 Thumbs.db
-
-# Coverage
-coverage/
-htmlcov/
-.coverage
+desktop.ini
 
 # Compressed files
 *.zip
@@ -214,4 +123,3 @@ htmlcov/
 *.tar.bz2
 *.tar.xz
 *.tar.zst
->>>>>>> origin/بررسی-فیلدهای-اجباری-در-سیستم-32d22
