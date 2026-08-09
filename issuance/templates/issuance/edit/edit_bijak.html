@@ -1,92 +1,17 @@
-{#{% extends 'base.html' %}#}
+{% extends 'issuance/base.html' %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="fa" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <title>پیش‌نمایش بیجک</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
 
-    <style>
-        body {
-            font-family: "Vazirmatn", "Tahoma", sans-serif;
-            background-color: #f8f9fa;
-        }
-
-        .bijak-card {
-            background: #fff;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, .1);
-            margin-bottom: 20px;
-        }
-
-        .bijak-header {
-            background: linear-gradient(135deg, #007bff, #0056b3);
-            color: white;
-            padding: 12px;
-            border-radius: 12px 12px 0 0;
-        }
-
-        .table th {
-            background-color: #f1f3f5;
-            text-align: center;
-        }
-
-        .table td {
-            vertical-align: middle;
-        }
-
-        .section-title {
-            font-weight: bold;
-            margin: 15px 0 8px;
-            color: #343a40;
-            border-right: 4px solid #0d6efd;
-            padding-right: 8px;
-        }
-
-        .btn {
-            min-width: 120px;
-        }
-
-        .bijak-card {
-            background: #fff;
-            border-radius: 12px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-
-        .bijak-header {
-            background: #f8f9fa;
-            border-bottom: 2px solid #007bff;
-            padding: 15px;
-            border-top-left-radius: 12px;
-            border-top-right-radius: 12px;
-        }
-
-        .section-title {
-            margin-top: 30px;
-            margin-bottom: 15px;
-            font-weight: bold;
-            color: #007bff;
-        }
-
-        table th {
-            background: #f1f1f1;
-        }
-
-        input, select, textarea {
-            text-align: center !important;
-        }
-    </style>
-</head>
-<body>
-
-
+{% block content %}
 <div class="container my-4">
-
     <div class="text-center my-4">
-        <h3>ویرایش بیجک</h3>
-        <p class="text-muted">در این صفحه می‌توانید اطلاعات بیجک را به‌روزرسانی کنید (کد رهگیری قابل ویرایش
-            نیست).</p>
+        <h3>ویرایش بیجک شماره {{ bijak.tracking_code }}</h3>
+        <p class="text-muted">در این صفحه می‌توانید اطلاعات بیجک را به‌روزرسانی کنید.</p>
+        
+        {% if bijak.approval_status == 'rejected' %}
+            <div class="alert alert-warning">
+                <strong>توجه:</strong> این بارنامه توسط مدیریت رد شده است. تنها بخش‌هایی که مجوز ویرایش دارند قابل تغییر هستند.
+            </div>
+        {% endif %}
     </div>
 
     <form method="post" class="bijak-form">
@@ -99,148 +24,190 @@
         </div>
 
         <!-- کارت اصلی -->
-        <div class="bijak-card">
-            <div class="bijak-header d-flex justify-content-between align-items-center">
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
                 <span><strong>کد رهگیری:</strong> {{ bijak.tracking_code }}</span>
                 <h4 class="m-0">ویرایش بیجک</h4>
             </div>
-            <div class="p-4">
+            <div class="card-body p-4">
 
                 <!-- اطلاعات کلی -->
-                <h5 class="section-title">اطلاعات بیجک</h5>
-                <table class="table table-bordered text-center align-middle">
-                    <tr>
-                        <th>تاریخ صدور</th>
-                        <th>کرایه پرداختی</th>
-                        <th>ارزش محموله</th>
-                        <th>مبدا بارگیری</th>
-                        <th>مقصد تخلیه</th>
-                        <th>مبلغ بیمه</th>
-                        <th>هزینه خدمات</th>
-                    </tr>
-                    <tr>
-                        <td>{{ bijak.issuance_datetime }}</td>
-                        <td>{{ bijak_form.total_fare }}</td>
-                        <td>{{ bijak_form.value }}</td>
-                        <td>{{ cargo_form.origin }}</td>
-                        <td>{{ cargo_form.destination }}</td>
-                        <td>{{ bijak_form.insurance }}</td>
-                        <td>{{ bijak_form.loading_fee }}</td>
-                    </tr>
-                </table>
+                <h5 class="section-title mb-3">اطلاعات کلی بارنامه</h5>
+                <div class="table-responsive">
+                    <table class="table table-bordered text-center align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>تاریخ صدور</th>
+                                <th>کرایه پرداختی</th>
+                                <th>ارزش محموله</th>
+                                <th>مبدا بارگیری</th>
+                                <th>مقصد تخلیه</th>
+                                <th>مبلغ بیمه</th>
+                                <th>هزینه خدمات</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>{{ bijak.issuance_datetime|date:"Y/m/d H:i" }}</td>
+                                <td>{% if can_edit_financial %}{{ bijak_form.total_fare }}{% else %}{{ bijak.total_fare }}{% endif %}</td>
+                                <td>{% if can_edit_financial %}{{ bijak_form.value }}{% else %}{{ bijak.value }}{% endif %}</td>
+                                <td>{{ cargo_form.origin }}</td>
+                                <td>{{ cargo_form.destination }}</td>
+                                <td>{% if can_edit_financial %}{{ bijak_form.insurance }}{% else %}{{ bijak.insurance }}{% endif %}</td>
+                                <td>{% if can_edit_financial %}{{ bijak_form.loading_fee }}{% else %}{{ bijak.loading_fee|default:"—" }}{% endif %}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
 
                 <!-- فرستنده -->
-                <h5 class="section-title">اطلاعات فرستنده</h5>
-                <table class="table table-bordered align-middle text-center">
-                    <tr>
-                        <th>نام و نام خانوادگی</th>
-                        <th>شناسه/کد ملی</th>
-                        <th>کد پستی</th>
-                        <th>آدرس</th>
-                        <th>تلفن</th>
-                        <th>تلفن دوم</th>
-                    </tr>
-                    <tr>
-                        <td>{{ sender_form.name }}</td>
-                        <td>{{ sender_form.national_id }}</td>
-                        <td>{{ sender_form.postal }}</td>
-                        <td>{{ sender_form.address }}</td>
-                        <td>{{ sender_form.phone }}</td>
-                        <td>{{ sender_form.phone2 }}</td>
-                    </tr>
-                </table>
+                <h5 class="section-title mb-3 mt-4">اطلاعات فرستنده</h5>
+                <div class="table-responsive">
+                    <table class="table table-bordered align-middle text-center">
+                        <thead class="table-light">
+                            <tr>
+                                <th>نام و نام خانوادگی</th>
+                                <th>شناسه/کد ملی</th>
+                                <th>کد پستی</th>
+                                <th>آدرس</th>
+                                <th>تلفن</th>
+                                <th>تلفن دوم</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>{% if can_edit_sender %}{{ sender_form.name }}{% else %}{{ bijak.sender.name }}{% endif %}</td>
+                                <td>{% if can_edit_sender %}{{ sender_form.national_id }}{% else %}{{ bijak.sender.national_id|default:"—" }}{% endif %}</td>
+                                <td>{% if can_edit_sender %}{{ sender_form.postal }}{% else %}{{ bijak.sender.postal|default:"—" }}{% endif %}</td>
+                                <td>{% if can_edit_sender %}{{ sender_form.address }}{% else %}{{ bijak.sender.address }}{% endif %}</td>
+                                <td>{% if can_edit_sender %}{{ sender_form.phone }}{% else %}{{ bijak.sender.phone|default:"—" }}{% endif %}</td>
+                                <td>{% if can_edit_sender %}{{ sender_form.phone2 }}{% else %}{{ bijak.sender.phone2|default:"—" }}{% endif %}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
 
                 <!-- گیرنده -->
-                <h5 class="section-title">اطلاعات گیرنده</h5>
-                <table class="table table-bordered align-middle text-center">
-                    <tr>
-                        <th>نام و نام خانوادگی</th>
-                        <th>شناسه/کد ملی</th>
-                        <th>کد پستی</th>
-                        <th>آدرس</th>
-                        <th>تلفن</th>
-                        <th>تلفن دوم</th>
-                    </tr>
-                    <tr>
-                        <td>{{ receiver_form.name }}</td>
-                        <td>{{ receiver_form.national_id }}</td>
-                        <td>{{ receiver_form.postal }}</td>
-                        <td>{{ receiver_form.address }}</td>
-                        <td>{{ receiver_form.phone }}</td>
-                        <td>{{ receiver_form.phone2 }}</td>
-                    </tr>
-                </table>
+                <h5 class="section-title mb-3 mt-4">اطلاعات گیرنده</h5>
+                <div class="table-responsive">
+                    <table class="table table-bordered align-middle text-center">
+                        <thead class="table-light">
+                            <tr>
+                                <th>نام و نام خانوادگی</th>
+                                <th>شناسه/کد ملی</th>
+                                <th>کد پستی</th>
+                                <th>آدرس</th>
+                                <th>تلفن</th>
+                                <th>تلفن دوم</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>{% if can_edit_receiver %}{{ receiver_form.name }}{% else %}{{ bijak.receiver.name }}{% endif %}</td>
+                                <td>{% if can_edit_receiver %}{{ receiver_form.national_id }}{% else %}{{ bijak.receiver.national_id|default:"—" }}{% endif %}</td>
+                                <td>{% if can_edit_receiver %}{{ receiver_form.postal }}{% else %}{{ bijak.receiver.postal|default:"—" }}{% endif %}</td>
+                                <td>{% if can_edit_receiver %}{{ receiver_form.address }}{% else %}{{ bijak.receiver.address }}{% endif %}</td>
+                                <td>{% if can_edit_receiver %}{{ receiver_form.phone }}{% else %}{{ bijak.receiver.phone|default:"—" }}{% endif %}</td>
+                                <td>{% if can_edit_receiver %}{{ receiver_form.phone2 }}{% else %}{{ bijak.receiver.phone2|default:"—" }}{% endif %}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
 
                 <!-- راننده -->
-                <h5 class="section-title">اطلاعات راننده</h5>
-                <table class="table table-bordered align-middle text-center">
-                    <tr>
-                        <th>نام و نام خانوادگی</th>
-                        <th>کد ملی</th>
-                        <th>تاریخ تولد</th>
-                        <th>شماره گواهی‌نامه</th>
-                        <th>تاریخ صدور</th>
-                        <th>موبایل</th>
-                        <th>تلفن دوم</th>
-                        <th>آدرس منزل</th>
-                    </tr>
-                    <tr>
-                        <td>{{ driver_form.name }}</td>
-                        <td>{{ driver_form.national_id }}</td>
-                        <td>{{ bijak_form.driver_birth_date }}</td>
-                        <td>{{ bijak_form.driver_certificate }}</td>
-                        <td>{{ bijak_form.driver_certificate_date }}</td>
-                        <td>{{ driver_form.phone }}</td>
-                        <td>{{ driver_form.phone2 }}</td>
-                        <td>{{ driver_form.address }}</td>
-                    </tr>
-                </table>
+                <h5 class="section-title mb-3 mt-4">اطلاعات راننده</h5>
+                <div class="table-responsive">
+                    <table class="table table-bordered align-middle text-center">
+                        <thead class="table-light">
+                            <tr>
+                                <th>نام و نام خانوادگی</th>
+                                <th>کد ملی</th>
+                                <th>تاریخ تولد</th>
+                                <th>شماره گواهی‌نامه</th>
+                                <th>تاریخ صدور</th>
+                                <th>موبایل</th>
+                                <th>تلفن دوم</th>
+                                <th>آدرس منزل</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>{% if can_edit_driver %}{{ driver_form.name }}{% else %}{{ bijak.driver.name }}{% endif %}</td>
+                                <td>{% if can_edit_driver %}{{ driver_form.national_id }}{% else %}{{ bijak.driver.national_id }}{% endif %}</td>
+                                <td>{% if can_edit_driver %}{{ driver_form.birth_date }}{% else %}{{ bijak.driver.birth_date|date:"Y/m/d" }}{% endif %}</td>
+                                <td>{% if can_edit_driver %}{{ driver_form.certificate }}{% else %}{{ bijak.driver.certificate }}{% endif %}</td>
+                                <td>{% if can_edit_driver %}{{ driver_form.certificate_date }}{% else %}{{ bijak.driver.certificate_date|date:"Y/m/d" }}{% endif %}</td>
+                                <td>{% if can_edit_driver %}{{ driver_form.phone }}{% else %}{{ bijak.driver.phone }}{% endif %}</td>
+                                <td>{% if can_edit_driver %}{{ driver_form.phone2 }}{% else %}{{ bijak.driver.phone2|default:"—" }}{% endif %}</td>
+                                <td>{% if can_edit_driver %}{{ driver_form.address }}{% else %}{{ bijak.driver.address }}{% endif %}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
 
                 <!-- خودرو -->
-                <h5 class="section-title">اطلاعات خودرو</h5>
-                <table class="table table-bordered text-center align-middle">
-                    <tr>
-                        <th>پلاک</th>
-                        <th>نوع وسیله</th>
-                    </tr>
-                    <tr>
-                        <td>
-                            {{ vehicle_form.license_plate_two_digit }}
-                            {{ vehicle_form.license_plate_alphabet }}
-                            {{ vehicle_form.license_plate_three_digit }}
-                            {{ vehicle_form.license_plate_series }}
-                        </td>
-                        <td>{{ vehicle_form.type }}</td>
-                    </tr>
-                </table>
+                <h5 class="section-title mb-3 mt-4">اطلاعات خودرو</h5>
+                <div class="table-responsive">
+                    <table class="table table-bordered text-center align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>پلاک</th>
+                                <th>نوع وسیله</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    ایران {{ bijak.vehicle.license_plate_series }} ||
+                                    {{ bijak.vehicle.license_plate_two_digit }}
+                                    {{ bijak.vehicle.license_plate_alphabet }}
+                                    {{ bijak.vehicle.license_plate_three_digit }}
+                                </td>
+                                <td>{{ bijak.vehicle.get_type_display }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
 
                 <!-- محموله -->
-                <h5 class="section-title">اطلاعات محموله</h5>
-                <table class="table table-bordered text-center align-middle">
-                    <tr>
-                        <th>شرح محموله</th>
-                        <th>وزن/حجم</th>
-                        <th>نوع بسته‌بندی</th>
-                        <th>تعداد بسته</th>
-                    </tr>
-                    <tr>
-                        <td>{{ cargo_form.name }}</td>
-                        <td>{{ cargo_form.weight }}</td>
-                        <td>{{ cargo_form.package_type }}</td>
-                        <td>{{ cargo_form.number_of_packaging }}</td>
-                    </tr>
-                </table>
+                <h5 class="section-title mb-3 mt-4">اطلاعات محموله</h5>
+                <div class="table-responsive">
+                    <table class="table table-bordered text-center align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>شرح محموله</th>
+                                <th>وزن/حجم</th>
+                                <th>نوع بسته‌بندی</th>
+                                <th>تعداد بسته</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>{% if can_edit_cargo %}{{ cargo_form.name }}{% else %}{{ bijak.cargo.name }}{% endif %}</td>
+                                <td>{% if can_edit_cargo %}{{ cargo_form.weight }}{% else %}{{ bijak.cargo.weight }}{% endif %}</td>
+                                <td>{% if can_edit_cargo %}{{ cargo_form.package_type }}{% else %}{{ bijak.cargo.package_type }}{% endif %}</td>
+                                <td>{% if can_edit_cargo %}{{ cargo_form.number_of_packaging }}{% else %}{{ bijak.cargo.number_of_packaging }}{% endif %}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
 
                 <!-- توضیحات -->
-                <h5 class="section-title">توضیحات پاورقی</h5>
-                <table class="table table-bordered text-center align-middle">
-                    <tr>
-                        <th>شرح توضیحات</th>
-                    </tr>
-                    <tr>
-                        <td>{{ bijak_form.final_description }}</td>
-                    </tr>
-                </table>
+                <h5 class="section-title mb-3 mt-4">توضیحات پاورقی</h5>
+                <div class="table-responsive">
+                    <table class="table table-bordered text-center align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>شرح توضیحات</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>{{ bijak.final_description }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
 
                 <!-- دکمه‌های پایین -->
                 <div class="text-center mt-4">
@@ -252,5 +219,21 @@
     </form>
 </div>
 
-</body>
-</html>
+<style>
+    .section-title {
+        font-weight: bold;
+        color: #0d6efd;
+        border-right: 4px solid #0d6efd;
+        padding-right: 10px;
+    }
+    
+    .table th {
+        background-color: #f8f9fa;
+        font-weight: bold;
+    }
+    
+    input, select, textarea {
+        text-align: center !important;
+    }
+</style>
+{% endblock %}

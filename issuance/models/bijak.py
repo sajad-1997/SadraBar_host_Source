@@ -113,6 +113,15 @@ class Bijak(UserTrackingModel):
     approved_at = models.DateTimeField(null=True, blank=True)
 
     # =========================
+    # مجوزهای ویرایش پس از رد بارنامه
+    # =========================
+    can_edit_sender = models.BooleanField(default=False, verbose_name='مجوز ویرایش فرستنده')
+    can_edit_receiver = models.BooleanField(default=False, verbose_name='مجوز ویرایش گیرنده')
+    can_edit_driver = models.BooleanField(default=False, verbose_name='مجوز ویرایش راننده')
+    can_edit_cargo = models.BooleanField(default=False, verbose_name='مجوز ویرایش محموله')
+    can_edit_financial = models.BooleanField(default=False, verbose_name='مجوز ویرایش بخش مالی')
+
+    # =========================
     # توضیحات
     # =========================
     selected_caption = models.ForeignKey(

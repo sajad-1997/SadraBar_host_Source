@@ -43,6 +43,31 @@
                 <label>علت رد بارنامه:</label>
                 <textarea name="reject_reason" class="form-control" rows="3"></textarea>
             </div>
+            
+            <div class="mb-4">
+                <label class="fw-bold">بخش‌های مجاز برای ویرایش:</label>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="can_edit_sender" id="can_edit_sender">
+                    <label class="form-check-label" for="can_edit_sender">ویرایش بخش فرستنده</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="can_edit_receiver" id="can_edit_receiver">
+                    <label class="form-check-label" for="can_edit_receiver">ویرایش بخش گیرنده</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="can_edit_driver" id="can_edit_driver">
+                    <label class="form-check-label" for="can_edit_driver">ویرایش بخش راننده</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="can_edit_cargo" id="can_edit_cargo">
+                    <label class="form-check-label" for="can_edit_cargo">ویرایش بخش محموله</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="can_edit_financial" id="can_edit_financial">
+                    <label class="form-check-label" for="can_edit_financial">ویرایش بخش مالی</label>
+                </div>
+            </div>
+            
             <button type="submit" name="action" value="reject" class="btn btn-danger">
                 رد بارنامه
             </button>
