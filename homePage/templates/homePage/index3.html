@@ -1,0 +1,382 @@
+{% extends 'homePage/base.html' %}
+{% block title %}خانه{% endblock %}
+
+{% block content %}
+
+    <div class="hero">
+        <h1>حمل‌ونقل سریع و هوشمند</h1>
+        <p>رزرو آنلاین – صدور بارنامه – پیگیری لحظه‌ای – بیمه کامل محموله</p>
+    </div>
+
+    <br>
+
+    <div class="flex-row">
+        <div class="card" style="flex:1; min-width:260px;">
+            <span style="font-size: 30px;">🚚</span>
+            <h3>حمل اثاثیه</h3>
+            <p>بسته‌بندی حرفه‌ای + کارگران متخصص</p>
+        </div>
+
+        <div class="card" style="flex:1; min-width:260px;">
+            <span style="font-size: 30px;">📦</span>
+            <h3>ارسال بسته</h3>
+            <p>تحویل سریع داخل شهر و بین‌شهری</p>
+        </div>
+
+        <div class="card" style="flex:1; min-width:260px;">
+            <span style="font-size: 30px;">🏗</span>
+            <h3>بار صنعتی</h3>
+            <p>کرین، جرثقیل و نیروهای متخصص</p>
+        </div>
+    </div>
+
+    <br><br>
+
+    <h2>فرم رزرو بار</h2>
+    <!-- فرض کنید این کد در جای مناسبی از template شما قرار می‌گیرد -->
+    <div class="booking-form-container">
+        <form id="reservationForm" method="post" action="{% url 'reserve' %}">
+            {% csrf_token %}
+
+            <!-- STEP 1 -->
+            <div class="steps active" id="step1">
+                <h3>مرحله ۱: اطلاعات تماس</h3>
+
+                <label for="id_full_name">نام کامل</label>
+                <input type="text" id="id_full_name" name="full_name" required
+                       placeholder="نام و نام خانوادگی خود را وارد کنید">
+
+                <label for="id_phone">شماره تماس</label>
+                <input type="text" id="id_phone" name="phone" required placeholder="مثال: 09123456789">
+
+                <div class="step-buttons">
+                    <span></span> <!-- Placeholder for the first button if needed -->
+                    <span class="btn" onclick="goStep(2)">مرحله بعد</span>
+                </div>
+            </div>
+
+            <!-- STEP 2 -->
+            <div class="steps" id="step2">
+                <h3>مرحله ۲: اطلاعات مسیر</h3>
+
+                <label for="id_origin">مبدا</label>
+                <input type="text" id="id_origin" name="origin" required placeholder="آدرس مبدا">
+
+                <label for="id_destination">مقصد</label>
+                <input type="text" id="id_destination" name="destination" required placeholder="آدرس مقصد">
+
+                <div class="step-buttons">
+                    <span class="btn" onclick="goStep(1)">مرحله قبل</span>
+                    <span class="btn" onclick="goStep(3)">مرحله بعد</span>
+                </div>
+            </div>
+
+            <!-- STEP 3 -->
+            <div class="steps" id="step3">
+                <h3>مرحله ۳: جزئیات بار</h3>
+
+                <label for="id_cargo_type">نوع بار</label>
+                <select id="id_cargo_type" name="cargo_type">
+                    <option value="residential">اثاثیه منزل</option>
+                    <option value="commercial">کالای تجاری</option>
+                    <option value="package">بسته و پاکت</option>
+                    <option value="industrial">بار صنعتی سنگین</option>
+                    <option value="other">سایر موارد</option>
+                </select>
+
+                <label for="id_weight">وزن تقریبی (کیلوگرم)</label>
+                <input type="number" id="id_weight" name="weight" placeholder="مثال: 500">
+
+                <label for="id_description">توضیحات (اختیاری)</label>
+                <textarea id="id_description" name="description" rows="4"
+                          placeholder="هرگونه جزئیات مهم مانند نیاز به کارگر، طبقه و ..."></textarea>
+
+                <div class="step-buttons">
+                    <span class="btn" onclick="goStep(2)">مرحله قبل</span>
+                    <!-- Changed span to button for actual submission -->
+                    <button class="btn" type="submit">ثبت نهایی رزرو</button>
+                </div>
+            </div>
+
+        </form>
+    </div>
+
+    <!-- Add the CSS within a <style> tag in your base.html or link to an external CSS file -->
+    <style>
+        /* Paste the CSS code provided above here */
+
+        /* --- Global Styles for the Form --- */
+        .booking-form-container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            margin: 50px auto;
+            overflow: hidden;
+            font-family: 'IRANSansWeb', sans-serif;
+        }
+
+        .booking-form-container h3 {
+            text-align: center;
+            color: #007bff;
+            margin-bottom: 25px;
+            font-size: 26px;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+        }
+
+        /* --- Step Styles --- */
+        .steps {
+            display: none;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        .steps.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .steps label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #444;
+            font-size: 14px;
+        }
+
+        /* --- Input Field Styles --- */
+        .steps input[type="text"],
+        .steps input[type="number"],
+        .steps textarea,
+        .steps select {
+            width: 100%;
+            padding: 14px 18px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-family: 'IRANSansWeb', sans-serif;
+            font-size: 15px;
+            color: #333;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            background-color: #fdfdfd;
+            margin-bottom: 20px;
+        }
+
+        .steps input:focus,
+        .steps textarea:focus,
+        .steps select:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.2);
+            background-color: white;
+        }
+
+        .steps input::placeholder,
+        .steps textarea::placeholder {
+            color: #aaa;
+        }
+
+        .steps textarea {
+            resize: vertical;
+        }
+
+        .steps select {
+            appearance: none;
+            background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2220%22%20height%3D%2210%22%20fill%3D%22%23555%22%3E%3Cpath%20d%3D%22M2%202L10%208l8-6%22%2F%3E%3C%2Fsvg%3E');
+            background-repeat: no-repeat;
+            background-position: left 15px top 50%;
+            background-size: 12px;
+            padding-left: 40px;
+        }
+
+
+        /* --- Step Navigation Buttons --- */
+        .step-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+
+        .step-buttons .btn {
+            background-color: #6c757d;
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: 'IRANSansWeb', sans-serif;
+            font-size: 15px;
+            font-weight: 500;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .step-buttons .btn:hover {
+            background-color: #5a6268;
+            transform: translateY(-1px);
+        }
+
+        .step-buttons .btn:nth-of-type(2) { /* Second button in the div (next/submit) */
+            background-color: #007bff;
+        }
+
+        .step-buttons .btn:nth-of-type(2):hover {
+            background-color: #0056b3;
+        }
+
+        /* Style for the submit button specifically */
+        .steps #step3 .step-buttons button[type="submit"] {
+            background-color: #28a745; /* Green color for final submit */
+            color: white;
+        }
+
+        .steps #step3 .step-buttons button[type="submit"]:hover {
+            background-color: #218838;
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            .booking-form-container {
+                margin: 30px 15px;
+                padding: 25px;
+            }
+
+            .steps h3 {
+                font-size: 22px;
+            }
+
+            .step-buttons .btn {
+                padding: 10px 20px;
+                font-size: 14px;
+            }
+        }
+
+    </style>
+
+    <!-- JavaScript for Step Navigation -->
+    <script>
+        function goStep(stepNumber) {
+            // Hide all steps
+            const steps = document.getElementsByClassName('steps');
+            for (let i = 0; i < steps.length; i++) {
+                steps[i].classList.remove('active');
+            }
+
+            // Show the target step
+            const targetStep = document.getElementById('step' + stepNumber);
+            if (targetStep) {
+                targetStep.classList.add('active');
+            }
+        }
+
+        // Optional: If you want to validate form fields before moving to the next step
+        function validateStep(stepId) {
+            const currentStepElement = document.getElementById(stepId);
+            let isValid = true;
+            const requiredFields = currentStepElement.querySelectorAll('[required]');
+
+            requiredFields.forEach(field => {
+                if (!field.value.trim()) {
+                    field.style.borderColor = 'red'; // Highlight invalid field
+                    isValid = false;
+                } else {
+                    field.style.borderColor = '#ccc'; // Reset border color
+                }
+            });
+            // Add more specific validation if needed (e.g., phone format, number range)
+
+            return isValid;
+        }
+
+        // Modified goStep function to include validation
+        function goStep(stepNumber) {
+            const currentActiveStepId = document.querySelector('.steps.active').id;
+            let currentStepNum = parseInt(currentActiveStepId.replace('step', ''));
+
+            // Validate current step before moving
+            if (stepNumber > currentStepNum) { // Moving forward
+                if (!validateStep(currentActiveStepId)) {
+                    alert("لطفا تمام فیلدهای الزامی را پر کنید.");
+                    return false; // Stop the function if validation fails
+                }
+            }
+
+            // Hide all steps
+            const steps = document.getElementsByClassName('steps');
+            for (let i = 0; i < steps.length; i++) {
+                steps[i].classList.remove('active');
+            }
+
+            // Show the target step
+            const targetStep = document.getElementById('step' + stepNumber);
+            if (targetStep) {
+                targetStep.classList.add('active');
+            }
+        }
+
+
+        // Initialize: Show the first step on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            if (document.getElementById('step1')) {
+                document.getElementById('step1').classList.add('active');
+            }
+        });
+    </script>
+
+    <script>
+        function goStep(step) {
+            document.querySelectorAll('.steps').forEach(s => s.classList.remove('active'));
+            document.getElementById('step' + step).classList.add('active');
+        }
+
+        function goStep(stepNumber) {
+            // پنهان کردن تمام مراحل
+            var allSteps = document.getElementsByClassName("steps");
+            for (var i = 0; i < allSteps.length; i++) {
+                allSteps[i].classList.remove("active");
+            }
+
+            // نمایش مرحله جدید
+            var nextStep = document.getElementById("step" + stepNumber);
+            if (nextStep) {
+                nextStep.classList.add("active");
+            }
+
+            // مدیریت نمایش/مخفی کردن دکمه‌ها (اختیاری، بسته به منطق شما)
+            // می‌توانید منطق پیچیده‌تری برای دکمه‌ها اضافه کنید
+        }
+
+        // برای نمایش اولین مرحله هنگام بارگذاری صفحه
+        document.addEventListener("DOMContentLoaded", function () {
+            // ابتدا همه مراحل را مخفی کنید (اگر با CSS همه مخفی نیستند)
+            var allSteps = document.getElementsByClassName("steps");
+            for (var i = 0; i < allSteps.length; i++) {
+                if (!allSteps[i].classList.contains("active")) {
+                    allSteps[i].style.display = "none";
+                }
+            }
+            // نمایش اولین مرحله
+            var firstStep = document.getElementById("step1");
+            if (firstStep) {
+                firstStep.classList.add("active");
+                firstStep.style.display = "block"; // اطمینان از نمایش
+            }
+        });
+
+    </script>
+
+{% endblock %}

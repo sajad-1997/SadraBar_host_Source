@@ -76,8 +76,13 @@
                 </div>
 
                 <div class="col-md-6">
-                    <label>شماره تلفن 2</label>
+                    <label>شماره تلفن دوم</label>
                     {{ form.phone2 }}
+                </div>
+
+                <div class="col-md-6">
+                    <label>شماره تلفن سوم</label>
+                    {{ form.phone3 }}
                 </div>
 
                 <div class="col-md-6">
@@ -115,20 +120,6 @@
                 </div>
 
                 <hr>
-                <small>اطلاعات بیمه نامه</small>
-
-                <div class="col-md-12">
-                    <label>شماره بیمه نامه</label>
-                    {{ form.insurance_policy_number }}
-                </div>
-
-                <div class="col-md-12">
-                    <label>تاریخ انقضاء بیمه نامه</label>
-                    {{ form.insurance_policy_expiry }}
-                    {% for error in form.insurance_policy_expiry.errors %}
-                        <div class="text-danger"><small>{{ error }}</small></div>
-                    {% endfor %}
-                </div>
             </div>
 
             <button type="submit" class="btn btn-success mt-3">ثبت راننده</button>

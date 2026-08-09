@@ -1,382 +1,349 @@
-{% extends 'homePage/base.html' %}
-{% block title %}خانه{% endblock %}
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>موسسه حمل و نقل صدرا بار خراسان | باربری مطمئن و هوشمند</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Vazirmatn Font -->
+    <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
+    <!-- Leaflet Map CSS & JS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-{% block content %}
-
-    <div class="hero">
-        <h1>حمل‌ونقل سریع و هوشمند</h1>
-        <p>رزرو آنلاین – صدور بارنامه – پیگیری لحظه‌ای – بیمه کامل محموله</p>
-    </div>
-
-    <br>
-
-    <div class="flex-row">
-        <div class="card" style="flex:1; min-width:260px;">
-            <span style="font-size: 30px;">🚚</span>
-            <h3>حمل اثاثیه</h3>
-            <p>بسته‌بندی حرفه‌ای + کارگران متخصص</p>
-        </div>
-
-        <div class="card" style="flex:1; min-width:260px;">
-            <span style="font-size: 30px;">📦</span>
-            <h3>ارسال بسته</h3>
-            <p>تحویل سریع داخل شهر و بین‌شهری</p>
-        </div>
-
-        <div class="card" style="flex:1; min-width:260px;">
-            <span style="font-size: 30px;">🏗</span>
-            <h3>بار صنعتی</h3>
-            <p>کرین، جرثقیل و نیروهای متخصص</p>
-        </div>
-    </div>
-
-    <br><br>
-
-    <h2>فرم رزرو بار</h2>
-    <!-- فرض کنید این کد در جای مناسبی از template شما قرار می‌گیرد -->
-    <div class="booking-form-container">
-        <form id="reservationForm" method="post" action="{% url 'reserve' %}">
-            {% csrf_token %}
-
-            <!-- STEP 1 -->
-            <div class="steps active" id="step1">
-                <h3>مرحله ۱: اطلاعات تماس</h3>
-
-                <label for="id_full_name">نام کامل</label>
-                <input type="text" id="id_full_name" name="full_name" required
-                       placeholder="نام و نام خانوادگی خود را وارد کنید">
-
-                <label for="id_phone">شماره تماس</label>
-                <input type="text" id="id_phone" name="phone" required placeholder="مثال: 09123456789">
-
-                <div class="step-buttons">
-                    <span></span> <!-- Placeholder for the first button if needed -->
-                    <span class="btn" onclick="goStep(2)">مرحله بعد</span>
-                </div>
-            </div>
-
-            <!-- STEP 2 -->
-            <div class="steps" id="step2">
-                <h3>مرحله ۲: اطلاعات مسیر</h3>
-
-                <label for="id_origin">مبدا</label>
-                <input type="text" id="id_origin" name="origin" required placeholder="آدرس مبدا">
-
-                <label for="id_destination">مقصد</label>
-                <input type="text" id="id_destination" name="destination" required placeholder="آدرس مقصد">
-
-                <div class="step-buttons">
-                    <span class="btn" onclick="goStep(1)">مرحله قبل</span>
-                    <span class="btn" onclick="goStep(3)">مرحله بعد</span>
-                </div>
-            </div>
-
-            <!-- STEP 3 -->
-            <div class="steps" id="step3">
-                <h3>مرحله ۳: جزئیات بار</h3>
-
-                <label for="id_cargo_type">نوع بار</label>
-                <select id="id_cargo_type" name="cargo_type">
-                    <option value="residential">اثاثیه منزل</option>
-                    <option value="commercial">کالای تجاری</option>
-                    <option value="package">بسته و پاکت</option>
-                    <option value="industrial">بار صنعتی سنگین</option>
-                    <option value="other">سایر موارد</option>
-                </select>
-
-                <label for="id_weight">وزن تقریبی (کیلوگرم)</label>
-                <input type="number" id="id_weight" name="weight" placeholder="مثال: 500">
-
-                <label for="id_description">توضیحات (اختیاری)</label>
-                <textarea id="id_description" name="description" rows="4"
-                          placeholder="هرگونه جزئیات مهم مانند نیاز به کارگر، طبقه و ..."></textarea>
-
-                <div class="step-buttons">
-                    <span class="btn" onclick="goStep(2)">مرحله قبل</span>
-                    <!-- Changed span to button for actual submission -->
-                    <button class="btn" type="submit">ثبت نهایی رزرو</button>
-                </div>
-            </div>
-
-        </form>
-    </div>
-
-    <!-- Add the CSS within a <style> tag in your base.html or link to an external CSS file -->
     <style>
-        /* Paste the CSS code provided above here */
-
-        /* --- Global Styles for the Form --- */
-        .booking-form-container {
-            background-color: white;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            max-width: 600px;
-            margin: 50px auto;
-            overflow: hidden;
-            font-family: 'IRANSansWeb', sans-serif;
-        }
-
-        .booking-form-container h3 {
-            text-align: center;
-            color: #007bff;
-            margin-bottom: 25px;
-            font-size: 26px;
-            border-bottom: 2px solid #eee;
-            padding-bottom: 10px;
-        }
-
-        /* --- Step Styles --- */
-        .steps {
-            display: none;
-            animation: fadeIn 0.5s ease-in-out;
-        }
-
-        .steps.active {
-            display: block;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .steps label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-            color: #444;
-            font-size: 14px;
-        }
-
-        /* --- Input Field Styles --- */
-        .steps input[type="text"],
-        .steps input[type="number"],
-        .steps textarea,
-        .steps select {
-            width: 100%;
-            padding: 14px 18px;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            box-sizing: border-box;
-            font-family: 'IRANSansWeb', sans-serif;
-            font-size: 15px;
-            color: #333;
-            transition: border-color 0.3s ease, box-shadow 0.3s ease;
-            background-color: #fdfdfd;
-            margin-bottom: 20px;
-        }
-
-        .steps input:focus,
-        .steps textarea:focus,
-        .steps select:focus {
-            outline: none;
-            border-color: #007bff;
-            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.2);
-            background-color: white;
-        }
-
-        .steps input::placeholder,
-        .steps textarea::placeholder {
-            color: #aaa;
-        }
-
-        .steps textarea {
-            resize: vertical;
-        }
-
-        .steps select {
-            appearance: none;
-            background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2220%22%20height%3D%2210%22%20fill%3D%22%23555%22%3E%3Cpath%20d%3D%22M2%202L10%208l8-6%22%2F%3E%3C%2Fsvg%3E');
-            background-repeat: no-repeat;
-            background-position: left 15px top 50%;
-            background-size: 12px;
-            padding-left: 40px;
-        }
-
-
-        /* --- Step Navigation Buttons --- */
-        .step-buttons {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 1px solid #eee;
-        }
-
-        .step-buttons .btn {
-            background-color: #6c757d;
-            color: white;
-            padding: 12px 25px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-family: 'IRANSansWeb', sans-serif;
-            font-size: 15px;
-            font-weight: 500;
-            transition: background-color 0.3s ease, transform 0.2s ease;
-            text-decoration: none;
-            display: inline-block;
-        }
-
-        .step-buttons .btn:hover {
-            background-color: #5a6268;
-            transform: translateY(-1px);
-        }
-
-        .step-buttons .btn:nth-of-type(2) { /* Second button in the div (next/submit) */
-            background-color: #007bff;
-        }
-
-        .step-buttons .btn:nth-of-type(2):hover {
-            background-color: #0056b3;
-        }
-
-        /* Style for the submit button specifically */
-        .steps #step3 .step-buttons button[type="submit"] {
-            background-color: #28a745; /* Green color for final submit */
-            color: white;
-        }
-
-        .steps #step3 .step-buttons button[type="submit"]:hover {
-            background-color: #218838;
-        }
-
-        /* Responsive Adjustments */
-        @media (max-width: 768px) {
-            .booking-form-container {
-                margin: 30px 15px;
-                padding: 25px;
-            }
-
-            .steps h3 {
-                font-size: 22px;
-            }
-
-            .step-buttons .btn {
-                padding: 10px 20px;
-                font-size: 14px;
-            }
-        }
-
+        body { font-family: 'Vazirmatn', sans-serif; }
+        .gradient-bg { background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%); }
+        .step-circle { transition: all 0.3s ease; }
+        .step-active { border-color: #2563eb; color: #2563eb; background-color: #eff6ff; }
+        .step-completed { background-color: #2563eb; color: white; border-color: #2563eb; }
+        #map { height: 400px; width: 100%; border-radius: 0.75rem; z-index: 1; }
+        .fade-in { animation: fadeIn 0.5s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
 
-    <!-- JavaScript for Step Navigation -->
+    <!-- Navbar -->
+    <nav class="bg-white shadow-md fixed w-full z-50">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="bg-blue-800 text-white p-2 rounded-lg"><i class="fas fa-truck-fast text-2xl"></i></div>
+                <div>
+                    <h1 class="text-xl font-bold text-blue-900">صدرا بار خراسان</h1>
+                    <p class="text-xs text-gray-500">موسسه حمل و نقل رسمی</p>
+                </div>
+            </div>
+            <div class="hidden md:flex gap-6 text-sm font-medium text-gray-700">
+                <a href="#home" class="hover:text-blue-700 transition">خانه</a>
+                <a href="#services" class="hover:text-blue-700 transition">خدمات</a>
+                <a href="#booking" class="hover:text-blue-700 transition">رزرو بار</a>
+                <a href="#tracking" class="hover:text-blue-700 transition">پیگیری مرسوله</a>
+                <a href="#contact" class="hover:text-blue-700 transition">تماس با ما</a>
+            </div>
+            <a href="tel:05135420703" class="bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded-full font-bold transition flex items-center gap-2">
+                <i class="fas fa-phone"></i> <span class="hidden sm:inline">۰۵۱-۳۵۴۲۰۷۰۳</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="gradient-bg text-white pt-32 pb-20 relative overflow-hidden">
+        <div class="absolute inset-0 opacity-10 bg-[url('https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80')] bg-cover bg-center"></div>
+        <div class="container mx-auto px-4 relative z-10 text-center">
+            <h2 class="text-4xl md:text-5xl font-extrabold mb-6 leading-tight">حمل‌ونقل سریع، ایمن و هوشمند<br>در خراسان و سراسر کشور</h2>
+            <p class="text-lg md:text-xl text-blue-100 mb-8 max-w-2xl mx-auto">با بیش از دو دهه سابقه درخشان، بار شما را با بیمه کامل و صدور بارنامه رسمی به مقصد می‌رسانیم.</p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="#booking" class="bg-yellow-500 hover:bg-yellow-600 text-blue-900 font-bold px-8 py-3 rounded-lg text-lg transition shadow-lg">رزرو آنلاین بار</a>
+                <a href="https://t.me/sadrabar_khorasan" target="_blank" class="bg-white/20 hover:bg-white/30 backdrop-blur border border-white/40 text-white font-bold px-8 py-3 rounded-lg text-lg transition flex items-center justify-center gap-2">
+                    <i class="fab fa-telegram"></i> عضویت در کانال تلگرام
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="py-12 bg-white shadow-sm -mt-10 relative z-20 container mx-auto rounded-xl max-w-5xl border border-gray-100">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+            <div class="p-4">
+                <i class="fas fa-calendar-check text-4xl text-blue-600 mb-3"></i>
+                <h3 class="text-3xl font-bold text-gray-900">+۲۰</h3>
+                <p class="text-gray-600 text-sm">سال سابقه درخشان</p>
+            </div>
+            <div class="p-4">
+                <i class="fas fa-box-open text-4xl text-blue-600 mb-3"></i>
+                <h3 class="text-3xl font-bold text-gray-900">+۱۵,۰۰۰</h3>
+                <p class="text-gray-600 text-sm">بار ارسال شده موفق</p>
+            </div>
+            <div class="p-4">
+                <i class="fas fa-users text-4xl text-blue-600 mb-3"></i>
+                <h3 class="text-3xl font-bold text-gray-900">+۱۰,۰۰۰</h3>
+                <p class="text-gray-600 text-sm">مشتری راضی</p>
+            </div>
+            <div class="p-4">
+                <i class="fas fa-truck text-4xl text-blue-600 mb-3"></i>
+                <h3 class="text-3xl font-bold text-gray-900">+۵۰</h3>
+                <p class="text-gray-600 text-sm">راننده فعال روزانه</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section id="services" class="py-20 container mx-auto px-4">
+        <div class="text-center mb-12">
+            <h2 class="text-3xl font-bold text-gray-900 mb-4">خدمات موسسه صدرا بار</h2>
+            <div class="w-20 h-1 bg-blue-600 mx-auto rounded"></div>
+        </div>
+        <div class="grid md:grid-cols-3 gap-8">
+            <div class="bg-white p-6 rounded-xl shadow-md hover:shadow-xl transition border-t-4 border-blue-600">
+                <i class="fas fa-couch text-4xl text-blue-600 mb-4"></i>
+                <h3 class="text-xl font-bold mb-3">حمل اثاثیه منزل</h3>
+                <p class="text-gray-600 text-sm leading-relaxed">بسته‌بندی حرفه‌ای، استفاده از کارگران متخصص و متعهد، و حمل ایمن لوازم خانگی به تمام نقاط کشور.</p>
+            </div>
+            <div class="bg-white p-6 rounded-xl shadow-md hover:shadow-xl transition border-t-4 border-blue-600">
+                <i class="fas fa-industry text-4xl text-blue-600 mb-4"></i>
+                <h3 class="text-xl font-bold mb-3">بار صنعتی و سنگین</h3>
+                <p class="text-gray-600 text-sm leading-relaxed">ارائه خدمات کرین، جرثقیل و خودروهای سنگین مخصوص حمل ماشین‌آلات و بارهای ترافیکی.</p>
+            </div>
+            <div class="bg-white p-6 rounded-xl shadow-md hover:shadow-xl transition border-t-4 border-blue-600">
+                <i class="fas fa-shipping-fast text-4xl text-blue-600 mb-4"></i>
+                <h3 class="text-xl font-bold mb-3">ارسال خرده بار و بسته</h3>
+                <p class="text-gray-600 text-sm leading-relaxed">تحویل سریع و مطمئن مرسولات کوچک و متوسط در کمترین زمان ممکن با رهگیری آنلاین.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Booking Form Section -->
+    <section id="booking" class="py-20 bg-blue-50">
+        <div class="container mx-auto px-4 max-w-3xl">
+            <div class="text-center mb-10">
+                <h2 class="text-3xl font-bold text-gray-900 mb-4">فرم رزرو آنلاین بار</h2>
+                <p class="text-gray-600">در کمتر از ۲ دقیقه درخواست خود را ثبت کنید تا کارشناسان ما با شما تماس بگیرند.</p>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-xl p-6 md:p-8">
+                <!-- Progress Steps -->
+                <div class="flex justify-between mb-8 relative">
+                    <div class="absolute top-1/2 left-0 right-0 h-1 bg-gray-200 -z-10 transform -translate-y-1/2"></div>
+                    <div id="step-indicator-1" class="step-circle step-active w-10 h-10 rounded-full border-2 flex items-center justify-center font-bold bg-white">۱</div>
+                    <div id="step-indicator-2" class="step-circle w-10 h-10 rounded-full border-2 border-gray-300 flex items-center justify-center font-bold bg-white text-gray-500">۲</div>
+                    <div id="step-indicator-3" class="step-circle w-10 h-10 rounded-full border-2 border-gray-300 flex items-center justify-center font-bold bg-white text-gray-500">۳</div>
+                </div>
+
+                <form id="bookingForm" onsubmit="return false;">
+                    <!-- Step 1: Contact Info -->
+                    <div id="step-1" class="fade-in">
+                        <h3 class="text-xl font-bold mb-6 text-blue-900">مرحله ۱: اطلاعات تماس</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">نام و نام خانوادگی</label>
+                                <input type="text" class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition" placeholder="مثال: علی محمدی">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">شماره تماس</label>
+                                <input type="tel" class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition" placeholder="مثال: ۰۹۱۲۳۴۵۶۷۸۹">
+                            </div>
+                        </div>
+                        <div class="mt-8 flex justify-end">
+                            <button onclick="nextStep(2)" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-bold transition">مرحله بعد <i class="fas fa-arrow-left mr-2"></i></button>
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Route Info -->
+                    <div id="step-2" class="hidden fade-in">
+                        <h3 class="text-xl font-bold mb-6 text-blue-900">مرحله ۲: اطلاعات مسیر</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">شهر مبدا</label>
+                                <input type="text" class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-500 outline-none transition" placeholder="مثال: مشهد">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">شهر مقصد</label>
+                                <input type="text" class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-500 outline-none transition" placeholder="مثال: تهران">
+                            </div>
+                        </div>
+                        <div class="mt-8 flex justify-between">
+                            <button onclick="prevStep(1)" class="text-gray-600 hover:text-gray-800 px-6 py-2 font-medium transition"><i class="fas fa-arrow-right ml-2"></i> مرحله قبل</button>
+                            <button onclick="nextStep(3)" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-bold transition">مرحله بعد <i class="fas fa-arrow-left mr-2"></i></button>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Cargo Details -->
+                    <div id="step-3" class="hidden fade-in">
+                        <h3 class="text-xl font-bold mb-6 text-blue-900">مرحله ۳: جزئیات بار</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">نوع بار</label>
+                                <select class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-500 outline-none transition bg-white">
+                                    <option>اثاثیه منزل</option>
+                                    <option>کالای تجاری</option>
+                                    <option>بار صنعتی سنگین</option>
+                                    <option>خرده بار و بسته</option>
+                                    <option>سایر موارد</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">وزن تقریبی (کیلوگرم)</label>
+                                <input type="number" class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-500 outline-none transition" placeholder="مثال: 500">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">توضیحات تکمیلی (اختیاری)</label>
+                                <textarea rows="3" class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-500 outline-none transition" placeholder="توضیحات خاصی درباره بار دارید؟"></textarea>
+                            </div>
+                        </div>
+                        <div class="mt-8 flex justify-between">
+                            <button onclick="prevStep(2)" class="text-gray-600 hover:text-gray-800 px-6 py-2 font-medium transition"><i class="fas fa-arrow-right ml-2"></i> مرحله قبل</button>
+                            <button onclick="submitForm()" class="bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-lg font-bold transition shadow-lg">ثبت نهایی رزرو <i class="fas fa-check mr-2"></i></button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Live Tracking Map Section -->
+    <section id="tracking" class="py-20 container mx-auto px-4">
+        <div class="text-center mb-12">
+            <h2 class="text-3xl font-bold text-gray-900 mb-4">ردیابی زنده ناوگان فعال</h2>
+            <p class="text-gray-600 max-w-2xl mx-auto">موقعیت تقریبی رانندگان فعال صدرا بار در منطقه شهرک صنعتی توس و مشهد را به صورت لحظه‌ای مشاهده کنید.</p>
+        </div>
+        <div class="bg-white p-2 rounded-2xl shadow-xl border border-gray-200">
+            <div id="map"></div>
+        </div>
+        <p class="text-center text-xs text-gray-500 mt-4">* برای اتصال به سامانه ردیابی GPS واقعی، نیاز به توسعه Backend و اپلیکیشن رانندگان می‌باشد.</p>
+    </section>
+
+    <!-- Why Choose Us -->
+    <section class="py-20 bg-blue-900 text-white">
+        <div class="container mx-auto px-4">
+            <div class="grid md:grid-cols-2 gap-12 items-center">
+                <div>
+                    <h2 class="text-3xl font-bold mb-6">چرا صدرا بار خراسان را انتخاب کنید؟</h2>
+                    <p class="text-blue-200 mb-8 leading-relaxed">مجموعه حمل و نقل صدرا بار خراسان با سابقه بیش از دو دهه خدمت‌رسانی، نشان افتخار رضایتمندی را از مشتریان عزیز به دلیل دقت، مورد اعتماد بودن و مسئولیت‌پذیری بالا دریافت نموده است.</p>
+                    <ul class="space-y-4">
+                        <li class="flex items-center gap-3"><i class="fas fa-check-circle text-yellow-400 text-xl"></i> صدور بارنامه رسمی و بیمه کامل محموله</li>
+                        <li class="flex items-center gap-3"><i class="fas fa-check-circle text-yellow-400 text-xl"></i> ناوگان مجهز و رانندگان مجرب و خوش‌نام</li>
+                        <li class="flex items-center gap-3"><i class="fas fa-check-circle text-yellow-400 text-xl"></i> پشتیبانی ۲۴ ساعته و پاسخگویی سریع</li>
+                        <li class="flex items-center gap-3"><i class="fas fa-check-circle text-yellow-400 text-xl"></i> قیمت‌گذاری منصفانه و شفاف بدون هزینه پنهان</li>
+                    </ul>
+                </div>
+                <div class="bg-white/10 backdrop-blur p-8 rounded-2xl border border-white/20">
+                    <h3 class="text-2xl font-bold mb-4 text-center">مشاوره رایگان حمل بار</h3>
+                    <p class="text-center text-blue-200 mb-6">همین حالا با کارشناسان ما تماس بگیرید تا بهترین راهکار حمل را به شما پیشنهاد دهیم.</p>
+                    <div class="space-y-3 text-center">
+                        <a href="tel:09309843704" class="block bg-yellow-500 hover:bg-yellow-600 text-blue-900 font-bold py-3 rounded-lg transition text-lg">تماس با مدیریت: ۰۹۳۰۹۸۴۳۷۰۴</a>
+                        <a href="tel:05135420703" class="block bg-white/20 hover:bg-white/30 text-white font-bold py-3 rounded-lg transition">۰۵۱-۳۵۴۲۰۷۰۳</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer id="contact" class="bg-gray-900 text-gray-300 py-12 border-t border-gray-800">
+        <div class="container mx-auto px-4 grid md:grid-cols-3 gap-8">
+            <div>
+                <div class="flex items-center gap-3 mb-4">
+                    <i class="fas fa-truck-fast text-3xl text-blue-500"></i>
+                    <h3 class="text-xl font-bold text-white">صدرا بار خراسان</h3>
+                </div>
+                <p class="text-sm leading-relaxed mb-4">ارائه‌دهنده خدمات حمل‌ونقل جاده‌ای با مجوز رسمی از سازمان راهداری و حمل‌ونقل جاده‌ای. متعهد به ایمنی و سرعت در ارسال بار شما.</p>
+                <a href="https://t.me/sadrabar_khorasan" target="_blank" class="inline-flex items-center gap-2 text-blue-400 hover:text-blue-300 transition">
+                    <i class="fab fa-telegram text-xl"></i> کانال تلگرام اعلام بار
+                </a>
+            </div>
+            <div>
+                <h4 class="text-white font-bold text-lg mb-4">اطلاعات تماس</h4>
+                <ul class="space-y-3 text-sm">
+                    <li class="flex items-start gap-3"><i class="fas fa-map-marker-alt mt-1 text-blue-500"></i> <span>مشهد، شهرک صنعتی توس، بلوار ایرج یزدان بخش، قبل از باسکول شهرک، موسسه حمل نقل صدرا بار خراسان</span></li>
+                    <li class="flex items-center gap-3"><i class="fas fa-phone text-blue-500"></i> <span dir="ltr">051-35420703, 051-35420704</span></li>
+                    <li class="flex items-center gap-3"><i class="fas fa-phone text-blue-500"></i> <span dir="ltr">051-35423515, 051-35422770</span></li>
+                    <li class="flex items-center gap-3"><i class="fas fa-mobile-alt text-blue-500"></i> <span dir="ltr">09309843704 (مدیریت)</span></li>
+                    <li class="flex items-center gap-3"><i class="fas fa-envelope text-blue-500"></i> <span>sadrabar@gmail.com</span></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="text-white font-bold text-lg mb-4">دسترسی سریع</h4>
+                <ul class="space-y-2 text-sm">
+                    <li><a href="#home" class="hover:text-white transition">صفحه اصلی</a></li>
+                    <li><a href="#services" class="hover:text-white transition">خدمات ما</a></li>
+                    <li><a href="#booking" class="hover:text-white transition">رزرو آنلاین بار</a></li>
+                    <li><a href="#tracking" class="hover:text-white transition">پیگیری مرسوله</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="container mx-auto px-4 mt-8 pt-8 border-t border-gray-800 text-center text-sm text-gray-500">
+            <p>© تمامی حقوق برای موسسه حمل و نقل صدرا بار خراسان محفوظ است.</p>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
     <script>
-        function goStep(stepNumber) {
-            // Hide all steps
-            const steps = document.getElementsByClassName('steps');
-            for (let i = 0; i < steps.length; i++) {
-                steps[i].classList.remove('active');
-            }
-
-            // Show the target step
-            const targetStep = document.getElementById('step' + stepNumber);
-            if (targetStep) {
-                targetStep.classList.add('active');
-            }
+        // Multi-step Form Logic
+        let currentStep = 1;
+        function nextStep(step) {
+            document.getElementById(`step-${currentStep}`).classList.add('hidden');
+            currentStep = step;
+            document.getElementById(`step-${currentStep}`).classList.remove('hidden');
+            updateIndicators();
         }
-
-        // Optional: If you want to validate form fields before moving to the next step
-        function validateStep(stepId) {
-            const currentStepElement = document.getElementById(stepId);
-            let isValid = true;
-            const requiredFields = currentStepElement.querySelectorAll('[required]');
-
-            requiredFields.forEach(field => {
-                if (!field.value.trim()) {
-                    field.style.borderColor = 'red'; // Highlight invalid field
-                    isValid = false;
+        function prevStep(step) {
+            document.getElementById(`step-${currentStep}`).classList.add('hidden');
+            currentStep = step;
+            document.getElementById(`step-${currentStep}`).classList.remove('hidden');
+            updateIndicators();
+        }
+        function updateIndicators() {
+            for(let i=1; i<=3; i++) {
+                const el = document.getElementById(`step-indicator-${i}`);
+                el.classList.remove('step-active', 'step-completed');
+                if(i < currentStep) {
+                    el.classList.add('step-completed');
+                    el.innerHTML = '<i class="fas fa-check"></i>';
+                } else if(i === currentStep) {
+                    el.classList.add('step-active');
+                    el.innerHTML = i;
                 } else {
-                    field.style.borderColor = '#ccc'; // Reset border color
+                    el.innerHTML = i;
                 }
+            }
+        }
+        function submitForm() {
+            // Here you would normally send data to backend via fetch/AJAX
+            alert('✅ درخواست رزرو شما با موفقیت ثبت شد!\nهمکاران ما در صدرا بار به زودی با شما تماس خواهند گرفت.');
+            location.reload();
+        }
+
+        // Leaflet Map Initialization (Mashhad Coordinates)
+        document.addEventListener('DOMContentLoaded', function() {
+            var map = L.map('map').setView([36.2972, 59.6067], 12); // مختصات مشهد
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(map);
+
+            // آیکون سفارشی برای رانندگان
+            var truckIcon = L.divIcon({
+                html: '<i class="fas fa-truck text-blue-600 text-2xl drop-shadow-md"></i>',
+                className: 'bg-transparent',
+                iconSize: [30, 30],
+                iconAnchor: [15, 15]
             });
-            // Add more specific validation if needed (e.g., phone format, number range)
 
-            return isValid;
-        }
+            // شبیه‌سازی رانندگان فعال (در نسخه واقعی از API دریافت می‌شود)
+            var drivers = [
+                {lat: 36.3050, lng: 59.5900, name: "نیسان بار - احمدی (شهرک صنعتی توس)"},
+                {lat: 36.2800, lng: 59.6200, name: "خاور مسقف - رضایی (بلوار وکیل‌آباد)"},
+                {lat: 36.3100, lng: 59.6100, name: "تریلی کفی - محمدی (جاده سنتو)"},
+                {lat: 36.2900, lng: 59.5800, name: "ایسوزو باربری - کریمی (میدان آزادی)"}
+            ];
 
-        // Modified goStep function to include validation
-        function goStep(stepNumber) {
-            const currentActiveStepId = document.querySelector('.steps.active').id;
-            let currentStepNum = parseInt(currentActiveStepId.replace('step', ''));
-
-            // Validate current step before moving
-            if (stepNumber > currentStepNum) { // Moving forward
-                if (!validateStep(currentActiveStepId)) {
-                    alert("لطفا تمام فیلدهای الزامی را پر کنید.");
-                    return false; // Stop the function if validation fails
-                }
-            }
-
-            // Hide all steps
-            const steps = document.getElementsByClassName('steps');
-            for (let i = 0; i < steps.length; i++) {
-                steps[i].classList.remove('active');
-            }
-
-            // Show the target step
-            const targetStep = document.getElementById('step' + stepNumber);
-            if (targetStep) {
-                targetStep.classList.add('active');
-            }
-        }
-
-
-        // Initialize: Show the first step on page load
-        document.addEventListener('DOMContentLoaded', () => {
-            if (document.getElementById('step1')) {
-                document.getElementById('step1').classList.add('active');
-            }
+            drivers.forEach(d => {
+                L.marker([d.lat, d.lng], {icon: truckIcon}).addTo(map).bindPopup(`<b>${d.name}</b><br>وضعیت: <span style="color:green">● فعال</span>`);
+            });
         });
     </script>
-
-    <script>
-        function goStep(step) {
-            document.querySelectorAll('.steps').forEach(s => s.classList.remove('active'));
-            document.getElementById('step' + step).classList.add('active');
-        }
-
-        function goStep(stepNumber) {
-            // پنهان کردن تمام مراحل
-            var allSteps = document.getElementsByClassName("steps");
-            for (var i = 0; i < allSteps.length; i++) {
-                allSteps[i].classList.remove("active");
-            }
-
-            // نمایش مرحله جدید
-            var nextStep = document.getElementById("step" + stepNumber);
-            if (nextStep) {
-                nextStep.classList.add("active");
-            }
-
-            // مدیریت نمایش/مخفی کردن دکمه‌ها (اختیاری، بسته به منطق شما)
-            // می‌توانید منطق پیچیده‌تری برای دکمه‌ها اضافه کنید
-        }
-
-        // برای نمایش اولین مرحله هنگام بارگذاری صفحه
-        document.addEventListener("DOMContentLoaded", function () {
-            // ابتدا همه مراحل را مخفی کنید (اگر با CSS همه مخفی نیستند)
-            var allSteps = document.getElementsByClassName("steps");
-            for (var i = 0; i < allSteps.length; i++) {
-                if (!allSteps[i].classList.contains("active")) {
-                    allSteps[i].style.display = "none";
-                }
-            }
-            // نمایش اولین مرحله
-            var firstStep = document.getElementById("step1");
-            if (firstStep) {
-                firstStep.classList.add("active");
-                firstStep.style.display = "block"; // اطمینان از نمایش
-            }
-        });
-
-    </script>
-
-{% endblock %}
+</body>
+</html>

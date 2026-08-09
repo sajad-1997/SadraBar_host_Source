@@ -41,13 +41,13 @@ media/
 .env.*
 !.env.example
 
-# IDE
+# IDE specific
 .vscode/
 .idea/
 *.swp
 *.swo
 
-# OS
+# OS generated files
 .DS_Store
 Thumbs.db
 

@@ -1,3 +1,4 @@
+import secrets
 import threading
 
 from django.conf import settings
@@ -20,6 +21,7 @@ class Bijak(UserTrackingModel):
     # اطلاعات پایه بارنامه
     # =========================
     tracking_code = models.CharField(max_length=15, unique=True, db_index=True)
+    access_token = models.CharField(max_length=64, unique=True, db_index=True, blank=True, null=True, verbose_name="توکن دسترسی عمومی")
     issuance_datetime = jmodels.jDateTimeField(verbose_name="تاریخ و ساعت صدور بارنامه", db_index=True)
     value = models.DecimalField(max_digits=15, decimal_places=0, verbose_name="ارزش محموله")
     insurance = models.DecimalField(max_digits=15, decimal_places=0, verbose_name="مبلغ بیمه")
@@ -165,6 +167,16 @@ class Bijak(UserTrackingModel):
             return prefix + str(counter).zfill(5)
 
     # =========================
+    # تولید توکن دسترسی امن
+    # =========================
+    def generate_access_token(self):
+        """تولید توکن تصادفی و یکتا برای دسترسی عمومی به بارنامه"""
+        while True:
+            token = secrets.token_urlsafe(32)
+            if not Bijak.objects.filter(access_token=token).exists():
+                return token
+
+    # =========================
     # ذخیره
     # =========================
     def save(self, *args, **kwargs):
@@ -178,6 +190,10 @@ class Bijak(UserTrackingModel):
 
         if not self.tracking_code:
             self.tracking_code = self.generate_tracking_code()
+
+        # تولید توکن دسترسی فقط هنگام ایجاد بارنامه جدید
+        if not self.pk and not self.access_token:
+            self.access_token = self.generate_access_token()
 
         if not self.issuance_datetime:
             self.issuance_datetime = timezone.now()

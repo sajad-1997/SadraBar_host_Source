@@ -41,14 +41,14 @@ class DriverForm(PersianNumberFormMixin, forms.ModelForm):
         })
     )
 
-    insurance_policy_expiry = forms.CharField(
-        error_messages={'required': 'تاریخ انقضاء بیمه نامه نمی‌تواند خالی باشد.'},
-        widget=forms.TextInput(attrs={
-            'class': 'form-control date-picker',
-            'placeholder': 'تاریخ انقضاء بیمه نامه',
-            'autocomplete': 'off'
-        })
-    )
+    # insurance_policy_expiry = forms.CharField(
+    #     error_messages={'required': 'تاریخ انقضاء بیمه نامه نمی‌تواند خالی باشد.'},
+    #     widget=forms.TextInput(attrs={
+    #         'class': 'form-control date-picker',
+    #         'placeholder': 'تاریخ انقضاء بیمه نامه',
+    #         'autocomplete': 'off'
+    #     })
+    # )
 
     name = forms.CharField(
         required=True,
@@ -96,10 +96,10 @@ class DriverForm(PersianNumberFormMixin, forms.ModelForm):
                 jalali_cert = jdatetime.date.fromgregorian(date=instance.certificate_date)
                 self.fields[
                     'certificate_date'].initial = f"{jalali_cert.year}/{jalali_cert.month:02}/{jalali_cert.day:02}"
-            if instance.insurance_policy_expiry:
-                jalali_cert = jdatetime.date.fromgregorian(date=instance.insurance_policy_expiry)
-                self.fields[
-                    'insurance_policy_expiry'].initial = f"{jalali_cert.year}/{jalali_cert.month:02}/{jalali_cert.day:02}"
+            # if instance.insurance_policy_expiry:
+            #     jalali_cert = jdatetime.date.fromgregorian(date=instance.insurance_policy_expiry)
+            #     self.fields[
+            #         'insurance_policy_expiry'].initial = f"{jalali_cert.year}/{jalali_cert.month:02}/{jalali_cert.day:02}"
 
     def clean_birth_date(self):
         data = self.cleaned_data.get('birth_date')
@@ -118,12 +118,12 @@ class DriverForm(PersianNumberFormMixin, forms.ModelForm):
                 raise forms.ValidationError("تاریخ صدور گواهینامه نامعتبر است")
             return g_date
         return None
-
-    def clean_insurance_policy_expiry(self):
-        data = self.cleaned_data.get('insurance_policy_expiry')
-        if data:
-            g_date = persian_to_gregorian(data)
-            if g_date is None:
-                raise forms.ValidationError("تاریخ اعتبار بیمه نامه نامعتبر است")
-            return g_date
-        return None
+    #
+    # def clean_insurance_policy_expiry(self):
+    #     data = self.cleaned_data.get('insurance_policy_expiry')
+    #     if data:
+    #         g_date = persian_to_gregorian(data)
+    #         if g_date is None:
+    #             raise forms.ValidationError("تاریخ اعتبار بیمه نامه نامعتبر است")
+    #         return g_date
+    #     return None
