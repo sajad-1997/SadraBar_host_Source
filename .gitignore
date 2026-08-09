@@ -1,4 +1,5 @@
 ```
+<<<<<<< HEAD
 # Python
 __pycache__/
 <<<<<<< HEAD
@@ -20,9 +21,20 @@ __pycache__/
 *.dll
 *.a
 *.out
+=======
+# Compiled and build artifacts
+*.pyc
+__pycache__/
 
-# Django
+# Dependencies
+.venv/
+venv/
+node_modules/
+>>>>>>> origin/نمایش-پیام‌های-سیستمی-موقت-84c4a
+
+# Logs and temp files
 *.log
+<<<<<<< HEAD
 local_settings.py
 db.sqlite3
 db.sqlite3-journal
@@ -131,6 +143,12 @@ target/
 
 <<<<<<< HEAD
 # Environment variables
+=======
+*.tmp
+*.swp
+
+# Environment
+>>>>>>> origin/نمایش-پیام‌های-سیستمی-موقت-84c4a
 .env
 .env.local
 .env.dev
@@ -138,6 +156,7 @@ target/
 .env.prod
 .env.*
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 # Coverage
 htmlcov/
@@ -247,3 +266,37 @@ media/
 staticfiles/
 ```
 >>>>>>> origin/مدیریت-بارنامه‌های-تکراری-83f66
+=======
+# Editors
+.vscode/
+.idea/
+
+# Coverage reports
+coverage/
+htmlcov/
+.coverage
+
+# Python specific
+*.pyo
+*.pyd
+*.so
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Web artifacts
+staticfiles/
+media/
+*.min.js
+*.min.css
+
+# Database
+*.db
+*.sqlite3
+
+# OS generated files
+.DS_Store
+Thumbs.db
+```
+>>>>>>> origin/نمایش-پیام‌های-سیستمی-موقت-84c4a

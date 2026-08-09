@@ -17,11 +17,35 @@
 
     {% if messages %}
         {% for message in messages %}
-            <div class="alert alert-{{ message.tags }} mt-2">
+            <div class="alert alert-{{ message.tags }} mt-2 system-message">
                 {{ message }}
             </div>
         {% endfor %}
     {% endif %}
+    
+    <style>
+        .system-message {
+            transition: opacity 0.5s ease-out;
+            opacity: 1;
+        }
+        .system-message.fade-out {
+            opacity: 0;
+        }
+    </style>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const messages = document.querySelectorAll('.system-message');
+            messages.forEach(function(msg) {
+                setTimeout(function() {
+                    msg.classList.add('fade-out');
+                    setTimeout(function() {
+                        msg.style.display = 'none';
+                    }, 500);
+                }, 2000);
+            });
+        });
+    </script>
 
     <div class="container">
         <h3>ویرایش راننده: {{ driver.name }}</h3>
