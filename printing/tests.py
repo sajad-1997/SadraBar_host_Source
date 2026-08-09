@@ -7,16 +7,13 @@ from django.test import TestCase, Client
 from django.contrib.auth import get_user_model
 from django.urls import reverse
 from django.utils import timezone
+from decimal import Decimal
 
-<<<<<<< HEAD
 from issuance.models import Bijak
 from drivers.models import Driver
 from customers.models import Customer
 from fleet.models import Vehicle
 from cargo.models import Cargo
-=======
-from issuance.models import Bijak, Driver, Customer, Vehicle, Cargo
->>>>>>> origin/بهبود-کیفیت-کد-پایه-75bf8
 from .models import WaybillPrintOTP
 from .serializers import (
     WaybillPrintOTPSerializer,
@@ -286,17 +283,10 @@ class PrintingViewTests(TestCase):
         )
         bijak_other = Bijak.objects.create(
             tracking_code='987654321',
-<<<<<<< HEAD
-            value=1000000,
-            insurance=500000,
-            freight=200000,
-            total_fare=200000,
-=======
             value=Decimal('1000000'),
             insurance=Decimal('500000'),
             freight=Decimal('200000'),
             total_fare=Decimal('200000'),
->>>>>>> origin/بهبود-کیفیت-کد-پایه-75bf8
             sender=self.customer,
             receiver=self.customer,
             driver=self.driver,
@@ -413,17 +403,10 @@ class PrintingAPITests(TestCase):
         )
         bijak_other = Bijak.objects.create(
             tracking_code='API987654',
-<<<<<<< HEAD
-            value=1000000,
-            insurance=500000,
-            freight=200000,
-            total_fare=200000,
-=======
             value=Decimal('1000000'),
             insurance=Decimal('500000'),
             freight=Decimal('200000'),
             total_fare=Decimal('200000'),
->>>>>>> origin/بهبود-کیفیت-کد-پایه-75bf8
             sender=self.customer,
             receiver=self.customer,
             driver=self.driver,

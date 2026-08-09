@@ -1,6 +1,6 @@
 from django.db import models
-
-<<<<<<< HEAD
+from django.conf import settings
+import jmodels
 
 class Driver(models.Model):
     name = models.CharField(max_length=200, verbose_name="نام و نام خانوادگی", db_index=True)
@@ -48,6 +48,3 @@ class Driver(models.Model):
             models.Index(fields=['certificate']),
             models.Index(fields=['phone']),
         ]
-=======
-# Create your models here.
->>>>>>> origin/تقسیم-پروژه-به-ماژول‌های-مستقل-362c7

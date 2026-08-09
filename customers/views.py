@@ -1,8 +1,3 @@
-<<<<<<< HEAD
-from django.shortcuts import render
-
-# Create your views here.
-=======
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
@@ -171,4 +166,3 @@ def search_customer(request):
     return JsonResponse({
         'results': list(customers.values('id', 'name', 'national_id', 'phone'))
     })
->>>>>>> origin/مدیریت-اطلاعات-مشتریان-8fb5c
