@@ -73,7 +73,7 @@ INSTALLED_APPS = [
     # 'jalali_date',
     'report',
     # 'django_celery_beat',
-    # 'duplicate_audit',
+    'duplicate_audit',
     'otp_verification',
     'printing',
 
