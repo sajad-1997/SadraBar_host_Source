@@ -29,6 +29,7 @@ class Migration(migrations.Migration):
                 ('driver_smart_card', models.CharField(blank=True, db_index=True, max_length=50, null=True, unique=True, verbose_name='شماره هوشمند راننده')),
                 ('phone', models.CharField(db_index=True, max_length=15, verbose_name='شماره تلفن راننده')),
                 ('phone2', models.CharField(blank=True, max_length=15, null=True, verbose_name='شماره تلفن دوم')),
+                ('phone3', models.CharField(blank=True, max_length=15, null=True, verbose_name='شماره تلفن سوم')),
                 ('address', models.TextField(blank=True, null=True, verbose_name='آدرس')),
                 ('created_by_role', models.CharField(blank=True, max_length=50, null=True)),
                 ('updated_by_role', models.CharField(blank=True, max_length=50, null=True)),
