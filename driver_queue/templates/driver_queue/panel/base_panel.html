@@ -1,0 +1,81 @@
+{% extends "driver_queue/base.html" %}
+{% block title %}پنل مدیریت نوبت‌دهی{% endblock %}
+{% block content %}
+    <style>
+        .panel-nav {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            align-items: center;
+            padding: 12px
+        }
+
+        .badge {
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: bold;
+            display: inline-block
+        }
+
+        .badge-waiting {
+            background: #dcfce7;
+            color: #14532d
+        }
+
+        .badge-loaded {
+            background: #dbeafe;
+            color: #1e3a8a
+        }
+
+        .badge-left {
+            background: #e2e8f0;
+            color: #334155
+        }
+
+        .badge-no_response, .badge-distance, .badge-staff {
+            background: #fee2e2;
+            color: #7f1d1d
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 13px
+        }
+
+        .btn-outline {
+            background: #fff;
+            border: 1px solid #cbd5e1
+        }
+
+        .toolbar {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: flex-end
+        }
+
+        .inline-form {
+            display: inline
+        }
+
+        .log-item {
+            font-size: 13px;
+            border-bottom: 1px dashed #e2e8f0;
+            padding: 6px 0
+        }
+    </style>
+    <div class="card panel-nav">
+        <a href="{% url 'driver_queue:panel_dashboard' %}"
+           class="btn btn-sm {% if active_tab == 'dashboard' %}btn-primary{% else %}btn-outline{% endif %}">داشبورد
+            نوبت‌دهی</a>
+        {% if is_manager %}
+            <a href="{% url 'driver_queue:panel_users' %}"
+               class="btn btn-sm {% if active_tab == 'users' %}btn-primary{% else %}btn-outline{% endif %}">کاربران
+                مجاز</a>
+        {% endif %}
+        <a href="{% url 'driver_queue:landing' %}" class="btn btn-sm btn-outline">صفحه رانندگان</a>
+        <span class="muted" style="margin-right:auto;font-size:13px">کاربر: {{ request.user }}</span>
+    </div>
+    {% block panel %}{% endblock %}
+{% endblock %}

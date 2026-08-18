@@ -1,0 +1,12 @@
+{% extends "driver_queue/base.html" %}
+{% block title %}ثبت‌نام راننده{% endblock %}
+{% block content %}
+    <div class="card">
+        <h1>ثبت‌نام راننده جدید</h1>
+        <p class="muted">اطلاعات شما در سوابق یافت نشد؛ لطفا ثبت‌نام را تکمیل کنید.</p>
+        <form method="post" novalidate>
+            {% include "driver_queue/_form_fields.html" %}
+            <button type="submit" class="btn btn-primary btn-lg">ثبت‌نام</button>
+        </form>
+    </div>
+{% endblock %}

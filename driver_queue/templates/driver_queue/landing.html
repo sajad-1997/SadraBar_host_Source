@@ -1,0 +1,10 @@
+{% extends "driver_queue/base.html" %}
+{% block content %}
+    <div class="card" style="text-align:center;padding:44px 20px">
+        <div style="font-size:52px">🚛</div>
+        <h1>سامانه نوبت‌دهی رانندگان</h1>
+        <p class="muted">نوبت‌دهی روزهای کاری از ساعت ۸:۰۰ تا ۱۱:۰۰ انجام می‌شود.</p>
+        <a href="{% url 'driver_queue:identify' %}" class="btn btn-primary btn-lg" style="width:auto;margin-top:12px">دریافت
+            نوبت</a>
+    </div>
+{% endblock %}

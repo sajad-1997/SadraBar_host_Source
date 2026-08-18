@@ -1,0 +1,12 @@
+{% extends "driver_queue/base.html" %}
+{% block title %}احراز هویت{% endblock %}
+{% block content %}
+    <div class="card">
+        <h1>دریافت نوبت</h1>
+        <p class="muted">لطفا نام و نام خانوادگی و شماره تماس خود را وارد کنید تا با سوابق سیستم تطابق داده شود.</p>
+        <form method="post" novalidate>
+            {% include "driver_queue/_form_fields.html" %}
+            <button type="submit" class="btn btn-primary btn-lg">بررسی و ادامه</button>
+        </form>
+    </div>
+{% endblock %}

@@ -1,0 +1,9 @@
+{% extends "driver_queue/base.html" %}
+{% block title %}نتیجه اعلام وضعیت{% endblock %}
+{% block content %}
+    <div class="card" style="text-align:center;padding:40px 20px">
+        <div style="font-size:52px">{% if ok %}✅{% else %}⚠️{% endif %}</div>
+        <h1>{{ message }}</h1>
+        <a class="btn btn-primary" style="margin-top:16px" href="{% url 'driver_queue:queue' %}">مشاهده صف</a>
+    </div>
+{% endblock %}

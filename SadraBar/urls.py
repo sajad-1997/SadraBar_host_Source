@@ -19,13 +19,18 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.shortcuts import render
 from django.urls import path, include
+from homePage import pwa_views
 
 
-def forbidden_view(request):
-    return render(request, 'accounts/forbidden.html', status=403)
+def forbidden_view(request, exception=None):
+    return render(request, 'errors/403.html', {'exception': exception}, status=403)
 
 
 urlpatterns = [
+    path('manifest.webmanifest', pwa_views.manifest, name='pwa_manifest'),
+    path('sw.js', pwa_views.service_worker, name='pwa_service_worker'),
+    path('offline/', pwa_views.offline, name='pwa_offline'),
+    path('browserconfig.xml', pwa_views.browserconfig, name='pwa_browserconfig'),
     path('admin/', admin.site.urls),
     path('accounts/', include('accounts.urls')),
     path('dashboard/', include(('dashboard.urls', 'dashboard'), namespace='dashboard')),
@@ -41,10 +46,13 @@ urlpatterns = [
     path('forbidden/', forbidden_view, name='forbidden'),
     # path('publish/', include('publish.urls', namespace='publish')),
     path('otp/', include(('otp_verification.urls', 'otp_verification'), namespace='otp_verification')),
-    path('printing/', include(('printing.urls', 'printing'), namespace='printing'))
+    path('printing/', include(('printing.urls', 'printing'), namespace='printing')),
+    path('driver-queue/', include(('driver_queue.urls', 'driver_queue'), namespace='driver_queue'))
 
 
 ]
+
+handler403 = forbidden_view
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

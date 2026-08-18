@@ -1,0 +1,142 @@
+{% extends "driver_queue/panel/base_panel.html" %}
+{% load jalali_filters %}
+{% block panel %}
+    <div class="card">
+        <div class="profile-row">
+            <h2 style="margin:0">مشخصات راننده: {{ driver.name }}</h2>
+            {% if profile.office_approved %}
+                <span class="badge badge-waiting">تاییدشده توسط دفتر</span>
+            {% else %}
+                <span class="badge badge-staff">در انتظار تایید دفتر</span>
+            {% endif %}
+        </div>
+        <table style="margin-top:12px">
+            <tr>
+                <th style="width:200px;text-align:right">نام و نام خانوادگی</th>
+                <td>{{ driver.name }}</td>
+            </tr>
+            <tr>
+                <th>کد ملی</th>
+                <td>{{ driver.national_id }}</td>
+            </tr>
+            <tr>
+                <th>نام پدر</th>
+                <td>{{ driver.father_name|default:"-" }}</td>
+            </tr>
+            <tr>
+                <th>تاریخ تولد</th>
+                <td>{% if driver.birth_date %}{{ driver.birth_date|jalali_date }}{% else %}-{% endif %}</td>
+            </tr>
+            <tr>
+                <th>شهر سکونت</th>
+                <td>{{ driver.residence|default:"-" }}</td>
+            </tr>
+            <tr>
+                <th>شماره گواهینامه</th>
+                <td>{{ driver.certificate }}</td>
+            </tr>
+            <tr>
+                <th>تاریخ صدور گواهینامه</th>
+                <td>{% if driver.certificate_date %}{{ driver.certificate_date|jalali_date }}{% else %}-{% endif %}</td>
+            </tr>
+            <tr>
+                <th>کارت هوشمند راننده</th>
+                <td>{{ driver.driver_smart_card|default:"-" }}</td>
+            </tr>
+            <tr>
+                <th>تلفن</th>
+                <td>{{ driver.phone }}</td>
+            </tr>
+            <tr>
+                <th>تلفن ۲</th>
+                <td>{{ driver.phone2|default:"-" }}</td>
+            </tr>
+            <tr>
+                <th>تلفن ۳</th>
+                <td>{{ driver.phone3|default:"-" }}</td>
+            </tr>
+            <tr>
+                <th>آدرس</th>
+                <td>{{ driver.address|default:"-" }}</td>
+            </tr>
+            <tr>
+                <th>ثبت‌کننده</th>
+                <td>{{ driver.created_by|default:"-" }}{% if driver.created_by_role %} ({{ driver.created_by_role }}
+                    ){% endif %}</td>
+            </tr>
+            <tr>
+                <th>تاریخ ثبت</th>
+                <td>{{ driver.created_at|jalali_date }} {{ driver.created_at|date:"H:i" }}</td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="card">
+        <h3 style="margin-top:0">عملیات</h3>
+        <div class="toolbar">
+            {% if profile.office_approved %}
+                <form method="post" action="{% url 'driver_queue:panel_driver_approve' driver.pk %}">
+                    {% csrf_token %}<input type="hidden" name="approve" value="0">
+                    <button class="btn btn-outline" type="submit">لغو تایید دفتر</button>
+                </form>
+            {% else %}
+                <form method="post" action="{% url 'driver_queue:panel_driver_approve' driver.pk %}">
+                    {% csrf_token %}<input type="hidden" name="approve" value="1">
+                    <button class="btn btn-primary" type="submit">تایید راننده (اطلاعات تکمیلی ارائه شد)</button>
+                </form>
+            {% endif %}
+
+            {% if today_ticket and today_ticket.status == "waiting" %}
+                <form method="post" action="{% url 'driver_queue:panel_ticket_loaded' today_ticket.pk %}">
+                    {% csrf_token %}
+                    <button class="btn btn-outline" type="submit">بار گرفت</button>
+                </form>
+                <form method="post" action="{% url 'driver_queue:panel_ticket_remove' today_ticket.pk %}"
+                      onsubmit="return confirm('نوبت این راننده حذف شود؟')">
+                    {% csrf_token %}
+                    <button class="btn btn-danger" type="submit">حذف از صف امروز</button>
+                </form>
+            {% elif not today_ticket %}
+                <form method="post" action="{% url 'driver_queue:panel_ticket_add' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="driver_pk" value="{{ driver.pk }}">
+                    <input type="hidden" name="date" value="{{ today|date:'Y-m-d' }}">
+                    <button class="btn btn-primary" type="submit">ثبت نوبت برای امروز</button>
+                </form>
+            {% endif %}
+        </div>
+        {% if today_ticket %}
+            <p class="muted" style="margin-top:12px">
+                وضعیت امروز: <span
+                    class="badge badge-{{ today_ticket.status }}">{{ today_ticket.get_status_display }}</span>
+                (شماره نوبت: {{ today_ticket.number }})
+            </p>
+        {% endif %}
+    </div>
+
+    <div class="card">
+        <h3 style="margin-top:0">سوابق نوبت</h3>
+        {% if history %}
+            <table>
+                <thead>
+                <tr>
+                    <th>تاریخ</th>
+                    <th>شماره نوبت</th>
+                    <th>وضعیت</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for t in history %}
+                    <tr>
+                        <td>{{ t.date|jalali_date }}</td>
+                        <td>{{ t.number }}</td>
+                        <td><span class="badge badge-{{ t.status }}">{{ t.get_status_display }}</span></td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p class="muted">سابقه‌ای ثبت نشده است.</p>
+        {% endif %}
+    </div>
+{% endblock %}

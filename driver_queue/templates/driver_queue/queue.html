@@ -1,0 +1,191 @@
+{% extends "driver_queue/base.html" %}
+{% load jalali_filters %}
+{% block title %}صف نوبت امروز{% endblock %}
+{% block content %}
+    <div class="card profile-row">
+        <div>
+            <strong>{{ driver.name }}</strong><br>
+            <small class="muted">کد ملی: {{ driver.national_id }} | {{ driver.phone }}</small>
+        </div>
+        {% if office_approved %}
+            <span class="chip chip-ok">تاییدشده توسط دفتر</span>
+        {% else %}
+            <span class="chip chip-warn">نیازمند تکمیل اطلاعات در دفتر</span>
+        {% endif %}
+    </div>
+
+    {% if not office_approved %}
+        <div class="alert alert-warning">جهت دریافت بار باید اطلاعات تکمیلی خود را به دفتر باربری ارائه دهید.</div>
+    {% endif %}
+
+    <div class="card">
+        <div class="profile-row" style="margin-bottom: 15px;">
+            <span class="muted">تاریخ امروز: {{ now|jalali_date }}</span>
+            <span class="muted">ساعت: {{ now|date:"H:i" }}</span>
+        </div>
+        
+        <!-- Notification Messages -->
+        {% for notification in notification_messages %}
+            <div class="alert alert-{{ notification.type }}" id="notification-{{ forloop.counter }}">
+                <p>{{ notification.message }}</p>
+            </div>
+        {% endfor %}
+        
+        {% if ticket %}
+            <h2>نوبت امروز شما</h2>
+            <div class="stat-row">
+                <div class="stat">
+                    <div class="big-number" id="ticket-number">{{ ticket.number }}</div>
+                    <div class="muted">شماره نوبت شما</div>
+                </div>
+                <div class="stat">
+                    <div class="big-number" id="ahead-count">{{ ahead }}</div>
+                    <div class="muted">نفر جلوتر از شما</div>
+                </div>
+                <div class="stat">
+                    <div class="big-number" id="waiting-count">{{ state.waiting_count }}</div>
+                    <div class="muted">حاضر در صف</div>
+                </div>
+            </div>
+
+            {% if pending_announcement and announce_links %}
+                <div class="alert alert-announce" id="announce-box">
+                    <p><strong>اعلان وضعیت:</strong> لطفا وضعیت خود را اعلام کنید (مهلت: ۱۵ دقیقه).</p>
+                    <p style="display:flex;gap:10px;flex-wrap:wrap">
+                        <a class="btn btn-danger" href="{{ announce_links.loaded }}">بار گرفته‌ام</a>
+                        <a class="btn btn-primary" href="{{ announce_links.waiting }}">هنوز در نوبت هستم</a>
+                    </p>
+                </div>
+            {% endif %}
+
+            {% if state.announce_window %}
+                <p class="muted">📍 در بازه به‌روزرسانی صف، موقعیت مکانی شما برای حضور در محدوده {{ radius_km }} کیلومتری
+                    دفتر بررسی می‌شود.</p>
+            {% endif %}
+        {% else %}
+            <h2>صف نوبت امروز</h2>
+            <p>تعداد حاضر در صف: <strong id="waiting-count">{{ state.waiting_count }}</strong> نفر</p>
+            {% if state.open %}
+                <form method="post" action="{% url 'driver_queue:join' %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-primary btn-lg">دریافت نوبت</button>
+                </form>
+            {% elif state.announce_window %}
+                <div class="alert alert-announce">بازه به‌روزرسانی و اعلام حضور صف (۱۱:۰۰ تا ۱۱:۳۰) در جریان است؛ امکان
+                    ثبت نوبت جدید نیست.
+                </div>
+            {% elif state.working_day %}
+                <p class="muted">نوبت‌دهی هر روز کاری از ساعت ۸:۰۰ تا ۱۱:۰۰ انجام می‌شود.</p>
+            {% else %}
+                <p class="muted">امروز روز کاری نیست؛ نوبت‌دهی از ساعت ۸:۰۰ اولین روز کاری فعال می‌شود.</p>
+            {% endif %}
+        {% endif %}
+    </div>
+
+    <div class="card">
+        <h3>اعضای در صف امروز</h3>
+        {% if waiting_list %}
+            <table>
+                <thead>
+                <tr>
+                    <th>ردیف</th>
+                    <th>نام و نام خانوادگی</th>
+                    <th>زمان ثبت</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for t in waiting_list %}
+                    <tr {% if ticket and t.pk == ticket.pk %}class="me"{% endif %}>
+                        <td>{{ t.number }}</td>
+                        <td>{{ t.driver.name }}{% if ticket and t.pk == ticket.pk %}
+                            <span class="chip chip-ok">شما</span>{% endif %}</td>
+                        <td>{{ t.joined_at|date:"H:i" }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p class="muted">هنوز امروز کسی نوبت نگرفته است.</p>
+        {% endif %}
+    </div>
+
+    <script>
+        const csrf = "{{ csrf_token }}";
+        const statusUrl = "{% url 'driver_queue:status_api' %}";
+        const locationUrl = "{% url 'driver_queue:report_location' %}";
+
+        async function refreshStatus() {
+            try {
+                const res = await fetch(statusUrl, {headers: {"X-Requested-With": "fetch"}});
+                const data = await res.json();
+                if (!data || data.authenticated === false) return;
+                const hasTicketEl = !!document.getElementById("ticket-number");
+                if ((data.ticket === null && hasTicketEl) || (data.ticket && !hasTicketEl)) {
+                    location.reload();
+                    return;
+                }
+                if (data.ticket) {
+                    if (data.ticket.pending_announcement && !document.getElementById("announce-box")) {
+                        location.reload();
+                        return;
+                    }
+                    document.getElementById("ticket-number").textContent = data.ticket.number;
+                    document.getElementById("ahead-count").textContent = data.ticket.ahead;
+                }
+                const wc = document.getElementById("waiting-count");
+                if (wc) wc.textContent = data.waiting_count;
+            } catch (e) {
+            }
+        }
+
+        // Auto-refresh every 5 minutes (300000 ms)
+        setInterval(refreshStatus, 300000);
+        
+        // Initial refresh
+        refreshStatus();
+
+        // Browser notification support
+        function requestNotificationPermission() {
+            if ("Notification" in window && Notification.permission === "default") {
+                Notification.requestPermission();
+            }
+        }
+
+        function showBrowserNotification(title, body) {
+            if ("Notification" in window && Notification.permission === "granted") {
+                new Notification(title, {
+                    body: body,
+                    icon: "/static/driver_queue/icons/icon-192.png"
+                });
+            }
+        }
+
+        // Request notification permission on page load
+        requestNotificationPermission();
+
+        {% if ticket and state.announce_window %}
+            function reportLocation() {
+                if (!navigator.geolocation) return;
+                navigator.geolocation.getCurrentPosition(pos => {
+                    fetch(locationUrl, {
+                        method: "POST",
+                        headers: {"Content-Type": "application/json", "X-CSRFToken": csrf},
+                        body: JSON.stringify({lat: pos.coords.latitude, lng: pos.coords.longitude})
+                    }).then(r => r.json()).then(d => {
+                        if (d.removed) {
+                            showBrowserNotification("حذف از صف", "شما به دلیل خارج شدن از محدوده دفتر از صف حذف شدید.");
+                            location.reload();
+                        }
+                    }).catch(() => {
+                    });
+                });
+            }
+            reportLocation();
+            setInterval(reportLocation, 60000);
+        {% endif %}
+
+        {% if pending_announcement %}
+            showBrowserNotification("اعلان وضعیت", "لطفا وضعیت خود را اعلام کنید (مهلت: ۱۵ دقیقه).");
+        {% endif %}
+    </script>
+{% endblock %}

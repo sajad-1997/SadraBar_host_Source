@@ -1,0 +1,13 @@
+{% extends "driver_queue/base.html" %}
+{% block title %}پایان ثبت‌نام{% endblock %}
+{% block content %}
+    <div class="card" style="text-align:center;padding:40px 20px">
+        <div style="font-size:52px">✅</div>
+        <h1>{{ driver.name }} عزیز، ثبت‌نام اولیه شما انجام شد.</h1>
+        <div class="alert alert-warning" style="margin-top:16px">
+            جهت دریافت بار باید اطلاعات تکمیلی خود را به دفتر باربری ارائه دهید.
+        </div>
+        <a class="btn btn-primary btn-lg" style="width:auto;margin-top:8px"
+           href="{% url 'driver_queue:queue' %}">تایید و ورود به صفحه نوبت‌دهی</a>
+    </div>
+{% endblock %}

@@ -1,0 +1,248 @@
+{% load static %}
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    {% include "pwa/head.html" %}
+    <title>{% block title %}نوبت‌دهی رانندگان{% endblock %}</title>
+    <style>
+        :root {
+            --primary: #0f766e;
+            --primary-dark: #115e59;
+            --bg: #f1f5f9;
+            --danger: #dc2626;
+            --muted: #64748b
+        }
+
+        * {
+            box-sizing: border-box
+        }
+
+        body {
+            margin: 0;
+            font-family: Tahoma, "Vazirmatn", "Segoe UI", sans-serif;
+            background: var(--bg);
+            color: #0f172a
+        }
+
+        .topbar {
+            background: #0f172a;
+            color: #fff;
+            padding: 14px 0;
+            font-weight: bold
+        }
+
+        .container {
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 16px
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 14px;
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, .08)
+        }
+
+        h1 {
+            font-size: 22px;
+            margin-top: 0
+        }
+
+        h2 {
+            font-size: 18px
+        }
+
+        h3 {
+            font-size: 16px
+        }
+
+        .btn {
+            display: inline-block;
+            border: 0;
+            border-radius: 10px;
+            padding: 12px 22px;
+            font-size: 15px;
+            font-weight: bold;
+            text-decoration: none;
+            cursor: pointer;
+            background: #e2e8f0;
+            color: #0f172a;
+            font-family: inherit
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: #fff
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark)
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: #fff
+        }
+
+        .btn-lg {
+            padding: 16px 34px;
+            font-size: 17px;
+            width: 100%
+        }
+
+        .field {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 10px;
+            font-size: 15px;
+            margin-top: 6px;
+            font-family: inherit
+        }
+
+        label {
+            font-weight: bold;
+            font-size: 14px
+        }
+
+        .form-row {
+            margin-bottom: 14px
+        }
+
+        .alert {
+            padding: 12px 14px;
+            border-radius: 10px;
+            margin-bottom: 14px;
+            font-size: 14px
+        }
+
+        .alert-success {
+            background: #dcfce7;
+            color: #14532d
+        }
+
+        .alert-error {
+            background: #fee2e2;
+            color: #7f1d1d
+        }
+
+        .alert-warning {
+            background: #fef3c7;
+            color: #78350f
+        }
+
+        .alert-announce {
+            background: #e0f2fe;
+            border: 2px solid #0284c7;
+            color: #0c4a6e
+        }
+
+        .alert-info {
+            background: #e0f2fe;
+            color: #0c4a6e
+        }
+
+        .alert-urgent {
+            background: #fee2e2;
+            border: 2px solid #dc2626;
+            color: #7f1d1d;
+            animation: pulse 2s infinite
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1 }
+            50% { opacity: 0.7 }
+        }
+
+        .chip {
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: bold
+        }
+
+        .chip-ok {
+            background: #dcfce7;
+            color: #14532d
+        }
+
+        .chip-warn {
+            background: #fef3c7;
+            color: #78350f
+        }
+
+        .big-number {
+            font-size: 48px;
+            font-weight: 800;
+            color: var(--primary);
+            line-height: 1.1
+        }
+
+        .muted {
+            color: var(--muted)
+        }
+
+        .stat-row {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap
+        }
+
+        .stat {
+            flex: 1;
+            min-width: 140px;
+            background: #f8fafc;
+            border-radius: 10px;
+            padding: 12px;
+            text-align: center
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse
+        }
+
+        th, td {
+            padding: 10px 8px;
+            border-bottom: 1px solid #e2e8f0;
+            text-align: right;
+            font-size: 14px
+        }
+
+        tr.me {
+            background: #ecfdf5
+        }
+
+        .errorlist {
+            color: var(--danger);
+            font-size: 13px;
+            margin: 4px 0 0;
+            padding: 0;
+            list-style: none
+        }
+
+        .profile-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap
+        }
+    </style>
+</head>
+<body>
+<header class="topbar">
+    <div class="container">🚛 سامانه نوبت‌دهی رانندگان</div>
+</header>
+<main class="container">
+    {% if messages %}{% for m in messages %}
+        <div class="alert alert-{{ m.tags }}">{{ m }}</div>{% endfor %}{% endif %}
+    {% block content %}{% endblock %}
+</main>
+{% include "pwa/scripts.html" %}
+</body>
+</html>

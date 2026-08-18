@@ -1,0 +1,67 @@
+{% extends "driver_queue/panel/base_panel.html" %}
+{% block panel %}
+    <div class="card">
+        <h2 style="margin-top:0">کاربران مجاز پنل نوبت‌دهی</h2>
+        <p class="muted">کاربران با نقش «کارمند» تنها پس از تایید مدیر به پنل دسترسی دارند؛ نقش «مدیریت» بدون نیاز به
+            تایید است.</p>
+        <form method="post" action="{% url 'driver_queue:panel_user_add' %}">
+            {% csrf_token %}
+            <div class="toolbar">
+                <div>{{ form.username.label_tag }}{{ form.username }}{{ form.username.errors }}</div>
+                <div>{{ form.role.label_tag }}{{ form.role }}{{ form.role.errors }}</div>
+                <button class="btn btn-primary" type="submit">افزودن کاربر</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="card">
+        {% if staff_list %}
+            <table>
+                <thead>
+                <tr>
+                    <th>کاربر</th>
+                    <th>نقش</th>
+                    <th>وضعیت دسترسی</th>
+                    <th>تاییدکننده</th>
+                    <th>عملیات</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for s in staff_list %}
+                    <tr>
+                        <td>{{ s.user }}</td>
+                        <td>{{ s.get_role_display }}</td>
+                        <td>
+                            {% if s.role == "manager" %}<span class="badge badge-waiting">فعال (مدیریت)</span>
+                            {% elif s.approved %}<span class="badge badge-waiting">فعال</span>
+                            {% else %}<span class="badge badge-staff">در انتظار تایید</span>{% endif %}
+                        </td>
+                        <td>{{ s.approved_by|default:"-" }}</td>
+                        <td>
+                            <div style="display:flex;gap:6px;flex-wrap:wrap">
+                                {% if s.role == "staff" %}
+                                    <form method="post" action="{% url 'driver_queue:panel_user_toggle' s.pk %}"
+                                          class="inline-form">
+                                        {% csrf_token %}
+                                        <button class="btn btn-outline btn-sm" type="submit">
+                                            {% if s.approved %}لغو تایید{% else %}تایید{% endif %}
+                                        </button>
+                                    </form>
+                                {% endif %}
+                                <form method="post" action="{% url 'driver_queue:panel_user_remove' s.pk %}"
+                                      class="inline-form"
+                                      onsubmit="return confirm('این کاربر از پنل حذف شود؟')">
+                                    {% csrf_token %}
+                                    <button class="btn btn-danger btn-sm" type="submit">حذف</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p class="muted">هنوز کاربری اضافه نشده است.</p>
+        {% endif %}
+    </div>
+{% endblock %}
