@@ -12,10 +12,102 @@ function toEnglishNumber(str) {
         .replace(/[\u0660-\u0669]/g, d => String.fromCharCode(d.charCodeAt(0) - 1584));
 }
 
+// -----------------------------
+// تبدیل عدد به حروف فارسی
+// -----------------------------
+function numberToPersianWords(num, unit = 'rial') {
+    let isNegative = false;
+    let cleanStr = num.toString();
+
+    // مدیریت اعداد منفی
+    if (cleanStr.startsWith('-')) {
+        isNegative = true;
+        cleanStr = cleanStr.slice(1);
+    }
+
+    // پاکسازی ورودی (حذف نقطه، کاما، فاصله و تبدیل اعداد فارسی/عربی به انگلیسی)
+    cleanStr = cleanStr
+        .replace(/[.,\s]/g, '')
+        .replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d))
+        .replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d));
+
+    if (!cleanStr || parseInt(cleanStr) === 0) {
+        return unit === 'rial' ? "صفر ریال" : "صفر تومان";
+    }
+
+    const ones = ['', 'یک', 'دو', 'سه', 'چهار', 'پنج', 'شش', 'هفت', 'هشت', 'نه'];
+    const teens = ['ده', 'یازده', 'دوازده', 'سیزده', 'چهارده', 'پانزده', 'شانزده', 'هفده', 'هجده', 'نوزده'];
+    const tens = ['', '', 'بیست', 'سی', 'چهل', 'پنجاه', 'شصت', 'هفتاد', 'هشتاد', 'نود'];
+    const hundreds = ['', 'یکصد', 'دویست', 'سیصد', 'چهارصد', 'پانصد', 'ششصد', 'هفتصد', 'هشتصد', 'نهصد'];
+    const scales = ['', 'هزار', 'میلیون', 'میلیارد', 'تریلیون'];
+
+    function convertThreeDigits(n) {
+        if (n === 0) return '';
+
+        let parts = [];
+        const h = Math.floor(n / 100);
+        const remainder = n % 100;
+
+        if (h > 0) parts.push(hundreds[h]);
+
+        if (remainder > 0) {
+            if (remainder < 10) {
+                parts.push(ones[remainder]);
+            } else if (remainder < 20) {
+                parts.push(teens[remainder - 10]);
+            } else {
+                const t = Math.floor(remainder / 10);
+                const o = remainder % 10;
+                if (o > 0) parts.push(tens[t] + ' و ' + ones[o]);
+                else parts.push(tens[t]);
+            }
+        }
+        // استفاده از join برای قرار دادن خودکار " و " بین اجزای یک عدد سه رقمی
+        return parts.join(' و ');
+    }
+
+    const groups = [];
+    for (let i = cleanStr.length; i > 0; i -= 3) {
+        const start = Math.max(0, i - 3);
+        groups.unshift(parseInt(cleanStr.slice(start, i)));
+    }
+
+    const validParts = [];
+    for (let i = 0; i < groups.length; i++) {
+        const groupValue = groups[i];
+        if (groupValue > 0) {
+            const groupWords = convertThreeDigits(groupValue);
+            const scaleIndex = groups.length - 1 - i;
+            if (scaleIndex > 0) validParts.push(groupWords + ' ' + scales[scaleIndex]);
+            else validParts.push(groupWords);
+        }
+    }
+
+    const unitText = unit === 'rial' ? ' ریال' : ' تومان';
+    let result = validParts.join(' و ').trim() + unitText;
+
+    return isNegative ? 'منفی ' + result : result;
+}
+
+// -----------------------------
+// تبدیل عدد به حروف فارسی با نمایش همزمان ریال و تومان
+// -----------------------------
+function numberToPersianWordsBoth(num) {
+    if (!num || num === 0) return "صفر ریال - صفر تومان";
+
+    const rialWords = numberToPersianWords(num, 'rial');
+    const tomanValue = Math.floor(num / 10);
+    const tomanWords = numberToPersianWords(tomanValue, 'toman');
+
+    return rialWords + ' - ' + tomanWords;
+}
+
 function parseNumber(value) {
     if (!value) return 0;
     value = toEnglishNumber(value.toString());
-    const num = Number(value.replace(/,/g, ""));
+    // حذف تمام جداکننده‌ها (کاما انگلیسی و فارسی)
+    const cleanedValue = value.replace(/[,٬]/g, "");
+    const num = Number(cleanedValue);
     return isNaN(num) ? 0 : num;
 }
 
@@ -32,12 +124,50 @@ function attachNumericField(field, callback) {
         let cursorPos = field.selectionStart;
         let originalLength = field.value.length;
         let rawValue = parseNumber(field.value);
-        field.value = formatNumber(rawValue);
-        let newLength = field.value.length;
-        cursorPos += newLength - originalLength;
-        field.setSelectionRange(cursorPos, cursorPos);
+
+        // اگر مقدار معتبر است، فرمت کن
+        if (rawValue >= 0) {
+            field.value = formatNumber(rawValue);
+            let newLength = field.value.length;
+            cursorPos += newLength - originalLength;
+            // اطمینان از اینکه کرسر در محدوده مجاز است
+            cursorPos = Math.max(0, Math.min(cursorPos, newLength));
+            field.setSelectionRange(cursorPos, cursorPos);
+        }
+
+        // به‌روزرسانی نمایش حروفی
+        updateWordDisplay(field, rawValue);
+
         if (callback) callback();
     });
+}
+
+// -----------------------------
+// افزودن نمایش حروفی به فیلدهای ریالی
+// -----------------------------
+function attachWordDisplay(field) {
+    // ایجاد عنصر نمایش حروفی بعد از فیلد
+    const wordDisplay = document.createElement('div');
+    wordDisplay.className = 'amount-in-words';
+    wordDisplay.style.fontSize = '0.85rem';
+    wordDisplay.style.color = '#6c757d';
+    wordDisplay.style.marginTop = '4px';
+    wordDisplay.style.fontWeight = '500';
+    field.parentNode.insertBefore(wordDisplay, field.nextSibling);
+
+    // ذخیره عنصر نمایش در فیلد برای دسترسی آسان
+    field._wordDisplay = wordDisplay;
+
+    // به‌روزرسانی اولیه
+    const initialValue = parseNumber(field.value);
+    updateWordDisplay(field, initialValue);
+}
+
+function updateWordDisplay(field, value) {
+    if (field._wordDisplay) {
+        const words = numberToPersianWordsBoth(value);
+        field._wordDisplay.textContent = words;
+    }
 }
 
 // -----------------------------
@@ -56,10 +186,15 @@ function initShipmentCalculations() {
     const totalFareField = getField("total_fare");
     const freightField = getField("freight");
 
-    if (!valueField || !insuranceField || !loadingFeeField ||  !unloadingFeeField || !scaleFeeField || !totalFareField || !freightField) {
+    if (!valueField || !insuranceField || !loadingFeeField || !unloadingFeeField || !scaleFeeField || !totalFareField || !freightField) {
         console.warn("یکی از فیلدهای فرم پیدا نشد!");
         return;
     }
+
+    // افزودن نمایش حروفی به تمام فیلدهای ریالی
+    [valueField, insuranceField, loadingFeeField, unloadingFeeField, scaleFeeField, totalFareField, freightField].forEach(f => {
+        attachWordDisplay(f);
+    });
 
     function updateInsurance() {
         const value = parseNumber(valueField.value);
@@ -73,6 +208,7 @@ function initShipmentCalculations() {
         }
         // const insurance = Math.round(value * 0.001);
         insuranceField.value = formatNumber(insurance);
+        updateWordDisplay(insuranceField, insurance);
     }
 
     function updateFreight() {
@@ -85,6 +221,7 @@ function initShipmentCalculations() {
         let freight = totalFare - (insurance + loadingFee + unloadingFee + scaleFee);
         if (isNaN(freight) || freight < 0) freight = 0;
         freightField.value = formatNumber(freight);
+        updateWordDisplay(freightField, freight);
     }
 
     [valueField, insuranceField, loadingFeeField, unloadingFeeField, scaleFeeField, totalFareField].forEach(f => {
@@ -102,7 +239,7 @@ function initShipmentCalculations() {
     });
     updateInsurance();
     updateFreight();
-    
+
     // اگر بارگیری / تخلیه / باسکول خالی بود صفر بفرست
     const feeFields = [loadingFeeField, unloadingFeeField, scaleFeeField];
 
@@ -271,14 +408,32 @@ function enableSearch(inputId, resultsId, hiddenId, searchUrl, extraOptions = {}
                 let html = "";
                 if (data && Array.isArray(data.results) && data.results.length > 0) {
                     data.results.forEach(item => {
+                        let addressHtml = "";
+                        if (item.addresses && item.addresses.length > 0) {
+                            addressHtml = "<div class='address-list'>";
+                            item.addresses.forEach(addr => {
+                                addressHtml += `<div class='address-item'>`;
+                                if (addr.address) {
+                                    addressHtml += `<span class='address-text'>${addr.address}</span>`;
+                                }
+                                if (addr.phone) {
+                                    addressHtml += `<span class='address-phone'>📞 ${addr.phone}</span>`;
+                                }
+                                addressHtml += `</div>`;
+                            });
+                            addressHtml += "</div>";
+                        } else if (item.address) {
+                            addressHtml = `<div class='address-item'><span class='address-text'>${item.address}</span></div>`;
+                        }
+
                         html += `<button type="button"
                                         class="list-group-item list-group-item-action"
                                         data-id="${item.id}"
                                         data-name="${item.name}"
-                                        data-phone="${item.address || ''}"
+                                        data-phone="${item.phone || ''}"
                                         data-plate="${item.plate || ''}">
                                         <strong>${item.name}</strong>
-                                        ${item.address ? " - " + item.address : ""}
+                                        ${addressHtml}
                                  </button>`;
                     });
                 } else {

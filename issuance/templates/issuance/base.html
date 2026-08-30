@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    {% include "pwa/head.html" %}
     <title>{% block title %}مؤسسه حمل و نقل صدرابار خراسان{% endblock %}</title>
 
     <link rel="stylesheet" href="{% static 'issuance/css/main.css' %}">
@@ -193,9 +194,49 @@
             #custom-main-header ul li a:hover {
                 color: #ffb347;
             }
+            
+            body {
+                background-color: #181a1f;
+                color: #e4e4e4;
+            }
+            
+            .container {
+                color: #e4e4e4;
+            }
+            
+            .card {
+                background-color: #2b2e36;
+                border-color: #3d414a;
+            }
+            
+            .table {
+                color: #e4e4e4;
+            }
+            
+            .table thead th {
+                background-color: #2b2e36;
+                border-color: #3d414a;
+            }
+            
+            .form-control {
+                background-color: #2b2e36;
+                border-color: #3d414a;
+                color: #e4e4e4;
+            }
+            
+            .form-control:focus {
+                background-color: #2b2e36;
+                border-color: #8f94fb;
+                color: #e4e4e4;
+            }
+            
+            .btn-light {
+                background-color: #2b2e36;
+                border-color: #3d414a;
+                color: #e4e4e4;
+            }
         }
     </style>
-
 </head>
 
 <body>
@@ -245,6 +286,7 @@
 
 {% block extra_scripts %}
 {% endblock %}
+{% include "pwa/scripts.html" %}
 
 </body>
 </html>

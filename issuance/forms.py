@@ -15,23 +15,22 @@ logger = logging.getLogger(__name__)
 class PersianNumberFormMixin:
     """
     تبدیل اعداد فارسی به انگلیسی در فیلدهای عددی
-    و تنظیم widget برای دریافت فقط اعداد انگلیسی
     """
     numeric_fields = []  # لیست فیلدهای عددی باید در کلاس‌های فرزند تعریف شود
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # تنظیم widget برای فیلدهای عددی جهت دریافت فقط اعداد
+        # تنظیم widget برای فیلدهای عددی به صورت text برای پشتیبانی از جداکننده
         for field_name in self.numeric_fields:
             if field_name in self.fields:
                 field = self.fields[field_name]
-                # اضافه کردن ویژگی‌های HTML5 برای ورودی عددی
+                # اضافه کردن ویژگی‌های HTML برای ورودی متنی با قابلیت عدد
                 if hasattr(field, 'widget'):
                     attrs = field.widget.attrs or {}
                     attrs.update({
-                        'inputmode': 'numeric',
-                        'pattern': '[0-9]*',
                         'autocomplete': 'off',
+                        'class': attrs.get('class', '') + ' currency-field',
+                        'maxlength': '20',  # اجازه تایپ تا 20 کاراکتر (با کاما)
                     })
                     field.widget.attrs = attrs
 
@@ -40,11 +39,14 @@ class PersianNumberFormMixin:
         for field in self.numeric_fields:
             value = cleaned_data.get(field)
             if value and isinstance(value, str):
-                cleaned_data[field] = persian_to_english_numbers(value)
+                # حذف جداکننده‌ها و تبدیل اعداد فارسی به انگلیسی
+                cleaned_value = value.replace(',', '').replace('٬', '')
+                cleaned_data[field] = persian_to_english_numbers(cleaned_value)
             elif value is not None and not isinstance(value, (int, float)):
                 # اگر مقدار از نوع دیگری است، سعی می‌کنیم به عدد تبدیل کنیم
                 try:
-                    cleaned_data[field] = int(persian_to_english_numbers(str(value)))
+                    cleaned_value = str(value).replace(',', '').replace('٬', '')
+                    cleaned_data[field] = int(persian_to_english_numbers(cleaned_value))
                 except (ValueError, TypeError):
                     pass
         return cleaned_data
@@ -85,10 +87,10 @@ class CustomerForm(PersianNumberFormMixin, forms.ModelForm):
 
 
 class DriverForm(PersianNumberFormMixin, forms.ModelForm):
-    numeric_fields = ['national_id', 'certificate', 'phone', 'phone2']
+    numeric_fields = ['national_id', 'certificate', 'driver_smart_card', 'phone', 'phone2', 'phone3']
 
     birth_date = forms.CharField(
-        error_messages={'required': 'تاریخ تولد نمی‌تواند خالی باشد.'},
+        required=False,
         widget=forms.TextInput(attrs={
             'class': 'form-control date-picker',
             'placeholder': 'تاریخ تولد',
@@ -97,19 +99,10 @@ class DriverForm(PersianNumberFormMixin, forms.ModelForm):
     )
 
     certificate_date = forms.CharField(
-        error_messages={'required': 'تاریخ صدور گواهینامه نمی‌تواند خالی باشد.'},
+        required=False,
         widget=forms.TextInput(attrs={
             'class': 'form-control date-picker',
             'placeholder': 'تاریخ صدور گواهینامه',
-            'autocomplete': 'off'
-        })
-    )
-
-    insurance_policy_expiry = forms.CharField(
-        error_messages={'required': 'تاریخ انقضاء بیمه نامه نمی‌تواند خالی باشد.'},
-        widget=forms.TextInput(attrs={
-            'class': 'form-control date-picker',
-            'placeholder': 'تاریخ انقضاء بیمه نامه',
             'autocomplete': 'off'
         })
     )
@@ -144,8 +137,28 @@ class DriverForm(PersianNumberFormMixin, forms.ModelForm):
 
     class Meta:
         model = Driver
-        fields = '__all__'
-        exclude = ['created_by', 'created_by_role', 'updated_by', 'updated_by_role']
+        fields = [
+            'name',
+            'national_id',
+            'father_name',
+            'birth_date',
+            'residence',
+            'certificate',
+            'certificate_date',
+            'driver_smart_card',
+            'phone',
+            'phone2',
+            'phone3',
+            'address',
+        ]
+        widgets = {
+            'father_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'نام پدر'}),
+            'residence': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'شهر سکونت'}),
+            'driver_smart_card': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'شماره هوشمند راننده'}),
+            'phone2': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'شماره تلفن دوم'}),
+            'phone3': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'شماره تلفن سوم'}),
+            'address': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'آدرس'}),
+        }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -154,14 +167,17 @@ class DriverForm(PersianNumberFormMixin, forms.ModelForm):
         instance = kwargs.get('instance')
         if instance:
             if instance.birth_date:
-                jalali_birth = jdatetime.date.fromgregorian(date=instance.birth_date)
-                self.fields['birth_date'].initial = jalali_birth.strftime('%Y/%m/%d')
+                self.fields['birth_date'].initial = self._format_jalali_date(instance.birth_date)
             if instance.certificate_date:
-                jalali_cert = jdatetime.date.fromgregorian(date=instance.certificate_date)
-                self.fields['certificate_date'].initial = jalali_cert.strftime('%Y/%m/%d')
-            if instance.insurance_policy_expiry:
-                jalali_cert = jdatetime.date.fromgregorian(date=instance.insurance_policy_expiry)
-                self.fields['insurance_policy_expiry'].initial = jalali_cert.strftime('%Y/%m/%d')
+                self.fields['certificate_date'].initial = self._format_jalali_date(instance.certificate_date)
+
+    @staticmethod
+    def _format_jalali_date(value):
+        if isinstance(value, jdatetime.date):
+            jalali_date = value
+        else:
+            jalali_date = jdatetime.date.fromgregorian(date=value)
+        return f"{jalali_date.year}/{jalali_date.month:02}/{jalali_date.day:02}"
 
     def clean_birth_date(self):
         data = self.cleaned_data.get('birth_date')
@@ -184,18 +200,6 @@ class DriverForm(PersianNumberFormMixin, forms.ModelForm):
                 raise forms.ValidationError("تاریخ صدور گواهینامه نامعتبر است")
             return g_date
         return None
-
-    def clean_insurance_policy_expiry(self):
-        data = self.cleaned_data.get('insurance_policy_expiry')
-        if data:
-            # تبدیل اعداد فارسی به انگلیسی قبل از پردازش
-            data = persian_to_english_numbers(data)
-            g_date = persian_to_gregorian(data)
-            if g_date is None:
-                raise forms.ValidationError("تاریخ اعتبار بیمه نامه نامعتبر است")
-            return g_date
-        return None
-
 
 class VehicleForm(PersianNumberFormMixin, forms.ModelForm):
     class Meta:
@@ -333,6 +337,15 @@ class ShipmentForm(PersianNumberFormMixin, forms.ModelForm):
             # 'selected_caption',
             # 'custom_caption',
         )
+        widgets = {
+            'total_fare': forms.TextInput(attrs={'class': 'form-control'}),
+            'value': forms.TextInput(attrs={'class': 'form-control'}),
+            'insurance': forms.TextInput(attrs={'class': 'form-control'}),
+            'loading_fee': forms.TextInput(attrs={'class': 'form-control'}),
+            'unloading_fee': forms.TextInput(attrs={'class': 'form-control'}),
+            'scale_fee': forms.TextInput(attrs={'class': 'form-control'}),
+            'freight': forms.TextInput(attrs={'class': 'form-control'}),
+        }
 
     # =========================
     # Clean

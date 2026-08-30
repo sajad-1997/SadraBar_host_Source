@@ -24,6 +24,41 @@
                     .system-message.fade-out {
                         opacity: 0;
                     }
+                    
+                    /* Address list styling */
+                    .address-list {
+                        margin-top: 8px;
+                        padding-right: 15px;
+                    }
+                    .address-item {
+                        margin-bottom: 6px;
+                        padding: 4px 8px;
+                        background-color: #f8f9fa;
+                        border-radius: 4px;
+                        font-size: 0.85rem;
+                    }
+                    .address-text {
+                        display: block;
+                        color: #495057;
+                        margin-bottom: 2px;
+                    }
+                    .address-phone {
+                        display: block;
+                        color: #6c757d;
+                        font-size: 0.8rem;
+                    }
+                    
+                    /* Amount in words styling */
+                    .amount-in-words {
+                        font-size: 0.85rem;
+                        color: #6c757d;
+                        margin-top: 4px;
+                        font-weight: 500;
+                        padding: 4px 8px;
+                        background-color: #f8f9fa;
+                        border-radius: 4px;
+                        border-right: 3px solid #007bff;
+                    }
                 </style>
                 
                 <script>
@@ -56,7 +91,7 @@
                         </div>
                         <div class="col-md-1 text-center">
                             <!-- دکمه افزودن مشتری -->
-                            <a href="{% url 'issuance:crud:add_customer' %}" class="btn btn-secondary btn-lg">
+                            <a href="{% url 'customers:add_customer' %}" class="btn btn-secondary btn-lg">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                                      class="bi bi-plus" viewBox="0 0 16 16">
                                     <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"/>
@@ -83,7 +118,7 @@
                         </div>
                         <div class="col-md-1 text-center">
                             <!-- دکمه افزودن مشتری -->
-                            <a href="{% url 'issuance:crud:add_customer' %}" class="btn btn-secondary btn-lg">
+                            <a href="{% url 'customers:add_customer' %}" class="btn btn-secondary btn-lg">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                                      class="bi bi-plus" viewBox="0 0 16 16">
                                     <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"/>
@@ -116,7 +151,7 @@
                         </div>
                         <div class="col-md-1 text-center">
                             <!-- دکمه افزودن راننده -->
-                            <a href="{% url 'issuance:crud:add_driver' %}" class="btn btn-secondary btn-lg"
+                            <a href="{% url 'drivers:add_driver' %}" class="btn btn-secondary btn-lg"
                                style="margin-top:5px;">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                                      class="bi bi-plus" viewBox="0 0 16 16">
@@ -222,7 +257,7 @@
             <div class="text-center mt-4">
 
                 {# مدیر #}
-                {% if user.is_staff %}
+                {% if user.role in 'manager admin' %}
                     {% if bijak.approval_status == 'waiting_approval' %}
                         <button class="btn btn-secondary" disabled>
                             در انتظار اقدام مدیریتی
@@ -330,7 +365,7 @@
             const driverId = driverIdInput.value;
             if (driverId) {
                 // هدایت به ویو ویرایش راننده با driverId
-                window.location.href = "{% url 'issuance:crud:edit_driver' 0 %}".replace('0', driverId);
+                window.location.href = "{% url 'drivers:edit_driver' 0 %}".replace('0', driverId);
             } else {
                 alert('لطفاً ابتدا یک راننده انتخاب کنید.');
             }
@@ -345,9 +380,24 @@
             const senderId = senderIdInput.value;
 
             if (senderId) {
-                window.location.href = "{% url 'issuance:crud:edit_customer' 0 %}".replace('0', senderId);
+                window.location.href = "{% url 'customers:edit_customer' 0 %}".replace('0', senderId);
             } else {
                 alert('لطفاً ابتدا فرستنده را انتخاب کنید.');
+            }
+        });
+    </script>
+    <script>
+        const editReceiverBtn = document.getElementById('edit-receiver-btn');
+        const receiverIdInput = document.getElementById('receiver-id');
+
+        editReceiverBtn.addEventListener('click', function (e) {
+            e.preventDefault();
+            const receiverId = receiverIdInput.value;
+
+            if (receiverId) {
+                window.location.href = "{% url 'customers:edit_customer' 0 %}".replace('0', receiverId);
+            } else {
+                alert('لطفاً ابتدا گیرنده را انتخاب کنید.');
             }
         });
     </script>
