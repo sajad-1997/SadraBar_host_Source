@@ -32,7 +32,9 @@ function numberToPersianWords(num, unit = 'rial') {
         .replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d));
 
     if (!cleanStr || parseInt(cleanStr) === 0) {
-        return unit === 'rial' ? "صفر ریال" : "صفر تومان";
+        if (unit === 'rial') return "صفر ریال";
+        if (unit === 'toman') return "صفر تومان";
+        return "صفر";
     }
 
     const ones = ['', 'یک', 'دو', 'سه', 'چهار', 'پنج', 'شش', 'هفت', 'هشت', 'نه'];
@@ -83,7 +85,7 @@ function numberToPersianWords(num, unit = 'rial') {
         }
     }
 
-    const unitText = unit === 'rial' ? ' ریال' : ' تومان';
+    const unitText = unit === 'rial' ? ' ریال' : unit === 'toman' ? ' تومان' : '';
     let result = validParts.join(' و ').trim() + unitText;
 
     return isNegative ? 'منفی ' + result : result;
@@ -258,6 +260,94 @@ function initShipmentCalculations() {
 }
 
 // -----------------------------
+// ۸. فیلدهای عددی محموله (وزن، وزن دوم و تعداد بسته‌بندی) - مشابه فیلد کرایه
+// -----------------------------
+
+// تبدیل عدد به حروف فارسی بدون پسوند واحد
+function numberToPersianWordsPlain(num) {
+    return numberToPersianWords(num, 'none');
+}
+
+// نمایش حروفی وزن - هر ۱۰۰۰ کیلوگرم = ۱ تن
+function weightToPersianWords(kg) {
+    kg = Math.floor(Math.abs(parseNumber(kg)));
+    if (!kg || kg === 0) return "صفر";
+
+    const tons = Math.floor(kg / 1000);
+    const remainingKg = kg % 1000;
+    const parts = [];
+
+    if (tons > 0) parts.push(numberToPersianWordsPlain(tons) + ' تن');
+    if (remainingKg > 0) parts.push(numberToPersianWordsPlain(remainingKg) + ' کیلوگرم');
+
+    return parts.join(' و ');
+}
+
+// نمایش حروفی تعداد بسته‌بندی
+function countToPersianWords(count) {
+    count = Math.floor(Math.abs(parseNumber(count)));
+    if (!count || count === 0) return "صفر";
+    return numberToPersianWordsPlain(count) + ' عدد';
+}
+
+// اتصال رفتار فیلدهای عددی (جداکننده سه‌تایی + نمایش حروفی) مشابه فیلد کرایه
+function attachCargoNumericField(field, wordsFn) {
+    if (!field) return;
+
+    // عنصر نمایش حروفی زیر فیلد (مشابه فیلد کرایه)
+    const wordDisplay = document.createElement('div');
+    wordDisplay.className = 'amount-in-words';
+    wordDisplay.style.fontSize = '0.85rem';
+    wordDisplay.style.color = '#6c757d';
+    wordDisplay.style.marginTop = '4px';
+    wordDisplay.style.fontWeight = '500';
+    field.parentNode.insertBefore(wordDisplay, field.nextSibling);
+    field._wordDisplay = wordDisplay;
+
+    const updateDisplay = function () {
+        const rawValue = parseNumber(field.value);
+        wordDisplay.textContent = wordsFn(rawValue);
+    };
+
+    // اعمال جداکننده سه‌تایی روی ورودی با حفظ موقعیت کرسر
+    field.addEventListener("input", function () {
+        let cursorPos = field.selectionStart;
+        let originalLength = field.value.length;
+        const rawValue = parseNumber(field.value);
+
+        field.value = formatNumber(rawValue);
+
+        let newLength = field.value.length;
+        cursorPos += newLength - originalLength;
+        cursorPos = Math.max(0, Math.min(cursorPos, newLength));
+        field.setSelectionRange(cursorPos, cursorPos);
+
+        updateDisplay();
+    });
+
+    // مقداردهی اولیه (مثلاً در حالت ویرایش که مقدار عددی خام از سرور می‌آید)
+    if (field.value) {
+        field.value = formatNumber(parseNumber(field.value));
+    }
+    updateDisplay();
+}
+
+function initCargoNumericFields() {
+    attachCargoNumericField(
+        document.querySelector('[name="cargo-weight"]'),
+        weightToPersianWords
+    );
+    attachCargoNumericField(
+        document.querySelector('[name="cargo-weight_2"]'),
+        weightToPersianWords
+    );
+    attachCargoNumericField(
+        document.querySelector('[name="cargo-number_of_packaging"]'),
+        countToPersianWords
+    );
+}
+
+// -----------------------------
 // ۴. selectable-card toggle
 // -----------------------------
 function initSelectableCards() {
@@ -382,6 +472,9 @@ function enableSearch(inputId, resultsId, hiddenId, searchUrl, extraOptions = {}
         return;
     }
 
+    // کش آخرین نتایج جستجو (برای دسترسی به تمام آدرس‌های مشتری انتخاب‌شده)
+    let lastResults = [];
+
     // debounce ساده
     function debounce(fn, wait) {
         let t = null;
@@ -407,36 +500,56 @@ function enableSearch(inputId, resultsId, hiddenId, searchUrl, extraOptions = {}
             success: function (data) {
                 let html = "";
                 if (data && Array.isArray(data.results) && data.results.length > 0) {
+                    // کش نتایج برای نمایش تمام آدرس‌های مشتری انتخاب‌شده بعد از کلیک
+                    lastResults = data.results;
+
                     data.results.forEach(item => {
-                        let addressHtml = "";
-                        if (item.addresses && item.addresses.length > 0) {
-                            addressHtml = "<div class='address-list'>";
-                            item.addresses.forEach(addr => {
-                                addressHtml += `<div class='address-item'>`;
-                                if (addr.address) {
-                                    addressHtml += `<span class='address-text'>${addr.address}</span>`;
-                                }
-                                if (addr.phone) {
-                                    addressHtml += `<span class='address-phone'>📞 ${addr.phone}</span>`;
-                                }
-                                addressHtml += `</div>`;
-                            });
-                            addressHtml += "</div>";
-                        } else if (item.address) {
-                            addressHtml = `<div class='address-item'><span class='address-text'>${item.address}</span></div>`;
+                        const addresses = (item.addresses && item.addresses.length > 0) ? item.addresses : [];
+
+                        // نمایش شماره تلفن اصلی (مثلاً برای راننده) در صورت فعال بودن گزینه showPhone
+                        let phoneHtml = "";
+                        if (extraOptions.showPhone && item.phone) {
+                            phoneHtml = `<span class='address-phone'>📞 ${item.phone}</span>`;
                         }
 
-                        html += `<button type="button"
-                                        class="list-group-item list-group-item-action"
-                                        data-id="${item.id}"
-                                        data-name="${item.name}"
-                                        data-phone="${item.phone || ''}"
-                                        data-plate="${item.plate || ''}">
-                                        <strong>${item.name}</strong>
-                                        ${addressHtml}
-                                 </button>`;
+                        if (addresses.length > 0) {
+                            // هر آدرس مشتری به‌صورت یک نتیجه انتخابی مستقل نمایش داده می‌شود
+                            // (یک مشتری با چند آدرس => چند نتیجه، هر کدام با نام مشتری و یکی از آدرس‌های او)
+                            addresses.forEach(addr => {
+                                let addrHtml = "";
+                                if (addr.address) {
+                                    addrHtml += `<span class='address-text'>${addr.address}</span>`;
+                                }
+                                if (addr.phone) {
+                                    addrHtml += `<span class='address-phone'>📞 ${addr.phone}</span>`;
+                                }
+
+                                html += `<button type="button"
+                                                class="list-group-item list-group-item-action"
+                                                data-id="${item.id}"
+                                                data-name="${item.name}"
+                                                data-address="${addr.address || ''}"
+                                                data-phone="${item.phone || ''}"
+                                                data-plate="${item.plate || ''}">
+                                                <strong>${item.name}</strong>
+                                                ${addrHtml}
+                                         </button>`;
+                            });
+                        } else {
+                            // بدون آدرس (مثلاً راننده): یک نتیجه ساده
+                            html += `<button type="button"
+                                            class="list-group-item list-group-item-action"
+                                            data-id="${item.id}"
+                                            data-name="${item.name}"
+                                            data-phone="${item.phone || ''}"
+                                            data-plate="${item.plate || ''}">
+                                            <strong>${item.name}</strong>
+                                            ${phoneHtml}
+                                     </button>`;
+                        }
                     });
                 } else {
+                    lastResults = [];
                     html = `<div class="list-group-item">نتیجه‌ای یافت نشد</div>`;
                 }
                 $results.html(html).show();
@@ -471,11 +584,13 @@ function enableSearch(inputId, resultsId, hiddenId, searchUrl, extraOptions = {}
     });
 
     // جلوگیری از چندبار اتصال handler کلیک: ابتدا off سپس on
-    $results.off('click.enableSearch').on('click.enableSearch', '.list-group-item', function () {
+    $results.off('click.enableSearch').on('click.enableSearch', '.list-group-item.list-group-item-action', function () {
         const $item = $(this);
         const id = $item.data('id');
         const name = $item.data('name') || "";
         const plate = $item.data('plate');
+        // آدرس انتخاب‌شده از روی همان نتیجه‌ای که کلیک شده خوانده می‌شود
+        const selectedAddress = $item.data('address') || "";
 
         // مقدار متن ورودی را با همان مقداری که عنصر پیشنهاد می‌دهد پر می‌کنیم
         $input.val(name);
@@ -485,7 +600,32 @@ function enableSearch(inputId, resultsId, hiddenId, searchUrl, extraOptions = {}
             $(`#${extraOptions.fillPlateField}`).val(plate);
         }
 
-        $results.empty().hide();
+        // نمایش تمام آدرس‌های مشتری انتخاب‌شده (به‌صورت پایدار زیر فیلد)
+        // آدرسی که کاربر روی آن کلیک کرده، هایلایت می‌شود
+        const selectedItem = lastResults.find(r => String(r.id) === String(id));
+        const selectedAddresses = (selectedItem && selectedItem.addresses) ? selectedItem.addresses : [];
+
+        if (selectedAddresses.length > 0) {
+            let addressListHtml = "<div class='address-list'>";
+            selectedAddresses.forEach(addr => {
+                const isSelected = selectedAddress && addr.address && String(addr.address) === String(selectedAddress);
+                addressListHtml += `<div class='address-item${isSelected ? ' selected' : ''}'>`;
+                if (addr.address) {
+                    addressListHtml += `<span class='address-text'>${addr.address}</span>`;
+                }
+                if (addr.phone) {
+                    addressListHtml += `<span class='address-phone'>📞 ${addr.phone}</span>`;
+                }
+                addressListHtml += `</div>`;
+            });
+            addressListHtml += "</div>";
+
+            $results.html(
+                `<div class="list-group-item no-action"><strong>${name}</strong>${addressListHtml}</div>`
+            ).show();
+        } else {
+            $results.empty().hide();
+        }
 
         if (extraOptions.updateVehicleAjax) {
             $.ajax({
@@ -528,6 +668,7 @@ function enableSearch(inputId, resultsId, hiddenId, searchUrl, extraOptions = {}
 // -----------------------------
 document.addEventListener("DOMContentLoaded", function () {
     initShipmentCalculations();
+    initCargoNumericFields();
     initSelectableCards();
     initExplanations();
 
@@ -536,7 +677,8 @@ document.addEventListener("DOMContentLoaded", function () {
     enableSearch("sender-input", "sender-results", "sender-id", urls.searchCustomer);
     enableSearch("driver-input", "driver-results", "driver-id", urls.searchDriver, {
         fillPlateField: "vehicle-plate",
-        updateVehicleAjax: urls.getVehicleByDriver
+        updateVehicleAjax: urls.getVehicleByDriver,
+        showPhone: true
     });
     enableSearch("vehicle-input", "vehicle-results", "vehicle-id", urls.searchVehicle);
 });

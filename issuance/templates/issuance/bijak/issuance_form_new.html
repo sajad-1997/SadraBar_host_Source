@@ -169,7 +169,23 @@
                     <div class="section cargo">
                         <h3>اطلاعات محموله</h3>
                         <hr>
-                        {{ cargo_form.as_p }}
+                        <div class="mb-3">
+                            <label for="{{ cargo_form.origin_display.id_for_label }}" class="form-label">مبدأ بارگیری</label>
+                            {{ cargo_form.origin_display }}
+                            {{ cargo_form.origin }}
+                            <div id="cargo-origin-results" class="list-group mt-2"></div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="{{ cargo_form.destination_display.id_for_label }}" class="form-label">مقصد تخلیه</label>
+                            {{ cargo_form.destination_display }}
+                            {{ cargo_form.destination }}
+                            <div id="cargo-destination-results" class="list-group mt-2"></div>
+                        </div>
+                        {{ cargo_form.name.as_p }}
+                        {{ cargo_form.weight.as_p }}
+                        {{ cargo_form.weight_2.as_p }}
+                        {{ cargo_form.package_type.as_p }}
+                        {{ cargo_form.number_of_packaging.as_p }}
                     </div>
                 </div>
             </div>
@@ -232,11 +248,11 @@
             getVehicleByDriver: "{% url 'get_vehicle_by_driver' %}",
             searchVehicle: "{% url 'search_vehicle' %}"
         };
+        const cargoCitySearchUrl = "{% url 'cargo:search_city' %}";
     </script>
 
-    <script src="{% static 'issuance/shipment_form.js' %}">
-
-    </script>
+    <script src="{% static 'issuance/shipment_form.js' %}"></script>
+    <script src="{% static 'issuance/city_search.js' %}"></script>
 
     {##}
     {#    </body>#}

@@ -6,6 +6,41 @@
             <h2>{% block title %}📋 فرم ثبت بارنامه جدید{% endblock %}</h2>
             <hr>
 
+            <!-- استایل‌های نمایش آدرس‌های مشتری و راننده (همیشه اعمال می‌شود) -->
+            <style>
+                .address-list {
+                    margin-top: 8px;
+                    padding-right: 15px;
+                }
+
+                .address-item {
+                    margin-bottom: 6px;
+                    padding: 4px 8px;
+                    background-color: #f8f9fa;
+                    border-radius: 4px;
+                    font-size: 0.85rem;
+                    text-align: right;
+                }
+
+                /* آدرس انتخاب‌شده توسط کاربر در لیست نتایج */
+                .address-item.selected {
+                    background-color: #d1e7dd;
+                    border: 1px solid #a3cfbb;
+                }
+
+                .address-text {
+                    display: block;
+                    color: #495057;
+                    margin-bottom: 2px;
+                }
+
+                .address-phone {
+                    display: block;
+                    color: #6c757d;
+                    font-size: 0.8rem;
+                }
+            </style>
+
             <!-- پیام‌ها -->
             {% if messages %}
                 <div class="mt-3">
@@ -15,39 +50,17 @@
                         </div>
                     {% endfor %}
                 </div>
-                
+
                 <style>
                     .system-message {
                         transition: opacity 0.5s ease-out;
                         opacity: 1;
                     }
+
                     .system-message.fade-out {
                         opacity: 0;
                     }
-                    
-                    /* Address list styling */
-                    .address-list {
-                        margin-top: 8px;
-                        padding-right: 15px;
-                    }
-                    .address-item {
-                        margin-bottom: 6px;
-                        padding: 4px 8px;
-                        background-color: #f8f9fa;
-                        border-radius: 4px;
-                        font-size: 0.85rem;
-                    }
-                    .address-text {
-                        display: block;
-                        color: #495057;
-                        margin-bottom: 2px;
-                    }
-                    .address-phone {
-                        display: block;
-                        color: #6c757d;
-                        font-size: 0.8rem;
-                    }
-                    
+
                     /* Amount in words styling */
                     .amount-in-words {
                         font-size: 0.85rem;
@@ -60,14 +73,14 @@
                         border-right: 3px solid #007bff;
                     }
                 </style>
-                
+
                 <script>
-                    document.addEventListener('DOMContentLoaded', function() {
+                    document.addEventListener('DOMContentLoaded', function () {
                         const messages = document.querySelectorAll('.system-message');
-                        messages.forEach(function(msg) {
-                            setTimeout(function() {
+                        messages.forEach(function (msg) {
+                            setTimeout(function () {
                                 msg.classList.add('fade-out');
-                                setTimeout(function() {
+                                setTimeout(function () {
                                     msg.style.display = 'none';
                                 }, 500);
                             }, 2000);
@@ -208,12 +221,174 @@
                 <div class="col-md-6">
                     <h3>اطلاعات بارنامه</h3>
                     <hr>
-                    {{ shipment_form.as_p }}
+
+                    <!-- تاریخ صدور بارنامه -->
+                    <div class="mb-3">
+                        <label for="{{ shipment_form.issuance_date.id_for_label }}" class="form-label">{{ shipment_form.issuance_date.label }} <span class="text-danger">*</span></label>
+                        {{ shipment_form.issuance_date }}
+                        {% if shipment_form.issuance_date.errors %}
+                            <div class="text-danger small mt-1">{{ shipment_form.issuance_date.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <!-- ساعت صدور بارنامه -->
+                    <div class="mb-3">
+                        <label for="{{ shipment_form.issuance_time.id_for_label }}" class="form-label">{{ shipment_form.issuance_time.label }} <span class="text-danger">*</span></label>
+                        {{ shipment_form.issuance_time }}
+                        {% if shipment_form.issuance_time.errors %}
+                            <div class="text-danger small mt-1">{{ shipment_form.issuance_time.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <!-- کرایه پرداختی در مقصد -->
+                    <div class="mb-3">
+                        <label for="{{ shipment_form.total_fare.id_for_label }}" class="form-label">{{ shipment_form.total_fare.label }} <span class="text-danger">*</span></label>
+                        {{ shipment_form.total_fare }}
+                        {% if shipment_form.total_fare.errors %}
+                            <div class="text-danger small mt-1">{{ shipment_form.total_fare.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <!-- ارزش محموله -->
+                    <div class="mb-3">
+                        <label for="{{ shipment_form.value.id_for_label }}" class="form-label">{{ shipment_form.value.label }} <span class="text-danger">*</span></label>
+                        {{ shipment_form.value }}
+                        {% if shipment_form.value.errors %}
+                            <div class="text-danger small mt-1">{{ shipment_form.value.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <!-- بیمه -->
+                    <div class="mb-3">
+                        <label for="{{ shipment_form.insurance.id_for_label }}" class="form-label">{{ shipment_form.insurance.label }} <span class="text-danger">*</span></label>
+                        {{ shipment_form.insurance }}
+                        {% if shipment_form.insurance.errors %}
+                            <div class="text-danger small mt-1">{{ shipment_form.insurance.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <!-- هزینه بارگیری -->
+                    <div class="mb-3">
+                        <label for="{{ shipment_form.loading_fee.id_for_label }}" class="form-label">{{ shipment_form.loading_fee.label }}</label>
+                        {{ shipment_form.loading_fee }}
+                        {% if shipment_form.loading_fee.errors %}
+                            <div class="text-danger small mt-1">{{ shipment_form.loading_fee.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <!-- هزینه تخلیه -->
+                    <div class="mb-3">
+                        <label for="{{ shipment_form.unloading_fee.id_for_label }}" class="form-label">{{ shipment_form.unloading_fee.label }}</label>
+                        {{ shipment_form.unloading_fee }}
+                        {% if shipment_form.unloading_fee.errors %}
+                            <div class="text-danger small mt-1">{{ shipment_form.unloading_fee.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <!-- هزینه باسکول -->
+                    <div class="mb-3">
+                        <label for="{{ shipment_form.scale_fee.id_for_label }}" class="form-label">{{ shipment_form.scale_fee.label }}</label>
+                        {{ shipment_form.scale_fee }}
+                        {% if shipment_form.scale_fee.errors %}
+                            <div class="text-danger small mt-1">{{ shipment_form.scale_fee.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <!-- کل کرایه -->
+                    <div class="mb-3">
+                        <label for="{{ shipment_form.freight.id_for_label }}" class="form-label">{{ shipment_form.freight.label }} <span class="text-danger">*</span></label>
+                        {{ shipment_form.freight }}
+                        {% if shipment_form.freight.errors %}
+                            <div class="text-danger small mt-1">{{ shipment_form.freight.errors }}</div>
+                        {% endif %}
+                    </div>
                 </div>
                 <div class="col-md-6">
                     <h3>اطلاعات محموله</h3>
                     <hr>
-                    {{ cargo_form.as_p }}
+
+                    <!-- فیلد مبدأ بارگیری -->
+                    <div class="mb-3">
+                        <label for="id_cargo-origin_display" class="form-label">مبدأ بارگیری <span
+                                class="text-danger">*</span></label>
+                        {{ cargo_form.origin_display }}
+                        {{ cargo_form.origin }} <!-- فیلد مخفی برای ذخیره ID -->
+                        {% if cargo_form.origin_display.errors %}
+                            <div class="text-danger small mt-1">{{ cargo_form.origin_display.errors }}</div>
+                        {% endif %}
+                        <!-- لیست نتایج جستجو (حتماً position-relative یا absolute باشد) -->
+                        <div id="cargo-origin-results" class="list-group mt-1 position-absolute w-100"
+                             style="z-index: 1050;"></div>
+                    </div>
+
+                    <!-- فیلد مقصد تخلیه -->
+                    <div class="mb-3">
+                        <label for="id_cargo-destination_display" class="form-label">مقصد تخلیه <span
+                                class="text-danger">*</span></label>
+                        {{ cargo_form.destination_display }}
+                        {{ cargo_form.destination }} <!-- فیلد مخفی برای ذخیره ID -->
+                        {% if cargo_form.destination_display.errors %}
+                            <div class="text-danger small mt-1">{{ cargo_form.destination_display.errors }}</div>
+                        {% endif %}
+                        <div id="cargo-destination-results" class="list-group mt-1 position-absolute w-100"
+                             style="z-index: 1050;"></div>
+                    </div>
+
+                    <!-- نام محموله -->
+                    <div class="mb-3">
+                        <label for="{{ cargo_form.name.id_for_label }}" class="form-label">{{ cargo_form.name.label }}
+                            <span class="text-danger">*</span></label>
+                        {{ cargo_form.name }}
+                        <input type="hidden" id="cargo-name-id">
+                        <!-- لیست نتایج جستجوی زنده نام محموله (مشابه جستجوی فرستنده/گیرنده) -->
+                        <div id="cargo-name-results" class="list-group mt-1 position-absolute w-100"
+                             style="z-index: 1050;"></div>
+                        {% if cargo_form.name.errors %}
+                            <div class="text-danger small mt-1">{{ cargo_form.name.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <!-- وزن/حجم -->
+                    <div class="mb-3">
+                        <label for="{{ cargo_form.weight.id_for_label }}"
+                               class="form-label">{{ cargo_form.weight.label }} <span
+                                class="text-danger">*</span></label>
+                        {{ cargo_form.weight }}
+                        {% if cargo_form.weight.errors %}
+                            <div class="text-danger small mt-1">{{ cargo_form.weight.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <!-- وزن/حجم دوم -->
+                    <div class="mb-3">
+                        <label for="{{ cargo_form.weight_2.id_for_label }}"
+                               class="form-label">{{ cargo_form.weight_2.label }}</label>
+                        {{ cargo_form.weight_2 }}
+                        {% if cargo_form.weight_2.errors %}
+                            <div class="text-danger small mt-1">{{ cargo_form.weight_2.errors }}</div>
+                        {% endif %}
+                        <div class="form-text text-muted">اختیاری</div>
+                    </div>
+
+                    <!-- نوع بسته‌بندی -->
+                    <div class="mb-3">
+                        <label for="{{ cargo_form.package_type.id_for_label }}"
+                               class="form-label">{{ cargo_form.package_type.label }}</label>
+                        {{ cargo_form.package_type }}
+                        {% if cargo_form.package_type.errors %}
+                            <div class="text-danger small mt-1">{{ cargo_form.package_type.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <!-- تعداد بسته‌بندی -->
+                    <div class="mb-3">
+                        <label for="{{ cargo_form.number_of_packaging.id_for_label }}"
+                               class="form-label">{{ cargo_form.number_of_packaging.label }}</label>
+                        {{ cargo_form.number_of_packaging }}
+                        {% if cargo_form.number_of_packaging.errors %}
+                            <div class="text-danger small mt-1">{{ cargo_form.number_of_packaging.errors }}</div>
+                        {% endif %}
+                    </div>
                 </div>
             </div>
 
@@ -227,23 +402,23 @@
                     </div>
                     <div class="mb-3">
                         <label for="selected_caption" class="fw-bold mb-2">انتخاب توضیح آماده (اختیاری)</label>
-{#                        <select id="selected_caption" name="shipment-selected_caption" class="form-select">#}
-{#                            <option value="">-- انتخاب کنید --</option>#}
-{#                                {% for caption in captions %}#}
-{#                                    <option value="{{ caption.id }}"#}
-{#                                    {% if selected_caption_id == caption.id|stringformat:"s" %}#}
-{#                                    selected#}
-{#                                    {% endif %}>#}
-{#                                        {{ caption.content|truncatechars:180 }}#}
-{#                                    </option>#}
-{#                                {% endfor %}#}
-{#                        </select>#}
+                        {#                        <select id="selected_caption" name="shipment-selected_caption" class="form-select">#}
+                        {#                            <option value="">-- انتخاب کنید --</option>#}
+                        {#                                {% for caption in captions %}#}
+                        {#                                    <option value="{{ caption.id }}"#}
+                        {#                                    {% if selected_caption_id == caption.id|stringformat:"s" %}#}
+                        {#                                    selected#}
+                        {#                                    {% endif %}>#}
+                        {#                                        {{ caption.content|truncatechars:180 }}#}
+                        {#                                    </option>#}
+                        {#                                {% endfor %}#}
+                        {#                        </select>#}
                     </div>
                     <div class="mb-3">
                         <label for="custom_caption" class="fw-bold">توضیح دستی (اختیاری)</label>
                         <textarea id="custom_caption" name="shipment-custom_caption" rows="3" class="form-control"
-                                    placeholder="اگر توضیح خاصی دارید، اینجا بنویسید..."
-                                    >{{ custom_caption }}</textarea>
+                                  placeholder="اگر توضیح خاصی دارید، اینجا بنویسید..."
+                        >{{ custom_caption }}</textarea>
                     </div>
                     <div class="text-center mt-3">
                         <a href="{% url 'issuance:crud:add_caption' %}" class="btn btn-secondary btn-lg">افزودن توضیح
@@ -258,12 +433,19 @@
 
                 {# مدیر #}
                 {% if user.role in 'manager admin' %}
-                    {% if bijak.approval_status == 'waiting_approval' %}
+                    {% if not bijak %}
+                        <button type="submit"
+                                name="action"
+                                value="send_for_approval"
+                                class="btn btn-primary">
+                            صدور بارنامه جدید
+                        </button>
+                    {% elif bijak.approval_status == 'waiting_approval' %}
                         <button class="btn btn-secondary" disabled>
                             در انتظار اقدام مدیریتی
                         </button>
                     {% elif bijak.approval_status == 'approved' %}
-                        <a href="{% url 'bijak_print' bijak.id %}" class="btn btn-success">
+                        <a href="{% url 'issuance:manager:bijak_print' bijak.id %}" class="btn btn-success">
                             چاپ بارنامه
                         </a>
                     {% endif %}
@@ -297,7 +479,7 @@
 
                         {# تأیید شده #}
                     {% elif bijak.status == 'approved' %}
-                        <a href="{% url 'bijak_print' bijak.id %}" class="btn btn-success">
+                        <a href="{% url 'issuance:manager:bijak_print' bijak.id %}" class="btn btn-success">
                             چاپ بارنامه
                         </a>
                     {% endif %}
@@ -310,7 +492,7 @@
 
 {% endblock %}
 {% block extra_scripts %}
- <script>
+    <script>
         $(document).ready(function () {
 
             /* ===== انتخاب تاریخ شمسی ===== */
@@ -406,7 +588,17 @@
             searchCustomer: "{% url 'issuance:search:search_customer' %}",
             searchDriver: "{% url 'issuance:search:search_driver' %}",
             getVehicleByDriver: "{% url 'issuance:search:get_vehicle_by_driver' %}",
-            searchVehicle: "{% url 'issuance:search:search_vehicle' %}"
+            searchVehicle: "{% url 'issuance:search:search_vehicle' %}",
+            searchCargoName: "{% url 'cargo:search_cargo_name' %}"
         };
+        const cargoCitySearchUrl = "{% url 'cargo:search_city' %}";
+    </script>
+    <script src="{% static 'issuance/city_search.js' %}"></script>
+    <script>
+        // جستجوی زنده نام محموله از دیتابیس محموله‌ها
+        // (دقیقاً با همان رفتار فیلد نام فرستنده / گیرنده)
+        $(document).ready(function () {
+            enableSearch("id_cargo-name", "cargo-name-results", "cargo-name-id", urls.searchCargoName);
+        });
     </script>
 {% endblock %}
