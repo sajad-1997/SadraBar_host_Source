@@ -1,8 +1,7 @@
 {% extends "issuance/base.html" %}
 {% load jalali_filters %}
 
-{% block content %}
-
+{% block extra_css %}
     <style>
         .date-picker {
             direction: ltr !important;
@@ -15,7 +14,9 @@
             margin: 0;
         }
     </style>
+{% endblock %}
 
+{% block content %}
     {% if messages %}
         {% for message in messages %}
             <div class="alert alert-{{ message.tags }} mt-2 system-message">
@@ -54,6 +55,11 @@
 
         <form method="POST" novalidate>
             {% csrf_token %}
+            {% if form.non_field_errors %}
+                <div class="alert alert-danger">
+                    {{ form.non_field_errors|join:", " }}
+                </div>
+            {% endif %}
 
             <div class="row">
                 <hr>
@@ -78,11 +84,14 @@
                 <div class="col-md-6">
                     <label>نام پدر</label>
                     {{ form.father_name }}
+                    {% for error in form.father_name.errors %}
+                        <div class="text-danger"><small>{{ error }}</small></div>
+                    {% endfor %}
                 </div>
 
                 <div class="col-md-6">
                     <label>تاریخ تولد</label>
-                    {{ form.birth_date|to_jalali }}
+                    {{ form.birth_date }}
                     {% for error in form.birth_date.errors %}
                         <div class="text-danger"><small>{{ error }}</small></div>
                     {% endfor %}
@@ -102,21 +111,33 @@
                 <div class="col-md-6">
                     <label>شماره تلفن دوم</label>
                     {{ form.phone2 }}
+                    {% for error in form.phone2.errors %}
+                        <div class="text-danger"><small>{{ error }}</small></div>
+                    {% endfor %}
                 </div>
 
                 <div class="col-md-6">
                     <label>شماره تلفن سوم</label>
                     {{ form.phone3 }}
+                    {% for error in form.phone3.errors %}
+                        <div class="text-danger"><small>{{ error }}</small></div>
+                    {% endfor %}
                 </div>
 
                 <div class="col-md-6">
                     <label>شهر محل سکونت</label>
                     {{ form.residence }}
+                    {% for error in form.residence.errors %}
+                        <div class="text-danger"><small>{{ error }}</small></div>
+                    {% endfor %}
                 </div>
 
                 <div class="col-md-12">
                     <label>آدرس</label>
                     {{ form.address }}
+                    {% for error in form.address.errors %}
+                        <div class="text-danger"><small>{{ error }}</small></div>
+                    {% endfor %}
                 </div>
 
                 <hr>
@@ -132,7 +153,7 @@
 
                 <div class="col-md-6">
                     <label>تاریخ صدور گواهینامه</label>
-                    {{ form.certificate_date|to_jalali:"%Y/%m" }}
+                    {{ form.certificate_date }}
                     {% for error in form.certificate_date.errors %}
                         <div class="text-danger"><small>{{ error }}</small></div>
                     {% endfor %}
@@ -141,6 +162,9 @@
                 <div class="col-md-6">
                     <label>شماره هوشمند راننده</label>
                     {{ form.driver_smart_card }}
+                    {% for error in form.driver_smart_card.errors %}
+                        <div class="text-danger"><small>{{ error }}</small></div>
+                    {% endfor %}
                 </div>
 
                 <hr>
@@ -152,7 +176,9 @@
     </div>
 
     <!-- ===== Persian Datepicker (دقیقاً مشابه قالب ویرایش) ===== -->
+{% endblock %}
 
+{% block extra_scripts %}
     <script>
         $(document).ready(function () {
 
@@ -178,5 +204,4 @@
 
         });
     </script>
-
 {% endblock %}

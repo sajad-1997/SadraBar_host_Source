@@ -1,20 +1,22 @@
 {% extends "issuance/base.html" %}
 {% load jalali_filters %}
-<!-- در بخش head قالب -->
-<style>
-    .date-picker {
-        direction: ltr !important;
-        text-align: right !important;
-    }
 
-    .date-picker::-webkit-outer-spin-button,
-    .date-picker::-webkit-inner-spin-button {
-        -webkit-appearance: none;
-        margin: 0;
-    }
-</style>
+{% block extra_css %}
+    <style>
+        .date-picker {
+            direction: ltr !important;
+            text-align: right !important;
+        }
+
+        .date-picker::-webkit-outer-spin-button,
+        .date-picker::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+    </style>
+{% endblock %}
+
 {% block content %}
-
     {% if messages %}
         {% for message in messages %}
             <div class="alert alert-{{ message.tags }} mt-2 system-message">
@@ -52,6 +54,11 @@
         <hr>
         <form method="POST" novalidate>
             {% csrf_token %}
+            {% if form.non_field_errors %}
+                <div class="alert alert-danger">
+                    {{ form.non_field_errors|join:", " }}
+                </div>
+            {% endif %}
             <div class="row">
                 <hr>
                 <small>اطلاعات شخصی</small>
@@ -83,7 +90,7 @@
                 </div>
                 <div class="col-md-6">
                     <label>تاریخ تولد</label>
-                    {{ form.birth_date|to_jalali }}
+                    {{ form.birth_date }}
                     {% if form.birth_date.errors %}
                         <div class="text-danger">
                             {% for error in form.birth_date.errors %}
@@ -110,6 +117,10 @@
                     {{ form.phone2 }}
                 </div>
                 <div class="col-md-6">
+                    <label>شماره تلفن سوم</label>
+                    {{ form.phone3 }}
+                </div>
+                <div class="col-md-6">
                     <label>شهر محل سکونت</label>
                     {{ form.residence }}
                 </div>
@@ -132,7 +143,7 @@
                 </div>
                 <div class="col-md-6">
                     <label>تاریخ صدور گواهینامه</label>
-                    {{ form.certificate_date|to_jalali:"%Y/%m" }}  <!-- با فرمت دلخواه -->
+                    {{ form.certificate_date }}
                     {% if form.certificate_date.errors %}
                         <div class="text-danger">
                             {% for error in form.certificate_date.errors %}
@@ -145,51 +156,22 @@
                     <label>شماره هوشمند راننده</label>
                     {{ form.driver_smart_card }}
                 </div>
-                <hr>
-                <small>اطلاعات بیمه نامه</small>
-                <div class="col-md-12">
-                    <label>شماره بیمه نامه</label>
-                    {{ form.insurance_policy_number }}
-                </div>
-                <div class="col-md-12">
-                    <label>تاریخ انقضاء بیمه نامه</label>
-                    {{ form.insurance_policy_expiry }}
-                    {% if form.insurance_policy_expiry.errors %}
-                        <div class="text-danger">
-                            {% for error in form.insurance_policy_expiry.errors %}
-                                <small>{{ error }}</small>
-                            {% endfor %}
-                        </div>
-                    {% endif %}
-                </div>
             </div>
 
-            <button type="submit" class="btn btn-primary mt-3">ذخیره تغییرات</button>
+            <button type="submit" class="btn btn-primary mt-3">افزودن خودرو</button>
             <a href="{% url 'drivers:driver_list' %}" class="btn btn-secondary mt-3">بازگشت</a>
         </form>
     </div>
 
-    <!-- اسکریپت date-picker -->
+{% endblock %}
+
+{% block extra_scripts %}
     <script>
         $(document).ready(function () {
-            console.log("📅 Datepicker initialization started...");
-
-            // بررسی عناصر date-picker
-            var dateFields = $('.date-picker');
-            console.log(`Found ${dateFields.length} date fields`);
-
-            dateFields.each(function (index) {
-                var $field = $(this);
-                var fieldId = $field.attr('id') || 'unknown';
-                var fieldValue = $field.val();
-                console.log(`Field ${index + 1}: ${fieldId} = "${fieldValue}"`);
-            });
-
-            // فعال کردن date-picker
             $('.date-picker').persianDatepicker({
                 format: 'YYYY/MM/DD',
                 autoClose: true,
-                initialValue: false, // مهم: این باید false باشد چون ما خودمان مقدار می‌دهیم
+                initialValue: false,
                 observer: true,
                 calendar: {
                     persian: {
@@ -203,32 +185,8 @@
                         text: {fa: 'امروز'}
                     }
                 },
-                timePicker: {enabled: false},
-                onShow: function () {
-                    console.log("Datepicker shown for: ", this.$input.attr('id'));
-                },
-                onSelect: function (pd) {
-                    console.log("Selected date: ", pd.format('YYYY/MM/DD'));
-                }
+                timePicker: {enabled: false}
             });
-
-            // تنظیم تاریخ برای فیلدهایی که مقدار دارند
-            $('.date-picker').each(function () {
-                var $this = $(this);
-                var value = $this.val();
-
-                if (value && value.trim() !== '') {
-                    console.log(`Setting datepicker for ${$this.attr('id')} to: ${value}`);
-                    try {
-                        $this.persianDatepicker('setDate', [value]);
-                    } catch (e) {
-                        console.error(`Error setting date for ${$this.attr('id')}:`, e);
-                    }
-                }
-            });
-
-            console.log("📅 Datepicker initialization completed");
         });
     </script>
-
 {% endblock %}

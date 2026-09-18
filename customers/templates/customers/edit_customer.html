@@ -38,7 +38,7 @@
         <h3>ویرایش مشتری: {{ customer.name }}</h3>
         <hr>
 
-        <form method="POST" novalidate>
+        <form id="edit-customer-form" method="POST" novalidate>
             {% csrf_token %}
 
             <div class="row">
@@ -60,7 +60,10 @@
 
                 <div class="col-md-6">
                     <label>کد ملی</label>
-                    {{ form.national_id }}
+                    <input type="text" name="national_id" value="{{ form.national_id.value|default:'' }}"
+                           class="form-control" inputmode="numeric" maxlength="10"
+                           data-numeric="10" data-exact="10" data-label="کد ملی"
+                           placeholder="کد ملی (۱۰ رقم)">
                     {% if form.national_id.errors %}
                         <div class="text-danger">
                             {% for error in form.national_id.errors %}
@@ -75,7 +78,10 @@
 
                 <div class="col-md-6">
                     <label>شماره تلفن</label>
-                    {{ form.phone }}
+                    <input type="text" name="phone" value="{{ form.phone.value|default:'' }}"
+                           class="form-control" inputmode="numeric" maxlength="11"
+                           data-numeric="11" data-label="شماره تلفن"
+                           placeholder="شماره تلفن (۱۱ رقم)">
                     {% if form.phone.errors %}
                         <div class="text-danger">
                             {% for error in form.phone.errors %}
@@ -87,12 +93,18 @@
 
                 <div class="col-md-6">
                     <label>شماره تلفن دوم</label>
-                    {{ form.phone2 }}
+                    <input type="text" name="phone2" value="{{ form.phone2.value|default:'' }}"
+                           class="form-control" inputmode="numeric" maxlength="11"
+                           data-numeric="11" data-label="شماره تلفن دوم"
+                           placeholder="شماره تلفن دوم (۱۱ رقم)">
                 </div>
 
                 <div class="col-md-6">
                     <label>کد پستی</label>
-                    {{ form.postal }}
+                    <input type="text" name="postal" value="{{ form.postal.value|default:'' }}"
+                           class="form-control" inputmode="numeric" maxlength="10"
+                           data-numeric="10" data-label="کد پستی"
+                           placeholder="کد پستی (۱۰ رقم)">
                     {% if form.postal.errors %}
                         <div class="text-danger">
                             {% for error in form.postal.errors %}
@@ -122,6 +134,76 @@
                     {{ form.caption }}
                 </div>
 
+                {% if addresses %}
+                    <small class="text-muted mt-3">آدرس‌های اضافی</small>
+                    <hr>
+
+                    {% for addr in addresses %}
+                        <div class="col-12 mb-3" style="border: 1px solid #ddd; padding: 15px; border-radius: 5px; background-color: #fafafa;">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <label>کد پستی</label>
+                                    <input type="text" name="addr_postal_{{ addr.pk }}" value="{{ addr.postal|default:'' }}"
+                                           class="form-control" inputmode="numeric" maxlength="10"
+                                           data-numeric="10" data-label="کد پستی"
+                                           placeholder="کد پستی (۱۰ رقم)">
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label>شماره تلفن</label>
+                                    <input type="text" name="addr_phone_{{ addr.pk }}" value="{{ addr.phone|default:'' }}"
+                                           class="form-control" inputmode="numeric" maxlength="11"
+                                           data-numeric="11" data-label="شماره تلفن"
+                                           placeholder="شماره تلفن (۱۱ رقم)">
+                                </div>
+
+                                <div class="col-md-4 d-flex align-items-end">
+                                    <!-- دکمه حذف از نوع button است تا فرم اصلی را با action حذف آلوده نکند؛
+                                         با جاوااسکریپت فیلد delete_address_id ست و فرم اصلی submit می‌شود -->
+                                    <button type="button" class="btn btn-danger w-100 delete-address-btn"
+                                            data-address-id="{{ addr.pk }}"
+                                            onclick="return confirm('آیا از حذف این آدرس مطمئن هستید؟');">
+                                        حذف این آدرس
+                                    </button>
+                                </div>
+
+                                <div class="col-md-12 mt-2">
+                                    <label>آدرس</label>
+                                    <textarea name="addr_address_{{ addr.pk }}" class="form-control" rows="2"
+                                              placeholder="آدرس">{{ addr.address }}</textarea>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+
+                <div class="col-12 mb-3" style="border: 1px dashed #007bff; padding: 15px; border-radius: 5px; background-color: #f8f9ff;">
+                    <small class="text-muted">افزودن آدرس اضافی جدید (اختیاری)</small>
+                    <div class="row mt-2">
+                        <div class="col-md-4">
+                            <label>کد پستی</label>
+                            <input type="text" name="extra_postal" class="form-control"
+                                   inputmode="numeric" maxlength="10"
+                                   data-numeric="10" data-label="کد پستی"
+                                   placeholder="کد پستی (۱۰ رقم)">
+                        </div>
+
+                        <div class="col-md-4">
+                            <label>شماره تلفن</label>
+                            <input type="text" name="extra_phone" class="form-control"
+                                   inputmode="numeric" maxlength="11"
+                                   data-numeric="11" data-label="شماره تلفن"
+                                   placeholder="شماره تلفن (۱۱ رقم)">
+                        </div>
+
+                        <div class="col-md-12 mt-2">
+                            <label>آدرس جدید</label>
+                            <textarea name="extra_address" class="form-control" rows="2"
+                                      placeholder="در صورت تمایل، آدرس جدید را وارد کنید"></textarea>
+                        </div>
+                    </div>
+                </div>
+
             </div>
 
             <button type="submit" class="btn btn-primary mt-3">
@@ -134,5 +216,153 @@
             </a>
         </form>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // =============================
+            // اعتبارسنجی فیلدهای عددی
+            // فقط قبول اعداد و محدود کردن طول بر اساس عنوان فیلد (data-numeric)
+            // =============================
+            const persianNumbers = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
+
+            function toEnglishNumber(str) {
+                let result = str;
+                for (let i = 0; i < 10; i++) {
+                    result = result.replace(new RegExp(persianNumbers[i], 'g'), i);
+                }
+                return result;
+            }
+
+            function isControlKey(charCode) {
+                // اجازه دادن به کلیدهای کنترل (backspace, delete, tab, etc)
+                return charCode === 8 || charCode === 46 || charCode === 9 || charCode === 0;
+            }
+
+            document.querySelectorAll('input[data-numeric]').forEach(function (field) {
+                const maxLength = parseInt(field.getAttribute('data-numeric'), 10);
+
+                // روی رویداد input: فقط اعداد را نگه دار
+                field.addEventListener('input', function () {
+                    let value = toEnglishNumber(this.value);
+                    // حذف همه چیز به جز اعداد
+                    value = value.replace(/[^0-9]/g, '');
+                    // محدود کردن طول
+                    if (value.length > maxLength) {
+                        value = value.substring(0, maxLength);
+                    }
+                    this.value = value;
+                });
+
+                // جلوگیری از کپی کردن متن غیرعددی
+                field.addEventListener('paste', function (e) {
+                    e.preventDefault();
+                    const pastedText = (e.clipboardData || window.clipboardData).getData('text');
+                    let cleanText = toEnglishNumber(pastedText).replace(/[^0-9]/g, '');
+                    const currentVal = this.value;
+                    const remainingLength = maxLength - currentVal.length;
+                    if (remainingLength > 0) {
+                        this.value = currentVal + cleanText.substring(0, remainingLength);
+                    }
+                });
+
+                // جلوگیری از تایپ کاراکترهای غیرعددی در کیبورد
+                field.addEventListener('keypress', function (e) {
+                    const charCode = e.which ? e.which : e.keyCode;
+                    if (isControlKey(charCode)) {
+                        return true;
+                    }
+                    // فقط اعداد مجاز هستند
+                    if (charCode < 48 || charCode > 57) {
+                        e.preventDefault();
+                        return false;
+                    }
+                    // بررسی طول حداکثر
+                    if (this.value.length >= maxLength) {
+                        e.preventDefault();
+                        return false;
+                    }
+                    return true;
+                });
+
+                // نمایش کیبورد عددی در موبایل (fallback برای مرورگرهای قدیمی)
+                if (!field.getAttribute('inputmode')) {
+                    field.setAttribute('inputmode', 'numeric');
+                }
+            });
+
+            // =============================
+            // دکمه حذف آدرس اضافی
+            // فیلد مخفی delete_address_id در فرم اصلی ست و فرم submit می‌شود
+            // (form.submit() مستقیم است و هندلر اعتبارسنجی submit را فعال نمی‌کند)
+            // =============================
+            document.querySelectorAll('.delete-address-btn').forEach(function (btn) {
+                btn.addEventListener('click', function () {
+                    const editForm = document.getElementById('edit-customer-form');
+                    if (!editForm) {
+                        return;
+                    }
+                    let hidden = document.getElementById('delete-address-id-input');
+                    if (!hidden) {
+                        hidden = document.createElement('input');
+                        hidden.type = 'hidden';
+                        hidden.name = 'delete_address_id';
+                        hidden.id = 'delete-address-id-input';
+                        editForm.appendChild(hidden);
+                    }
+                    hidden.value = this.getAttribute('data-address-id');
+                    editForm.submit();
+                });
+            });
+
+            // =============================
+            // اعتبارسنجی هنگام ثبت فرم ویرایش
+            // بررسی طول دقیق بر اساس data-exact و عنوان فیلد (data-label)
+            // =============================
+            const editForm = document.getElementById('edit-customer-form');
+            if (editForm) {
+                editForm.addEventListener('submit', function (e) {
+                    let valid = true;
+
+                    editForm.querySelectorAll('input[data-numeric]').forEach(function (field) {
+                        // حذف خطای قبلی در صورت وجود
+                        const existingError = field.parentElement.querySelector('.numeric-error');
+                        if (existingError) {
+                            existingError.remove();
+                        }
+                        field.classList.remove('is-invalid');
+
+                        const value = field.value.trim();
+                        if (!value) {
+                            return;
+                        }
+
+                        const label = field.getAttribute('data-label') || 'این فیلد';
+                        const exact = field.getAttribute('data-exact');
+                        const maxLength = parseInt(field.getAttribute('data-numeric'), 10);
+
+                        let errorMsg = null;
+                        if (exact && value.length !== parseInt(exact, 10)) {
+                            errorMsg = label + ' باید دقیقاً ' + exact + ' رقم باشد.';
+                        } else if (!exact && value.length > maxLength) {
+                            errorMsg = label + ' نمی‌تواند بیشتر از ' + maxLength + ' رقم باشد.';
+                        }
+
+                        if (errorMsg) {
+                            valid = false;
+                            field.classList.add('is-invalid');
+                            const errorDiv = document.createElement('div');
+                            errorDiv.className = 'text-danger numeric-error';
+                            errorDiv.innerHTML = '<small>' + errorMsg + '</small>';
+                            field.parentElement.appendChild(errorDiv);
+                        }
+                    });
+
+                    if (!valid) {
+                        e.preventDefault();
+                    }
+                });
+            }
+        });
+    </script>
 
 {% endblock %}

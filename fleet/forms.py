@@ -95,11 +95,43 @@ class VehicleForm(PersianNumberFormMixin, forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
+        # اضافه کردن کلاس is-invalid به فیلدهایی که خطا دارند
+        if hasattr(self, 'errors'):
+            for field_name, errors in self.errors.items():
+                if field_name in self.fields:
+                    existing_class = self.fields[field_name].widget.attrs.get('class', '')
+                    if 'is-invalid' not in existing_class:
+                        self.fields[field_name].widget.attrs['class'] = f"{existing_class} is-invalid".strip()
+
         # اگر instance وجود دارد، تاریخ بیمه را به Jalali رشته‌ای تبدیل کن
         instance = kwargs.get('instance')
         if instance and instance.insurance_policy_expiry:
             jalali_insurance = jdatetime.date.fromgregorian(date=instance.insurance_policy_expiry)
             self.fields['insurance_policy_expiry'].initial = f"{jalali_insurance.year}/{jalali_insurance.month:02}/{jalali_insurance.day:02}"
+
+    def clean_license_plate_two_digit(self):
+        value = self.cleaned_data.get('license_plate_two_digit')
+        if value:
+            persian_numbers = '۰۱۲۳۴۵۶۷۸۹'
+            english_numbers = '0123456789'
+            return str(value).translate(str.maketrans(persian_numbers, english_numbers))
+        return value
+
+    def clean_license_plate_three_digit(self):
+        value = self.cleaned_data.get('license_plate_three_digit')
+        if value:
+            persian_numbers = '۰۱۲۳۴۵۶۷۸۹'
+            english_numbers = '0123456789'
+            return str(value).translate(str.maketrans(persian_numbers, english_numbers))
+        return value
+
+    def clean_license_plate_series(self):
+        value = self.cleaned_data.get('license_plate_series')
+        if value:
+            persian_numbers = '۰۱۲۳۴۵۶۷۸۹'
+            english_numbers = '0123456789'
+            return str(value).translate(str.maketrans(persian_numbers, english_numbers))
+        return value
 
     def clean(self):
         cleaned_data = super().clean()

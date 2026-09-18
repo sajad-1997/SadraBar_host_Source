@@ -9,24 +9,25 @@
             </div>
         {% endfor %}
     {% endif %}
-    
+
     <style>
         .system-message {
             transition: opacity 0.5s ease-out;
             opacity: 1;
         }
+
         .system-message.fade-out {
             opacity: 0;
         }
     </style>
-    
+
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const messages = document.querySelectorAll('.system-message');
-            messages.forEach(function(msg) {
-                setTimeout(function() {
+            messages.forEach(function (msg) {
+                setTimeout(function () {
                     msg.classList.add('fade-out');
-                    setTimeout(function() {
+                    setTimeout(function () {
                         msg.style.display = 'none';
                     }, 500);
                 }, 2000);
@@ -36,7 +37,8 @@
 
     <div class="container">
 
-        <h3>ثبت مشتری (فیلد های ستاره دار الزامی است.)</h3>
+        <h2>ثبت مشتری</h2>
+        <h3>در صورتی که مشتری چندین آدرس دارد، <label style="font-style: italic">افزودن اطلاعات اضافی</label> را بزنید.</h3>
         <hr>
         <div id="msg"></div>
 
@@ -46,7 +48,7 @@
             <input type="hidden" id="customer-id" name="id">
 
             <div class="mb-3">
-                <label>*نام مشتری:</label>
+                <label>نام مشتری: </label><label style="color: red">(الزامی)</label>
                 <input type="text" id="customer-input" name="name">
                 <div id="customer-results" class="list-group" style="display:none; z-index:1000;"></div>
                 <div class="error-msg" id="error_name"></div>
@@ -54,21 +56,26 @@
 
             <div class="mb-3">
                 <label>شناسه / کد ملی:</label>
-                <input type="text" id="customer-national" name="national_id">
+                <input type="text" id="customer-national" name="national_id" inputmode="numeric" pattern="[0-9]*" maxlength="10" placeholder="۱۰ رقم">
             </div>
 
             <div class="mb-3">
                 <label>کد پستی:</label>
-                <input type="text" id="customer-postal" name="postal">
+                <input type="text" id="customer-postal" name="postal" inputmode="numeric" pattern="[0-9]*" maxlength="10" placeholder="۱۰ رقم">
             </div>
 
             <div class="mb-3">
                 <label>تلفن:</label>
-                <input type="text" id="customer-phone" name="phone">
+                <input type="text" id="customer-phone" name="phone" inputmode="numeric" pattern="[0-9]*" maxlength="11" placeholder="۱۱ رقم">
             </div>
 
             <div class="mb-3">
-                <label>*آدرس:</label>
+                <label>تلفن دوم:</label>
+                <input type="text" id="customer-phone2" name="phone2" inputmode="numeric" pattern="[0-9]*" maxlength="11" placeholder="۱۱ رقم">
+            </div>
+
+            <div class="mb-3">
+                <label>آدرس:</label><label style="color: red">(الزامی)</label>
                 <input type="text" id="customer-address" name="address">
                 <div class="error-msg" id="error_address"></div>
             </div>
@@ -77,16 +84,22 @@
             <div class="mb-3" style="border: 1px solid #ddd; padding: 15px; border-radius: 5px; margin-top: 20px;">
                 <h4 style="display: flex; align-items: center; gap: 10px;">
                     افزودن اطلاعات اضافی (کد پستی، تلفن، آدرس)
-                    <button type="button" id="toggle-extra-fields" style="background: none; border: none; font-size: 20px; cursor: pointer;">+</button>
+                    <button type="button" id="toggle-extra-fields"
+                            >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                             class="bi bi-plus" viewBox="0 0 16 16">
+                            <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"/>
+                        </svg>
+                    </button>
                 </h4>
                 <div id="extra-fields" style="display: none; margin-top: 15px;">
                     <div class="mb-3">
                         <label>کد پستی:</label>
-                        <input type="text" id="extra-postal" name="extra_postal" class="form-control">
+                        <input type="text" id="extra-postal" name="extra_postal" class="form-control" inputmode="numeric" pattern="[0-9]*" maxlength="10" placeholder="۱۰ رقم">
                     </div>
                     <div class="mb-3">
                         <label>شماره تلفن:</label>
-                        <input type="text" id="extra-phone" name="extra_phone" class="form-control">
+                        <input type="text" id="extra-phone" name="extra_phone" class="form-control" inputmode="numeric" pattern="[0-9]*" maxlength="11" placeholder="۱۱ رقم">
                     </div>
                     <div class="mb-3">
                         <label>آدرس:</label>
@@ -193,7 +206,7 @@
                     e.preventDefault();
                     return;
                 }
-                
+
                 // اگر فیلدهای اضافی پر شده باشند، آنها را به فرم اضافه کن
                 if (extraPostalField.val().trim()) {
                     $('<input>').attr({
@@ -219,7 +232,7 @@
                         value: extraAddressField.val().trim()
                     }).appendTo(form);
                 }
-                
+
                 // فرم به صورت عادی submit می‌شود
             });
 
@@ -275,6 +288,84 @@
                 $(this).removeClass("error-field shake");
                 $(this).next(".error-msg").remove();
                 msgDiv.html("");
+            });
+
+            // =============================
+            // اعتبارسنجی فیلدهای عددی
+            // فقط قبول اعداد و محدود کردن طول
+            // =============================
+            const numericFields = {
+                'customer-national': 10,
+                'customer-postal': 10,
+                'customer-phone': 11,
+                'customer-phone2': 11,
+                'extra-postal': 10,
+                'extra-phone': 11
+            };
+
+            // فقط اعداد انگلیسی و فارسی را قبول کن و به انگلیسی تبدیل کن
+            function toEnglishNumber(str) {
+                const persianNumbers = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
+                let result = str;
+                for (let i = 0; i < 10; i++) {
+                    result = result.replace(new RegExp(persianNumbers[i], 'g'), i);
+                }
+                return result;
+            }
+
+            // اعتبارسنجی فیلدهای عددی
+            Object.keys(numericFields).forEach(function(fieldId) {
+                const maxLength = numericFields[fieldId];
+                const $field = $('#' + fieldId);
+
+                // روی رویداد input: فقط اعداد را نگه دار
+                $field.on('input', function() {
+                    let value = $(this).val();
+                    // تبدیل اعداد فارسی به انگلیسی
+                    value = toEnglishNumber(value);
+                    // حذف همه چیز به جز اعداد
+                    value = value.replace(/[^0-9]/g, '');
+                    // محدود کردن طول
+                    if (value.length > maxLength) {
+                        value = value.substring(0, maxLength);
+                    }
+                    $(this).val(value);
+                });
+
+                // جلوگیری از کپی کردن متن غیرعددی
+                $field.on('paste', function(e) {
+                    e.preventDefault();
+                    const pastedText = (e.originalEvent.clipboardData || window.clipboardData).getData('text');
+                    let cleanText = toEnglishNumber(pastedText);
+                    cleanText = cleanText.replace(/[^0-9]/g, '');
+                    const currentVal = $(this).val();
+                    const remainingLength = maxLength - currentVal.length;
+                    if (remainingLength > 0) {
+                        const textToAdd = cleanText.substring(0, remainingLength);
+                        const newValue = currentVal + textToAdd;
+                        $(this).val(newValue);
+                    }
+                });
+
+                // جلوگیری از تایپ کاراکترهای غیرعددی در کیبورد
+                $field.on('keypress', function(e) {
+                    const charCode = e.which ? e.which : e.keyCode;
+                    // اجازه دادن به کلیدهای کنترل (backspace, delete, tab, etc)
+                    if (charCode === 8 || charCode === 46 || charCode === 9 || charCode === 0) {
+                        return true;
+                    }
+                    // فقط اعداد مجاز هستند
+                    if (charCode < 48 || charCode > 57) {
+                        e.preventDefault();
+                        return false;
+                    }
+                    // بررسی طول حداکثر
+                    if ($(this).val().length >= maxLength) {
+                        e.preventDefault();
+                        return false;
+                    }
+                    return true;
+                });
             });
         });
     </script>

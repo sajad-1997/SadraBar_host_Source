@@ -24,6 +24,19 @@ class CustomerForm(forms.ModelForm):
         self.fields['name'].required = True
         self.fields['address'].required = True
 
+    def clean_national_id(self):
+        """بررسی تکراری نبودن کد ملی"""
+        national_id = self.cleaned_data.get('national_id')
+        if national_id:
+            # بررسی وجود مشتری با همان کد ملی
+            existing = Customer.objects.filter(national_id=national_id)
+            if self.instance.pk:
+                # در حالت ویرایش، مشتری فعلی را از جستجو حذف کن
+                existing = existing.exclude(pk=self.instance.pk)
+            if existing.exists():
+                raise forms.ValidationError('مشتری با این کد ملی قبلاً ثبت شده است. لطفاً کد ملی دیگری وارد کنید.')
+        return national_id
+
     def clean(self):
         cleaned_data = super().clean()
         required_fields = ['name', 'address']

@@ -52,7 +52,7 @@ def add_vehicle(request):
     if request.method == 'POST':
         if form.is_valid():
             instance = form.save(commit=False)
-            
+
             # بررسی تکراری بودن کارت هوشمند
             smart_card = form.cleaned_data.get('vehicle_smart_card')
             if smart_card and Vehicle.objects.filter(vehicle_smart_card=smart_card).exists():
@@ -61,6 +61,12 @@ def add_vehicle(request):
                     'این کارت هوشمند ناوگان قبلاً در سیستم ثبت شده است'
                 )
             else:
+                # افزودن اطلاعات کاربر ایجاد کننده
+                instance.created_by = request.user
+                instance.created_by_role = getattr(request.user, 'role', 'employee')
+                instance.updated_by = request.user
+                instance.updated_by_role = getattr(request.user, 'role', 'employee')
+
                 instance.save()
                 messages.success(request, 'ناوگان جدید با موفقیت ثبت شد')
                 return redirect('fleet:vehicle_list')

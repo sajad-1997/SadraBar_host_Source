@@ -1,0 +1,87 @@
+{% extends "issuance/base.html" %}
+{% load static %}
+{% block content %}
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} mt-2 system-message">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <style>
+        .system-message {
+            transition: opacity 0.5s ease-out;
+            opacity: 1;
+        }
+
+        .system-message.fade-out {
+            opacity: 0;
+        }
+    </style>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const messages = document.querySelectorAll('.system-message');
+            messages.forEach(function (msg) {
+                setTimeout(function () {
+                    msg.classList.add('fade-out');
+                    setTimeout(function () {
+                        msg.style.display = 'none';
+                    }, 500);
+                }, 2000);
+            });
+        });
+    </script>
+
+    <div class="container">
+        <h2>مدیریت توضیحات آماده</h2>
+        <hr>
+
+        <form method="get" class="row g-2 align-items-center mb-3">
+            <div class="col-md-6">
+                <input type="text" name="q" value="{{ query }}" class="form-control"
+                       placeholder="جستجو در نام یا محتوای توضیحات..." autocomplete="off">
+            </div>
+            <div class="col-md-6">
+                <button type="submit" class="btn btn-primary">جستجو</button>
+                <a href="{% url 'captions:add_caption' %}" class="btn btn-success">افزودن توضیح جدید</a>
+            </div>
+        </form>
+
+        <table class="table table-striped table-hover align-middle">
+            <thead>
+            <tr>
+                <th>#</th>
+                <th>نام توضیح</th>
+                <th>محتوای توضیح</th>
+                <th>عملیات</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for caption in captions %}
+                <tr>
+                    <td>{{ caption.id }}</td>
+                    <td>{{ caption.name|default:"—" }}</td>
+                    <td>{{ caption.content|truncatechars:120 }}</td>
+                    <td>
+                        <a href="{% url 'captions:edit_caption' caption.id %}" class="btn btn-sm btn-warning">ویرایش</a>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="4" class="text-center text-muted">
+                        {% if query %}
+                            هیچ توضیحی برای جستجوی «{{ query }}» یافت نشد.
+                        {% else %}
+                            هنوز هیچ توضیحی ثبت نشده است.
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+{% endblock %}

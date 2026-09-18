@@ -1,103 +1,153 @@
 {% extends 'issuance/search/base.html' %}
+{% load static %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'issuance/css/list_waiting_style.css' %}?v=3">
+{% endblock %}
+
 {% block content %}
 
-<h2>👥 لیست مشتریان</h2>
+    <h2>👥 لیست مشتریان</h2>
 
-<!-- فرم فیلتر -->
-<div class="card filter-card shadow-sm">
-    <form method="get">
-        <div class="row g-2">
-            <div class="col-12 col-md-3">
-                <input type="text" name="name" value="{{ filters.name }}"
-                       class="form-control" placeholder="نام مشتری">
+    <!-- فرم فیلتر -->
+    <div class="card filter-card shadow-sm">
+        <form method="get">
+            <div class="row g-2">
+                <div class="col-4">
+                    <input type="text" name="name" value="{{ filters.name }}"
+                           class="form-control" placeholder="نام مشتری">
+                </div>
+
+                <div class="col-4">
+                    <input type="text" name="national_id" value="{{ filters.national_id }}"
+                           class="form-control" placeholder="کد ملی">
+                </div>
+
+                <div class="col-4">
+                    <input type="text" name="phone" value="{{ filters.phone }}"
+                           class="form-control" placeholder="شماره تماس">
+                </div>
             </div>
+            <div class="row g-2 mt-2">
+                <div class="col-6">
+                    <button type="submit" class="btn w-100">اعمال فیلتر</button>
+                </div>
 
-            <div class="col-12 col-md-3">
-                <input type="text" name="national_id" value="{{ filters.national_id }}"
-                       class="form-control" placeholder="کد ملی">
+                <div class="col-6">
+                    <a href="{% url 'customers:customer_list' %}"
+                       class="btn btn-outline-secondary w-100">پاکسازی فیلتر</a>
+                </div>
             </div>
-
-            <div class="col-12 col-md-3">
-                <input type="text" name="phone" value="{{ filters.phone }}"
-                       class="form-control" placeholder="شماره تماس">
-            </div>
-
-            <div class="col-6 col-md-3">
-                <button type="submit" class="btn w-100">اعمال فیلتر</button>
-            </div>
-
-            <div class="col-6 col-md-3">
-                <a href="{% url 'customers:customer_list' %}"
-                   class="btn btn-outline-secondary w-100">پاکسازی فیلتر</a>
+        </form>
+        <div class="row g-2 mt-2">
+            <div class="col-12">
+                <a href="{% url 'customers:add_customer' %}"
+                   class="btn btn-outline-warning w-100">افزودن مشتری جدید</a>
             </div>
         </div>
-    </form>
-</div>
-
-
-<!-- کارت موبایل -->
-{% for c in customers %}
-<div class="bijak-card">
-
-    <div class="bijak-header">
-        {{ c.name }} | کد ملی: {{ c.national_id|default:"---" }}
     </div>
 
-    <div class="bijak-row">
-        <span>تلفن: {{ c.phone|default:"---" }}</span>
-        <span>تلفن 2: {{ c.phone2|default:"---" }}</span>
-    </div>
 
-    <div class="bijak-row">
-        <span>کد پستی: {{ c.postal|default:"---" }}</span>
-    </div>
-
-    <div class="bijak-row">
-        <span>آدرس:</span>
-        <span>{{ c.address|default:"---" }}</span>
-    </div>
-
-    <div class="btn-group-card">
-        <a href="{% url 'customers:edit_customer' c.pk %}"
-           class="btn btn-sm btn-warning w-100">ویرایش</a>
-    </div>
-
-</div>
-{% empty %}
-<p class="text-center mt-3">هیچ مشتری‌ای یافت نشد</p>
-{% endfor %}
-
-
-
-<!-- جدول دسکتاپ -->
-<table class="desktop-table">
-    <thead>
-    <tr>
-        <th>نام</th>
-        <th>کد ملی</th>
-        <th>تلفن</th>
-        <th>تلفن 2</th>
-        <th>کد پستی</th>
-        <th>آدرس</th>
-        <th>عملیات</th>
-    </tr>
-    </thead>
-    <tbody>
+    <!-- کارت موبایل -->
     {% for c in customers %}
-    <tr>
-        <td>{{ c.name }}</td>
-        <td>{{ c.national_id|default:"---" }}</td>
-        <td>{{ c.phone|default:"---" }}</td>
-        <td>{{ c.phone2|default:"---" }}</td>
-        <td>{{ c.postal|default:"---" }}</td>
-        <td>{{ c.address|default:"---" }}</td>
-        <td>
-            <a href="{% url 'customers:edit_customer' c.pk %}"
-               class="btn btn-sm btn-warning">ویرایش</a>
-        </td>
-    </tr>
+        <div class="bijak-card">
+
+            <div class="bijak-header">
+                {{ c.name }} | شناسه/کد ملی: {{ c.national_id|default:"---" }}
+            </div>
+
+            <div class="bijak-row">
+                <span>تلفن: {{ c.phone|default:"---" }}</span>
+                <span>تلفن دوم: {{ c.phone2|default:"---" }}</span>
+            </div>
+
+            <div class="bijak-row">
+                <span>کد پستی: {{ c.postal|default:"---" }}</span>
+            </div>
+
+            <div class="bijak-row">
+                <span>آدرس اصلی:</span>
+                <span>{{ c.address|default:"---" }}</span>
+            </div>
+
+            {% if c.addresses.all %}
+                <div class="bijak-row"
+                     style="background-color: #f0f0f0; padding: 10px; margin-top: 10px; border-radius: 5px;">
+                    <span style="font-weight: bold; color: #666;">آدرس‌های اضافی:</span>
+                </div>
+                {% for addr in c.addresses.all %}
+                    <div class="bijak-row"
+                         style="background-color: #fafafa; padding: 8px; margin: 5px 0; border-radius: 3px; border-right: 3px solid #007bff;">
+                        <div style="width: 100%;">
+                            <div style="margin-bottom: 5px;">
+                                <strong>آدرس:</strong> {{ addr.address|default:"---" }}
+                            </div>
+                            <div>
+                                <strong>تلفن:</strong> {{ addr.phone|default:"---" }} |
+                                <strong>کد پستی:</strong> {{ addr.postal|default:"---" }}
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <div class="btn-group-card">
+                <a href="{% url 'customers:edit_customer' c.pk %}"
+                   class="btn btn-sm btn-warning w-100">ویرایش</a>
+            </div>
+
+        </div>
+    {% empty %}
+        <p class="text-center mt-3">هیچ مشتری‌ای یافت نشد</p>
     {% endfor %}
-    </tbody>
-</table>
+
+
+
+    <!-- جدول دسکتاپ -->
+    <table class="desktop-table">
+        <thead>
+        <tr>
+            <th>نام</th>
+            <th>شناسه/کد ملی</th>
+            <th>تلفن</th>
+            <th>تلفن دوم</th>
+            <th>کد پستی</th>
+            <th>آدرس اصلی</th>
+            <th>آدرس‌های اضافی</th>
+            <th>عملیات</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for c in customers %}
+            <tr>
+                <td>{{ c.name }}</td>
+                <td>{{ c.national_id|default:"---" }}</td>
+                <td>{{ c.phone|default:"---" }}</td>
+                <td>{{ c.phone2|default:"---" }}</td>
+                <td>{{ c.postal|default:"---" }}</td>
+                <td>{{ c.address|default:"---" }}</td>
+                <td>
+                    {% if c.addresses.all %}
+                        <div style="font-size: 0.85em;">
+                            {% for addr in c.addresses.all %}
+                                <div style="border-bottom: 1px solid #eee; padding: 5px 0;">
+                                    <div><strong>آدرس:</strong> {{ addr.address|default:"---" }}</div>
+                                    <div><strong>تلفن:</strong> {{ addr.phone|default:"---" }} | <strong>کد
+                                        پستی:</strong> {{ addr.postal|default:"---" }}</div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <span style="color: #999;">---</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <a href="{% url 'customers:edit_customer' c.pk %}"
+                       class="btn btn-sm btn-warning">ویرایش</a>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
 
 {% endblock %}
