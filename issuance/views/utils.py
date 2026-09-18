@@ -2,7 +2,6 @@
 
 import jdatetime
 from django.contrib import messages
-import re
 
 
 FIELD_LABELS = {
@@ -48,27 +47,3 @@ def to_jalali(date_obj):
     if not date_obj:
         return "—"
     return jdatetime.date.fromgregorian(date=date_obj).strftime("%Y/%m/%d")
-
-
-
-
-def normalize_caption(text):
-    if not text:
-        return ""
-
-    text = text.strip()
-
-    # عربی به فارسی
-    text = text.replace("ي", "ی")
-    text = text.replace("ك", "ک")
-
-    # حذف نیم فاصله
-    text = text.replace("\u200c", " ")
-
-    # حذف فاصله های اضافی
-    text = re.sub(r"\s+", " ", text)
-
-    # حذف فاصله قبل از علائم
-    text = re.sub(r"\s+([.,،؛:!?])", r"\1", text)
-
-    return text

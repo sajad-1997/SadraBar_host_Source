@@ -7,7 +7,8 @@ from issuance.models import Bijak, BijakApprovalLog
 
 
 def is_manager(user):
-    return user.is_superuser or user.role in ['admin', 'manager']
+    from accounts.decorators import ROLE_ADMIN, ROLE_MANAGER
+    return user.is_superuser or user.role in [ROLE_ADMIN, ROLE_MANAGER]
 
 @login_required
 def manager_preview_page(request, pk):

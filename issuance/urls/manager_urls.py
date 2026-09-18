@@ -6,7 +6,7 @@ from issuance.views.manager.bijak_print import bijak_print
 from issuance.views.manager.review_pending_list import waiting_list
 from issuance.views.manager.review_status_list import final_status_list
 from issuance.views.manager.manager_status import manager_set_final_status
-from issuance.views.driver_views import driver_list
+from drivers.views import driver_list
 
 app_name = 'manager'
 

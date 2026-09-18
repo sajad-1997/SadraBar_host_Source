@@ -40,6 +40,59 @@ body {
     border: 2px solid #ccc;
     border-radius: 10px;
     box-shadow: 12px 14px 16px rgba(0, 0, 0, 0.8);
+    overflow-x: auto;
+}
+
+/* Mobile Responsive Styles */
+@media screen and (max-width: 768px) {
+    .container {
+        margin: 10px;
+        border-radius: 5px;
+        box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    .form-content {
+        padding: 10px;
+    }
+
+    .controls {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        justify-content: center;
+        padding: 10px;
+    }
+
+    .controls button,
+    .controls .btn {
+        flex: 1;
+        min-width: 120px;
+        font-size: 14px;
+        padding: 10px 15px;
+    }
+
+    /* Scale down the form content for mobile viewing */
+    .form-content {
+        transform: scale(0.6);
+        transform-origin: top right;
+        width: 166.67%; /* 100% / 0.6 */
+        margin-bottom: -40%;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .form-content {
+        transform: scale(0.5);
+        width: 200%; /* 100% / 0.5 */
+        margin-bottom: -50%;
+    }
+
+    .controls button,
+    .controls .btn {
+        font-size: 12px;
+        padding: 8px 12px;
+        min-width: 100px;
+    }
 }
 
 .form-content {
@@ -51,6 +104,7 @@ body {
     display: grid;
     grid-template-columns: 0.8fr 1fr 0.8fr;
     align-items: start;
+    grid-auto-flow: column;
 }
 
 .company-header {
@@ -176,6 +230,37 @@ body {
     text-align: center;
 }
 
+/* Digital Stamp */
+.digital-stamp-container {
+    margin-top: 10px;
+    text-align: center;
+}
+
+.digital-stamp {
+    width: 80px;
+    height: 80px;
+    object-fit: contain;
+    margin-bottom: 5px;
+}
+
+/* Digital Signature (موسسه حمل و نقل) */
+.digital-signature-container {
+    margin-top: 5px;
+    text-align: center;
+}
+
+.digital-signature {
+    width: 110px;
+    height: 50px;
+    object-fit: contain;
+}
+
+.user-code {
+    font-size: 10px;
+    font-weight: bold;
+    margin: 0;
+}
+
 /* Phone section */
 .phone-section {
     display: grid;
@@ -258,6 +343,7 @@ body {
     .header-section {
         grid-template-columns: 1fr;
         gap: 10px;
+        grid-auto-flow: column;
     }
 
     .bottom-section {

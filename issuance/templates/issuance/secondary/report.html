@@ -13,6 +13,31 @@
         .summary {margin-top: 10px; font-weight: bold;}
         .stats-box {display: flex; gap: 10px; margin: 15px 0;}
         .card {flex: 1; background: #f8f8f8; padding: 10px; border-radius: 8px; text-align: center;}
+
+        /* Dark mode support */
+        @media (prefers-color-scheme: dark) {
+            body {
+                background-color: #181a1f;
+                color: #e4e4e4;
+            }
+            
+            table {
+                color: #e4e4e4;
+            }
+            
+            th, td {
+                border-color: #3d414a;
+            }
+            
+            th {
+                background-color: #2b2e36;
+            }
+            
+            .card {
+                background-color: #2b2e36;
+                color: #e4e4e4;
+            }
+        }
     </style>
 </head>
 <body>

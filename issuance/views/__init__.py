@@ -6,10 +6,6 @@ from .bijak_qr_views import *
 from .bijak_token_views import *
 from .bijak_search_views import *
 from .bijaks_employee_views import *
-from .caption_views import *
-from .customer_views import *
 from .dashboard_views import *
-from .driver_views import *
 from .edit_views import *
 from .utils import *
-from .vehicle_views import *

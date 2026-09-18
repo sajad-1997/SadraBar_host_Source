@@ -113,7 +113,7 @@
                                   placeholder="اگر توضیح خاصی دارید، اینجا بنویسید..."></textarea>
                     </div>
                     <div class="mt-2 text-center">
-                        <a href="{% url 'issuance:crud:add_caption' %}" class="btn btn-secondary btn-sm">
+                        <a href="{% url 'captions:add_caption' %}?next={{ request.get_full_path }}" class="btn btn-secondary btn-sm">
                             افزودن توضیح همیشگی
                         </a>
                     </div>
@@ -124,7 +124,7 @@
             <div class="mt-4 text-center">
                 {% if bijak.id %}
                     {% if bijak.approval_status == 'approved' %}
-                        <a href="{% url 'bijak_print' bijak.id %}" class="btn btn-success">چاپ بارنامه</a>
+                        <a href="{% url 'issuance:manager:bijak_print' bijak.id %}" class="btn btn-success">چاپ بارنامه</a>
                     {% elif bijak.approval_status == 'pending' %}
                         <button type="submit" name="action" value="send_for_approval" class="btn btn-primary">
                             ارسال برای تایید مدیر

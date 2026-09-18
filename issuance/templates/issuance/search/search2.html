@@ -83,20 +83,22 @@
 <div class="card filter-card shadow-sm">
     <form method="get">
         <div class="row g-2">
-            <div class="col-12 col-md-3"><input type="text" name="tracking" value="{{ filters.tracking }}" class="form-control" placeholder="کد رهگیری"></div>
-            <div class="col-12 col-md-3"><input type="text" name="sender" value="{{ filters.sender }}" class="form-control" placeholder="نام فرستنده"></div>
-            <div class="col-12 col-md-3"><input type="text" name="receiver" value="{{ filters.receiver }}" class="form-control" placeholder="نام گیرنده"></div>
-            <div class="col-12 col-md-3"><input type="text" name="origin" value="{{ filters.origin }}" class="form-control" placeholder="مبدا"></div>
+            <div class="col-12"><input type="text" name="tracking" value="{{ filters.tracking }}" class="form-control" placeholder="کد رهگیری"></div>
+            <div class="col-12"><input type="text" name="sender" value="{{ filters.sender }}" class="form-control" placeholder="نام فرستنده"></div>
+            <div class="col-12"><input type="text" name="receiver" value="{{ filters.receiver }}" class="form-control" placeholder="نام گیرنده"></div>
+            <div class="col-12"><input type="text" name="origin" value="{{ filters.origin }}" class="form-control" placeholder="مبدا"></div>
+            <div class="col-12"><input type="text" name="destination" value="{{ filters.destination }}" class="form-control" placeholder="مقصد"></div>
+            <div class="col-12"><input type="text" name="driver" value="{{ filters.driver }}" class="form-control" placeholder="نام راننده"></div>
+            <div class="col-12"><input type="text" id="start_date" class="datepicker-input" placeholder="تاریخ شروع"></div>
+            <div class="col-12"><input type="text" id="end_date" class="datepicker-input" placeholder="تاریخ پایان"></div>
         </div>
         <div class="row g-2 mt-2">
-            <div class="col-12 col-md-3"><input type="text" name="destination" value="{{ filters.destination }}" class="form-control" placeholder="مقصد"></div>
-            <div class="col-12 col-md-3"><input type="text" name="driver" value="{{ filters.driver }}" class="form-control" placeholder="نام راننده"></div>
-            <div class="col-12 col-md-3"><input type="text" id="start_date" class="datepicker-input" placeholder="تاریخ شروع"></div>
-            <div class="col-12 col-md-3"><input type="text" id="end_date" class="datepicker-input" placeholder="تاریخ پایان"></div>
-        </div>
-        <div class="row g-2 mt-2">
-            <div class="col-6 col-md-3"><button type="submit" class="btn w-100">اعمال فیلتر</button></div>
-            <div class="col-6 col-md-3"><a href="{% url 'issuance:search:search_shipment' %}" class="btn btn-outline-secondary w-100">پاکسازی فیلتر</a></div>
+            <div class="col-6">
+                <button type="submit" class="btn w-100">اعمال فیلتر</button>
+            </div>
+            <div class="col-6">
+                <a href="{% url 'issuance:search:search_shipment' %}" class="btn btn-outline-secondary w-100">پاکسازی فیلتر</a>
+            </div>
         </div>
 
         <!-- فیلدهای مخفی برای ارسال تاریخ میلادی -->

@@ -20,9 +20,13 @@ class CurrentUserMiddleware:
 
     def __call__(self, request):
         # ذخیره کاربر واردشده
-        if request.user.is_authenticated:
-            set_current_user(request.user)
-        else:
+        try:
+            if request.user.is_authenticated:
+                set_current_user(request.user)
+            else:
+                set_current_user(None)
+        except AttributeError:
+            # در صورتی که کاربر AnonymousUser باشد
             set_current_user(None)
 
         response = self.get_response(request)

@@ -1,5 +1,11 @@
 {% extends 'issuance/search/base.html' %}
+{% load static %}
 {% load humanize %}
+
+{% block extra_css %}
+    {#    <link rel="stylesheet" href="{% static 'issuance/css/list_waiting_style.css' %}?v=3">#}
+{% endblock %}
+
 {% block content %}
 
     <h2>{% block title %}🔍 جستجوی سراسری بارنامه‌ها{% endblock %}</h2>
@@ -7,26 +13,29 @@
     <!-- فرم جستجوی سراسری با قابلیت AJAX -->
     <div class="card filter-card shadow-sm">
         <form method="get" id="search-form">
-            <div class="row g-2 align-items-center">
-                <div class="col-12 col-md-9">
+            <div class="row g-3">
+                <div class="col-6">
                     <input
-                        type="text"
-                        name="q"
-                        id="search-input"
-                        value="{{ search_query }}"
-                        class="form-control"
-                        placeholder="جستجو بر اساس کد رهگیری، نام فرستنده، گیرنده، راننده، پلاک، مبدا، مقصد، کد ملی، آدرس..."
-                        autofocus
-                        autocomplete="off"
+                            type="text"
+                            name="q"
+                            id="search-input"
+                            value="{{ search_query }}"
+                            class="form-control"
+                            placeholder="جستجو بر اساس کد رهگیری، نام فرستنده، گیرنده، راننده، پلاک، مبدا، مقصد، کد ملی، آدرس..."
+                            autofocus
+                            autocomplete="off"
                     >
                 </div>
-                <div class="col-6 col-md-2">
+                <div class="col-6">
                     <button type="submit" class="btn w-100">جستجو</button>
                 </div>
-                <div class="col-6 col-md-1">
+                <div class="col-6">
                     <a href="{% url 'issuance:search:search_shipment' %}"
-                       class="btn btn-outline-secondary w-100">×</a>
+                       class="btn btn-outline-secondary w-100">پاکسازی</a>
                 </div>
+            </div>
+            <div class="row g-2 mt-2">
+
             </div>
         </form>
     </div>
@@ -61,20 +70,34 @@
                 <td>{{ b.total_fare|intcomma }} ریال</td>
                 <td>{{ b.value|intcomma }} ریال</td>
                 <td>{{ b.cargo.name }}</td>
-                <td>{{ b.cargo.origin }}</td>
-                <td>{{ b.cargo.destination }}</td>
+                <td>{{ b.cargo.origin.name }}</td>
+                <td>{{ b.cargo.destination.name }}</td>
                 <td>{{ b.driver.name }}</td>
                 <td>
                     {% if b.approval_status == 'pending' %}
-                        <a href="{% url 'issuance:crud:preview' b.pk %}" class="btn btn-sm btn-info">مشاهده</a>
+                        {% if request.user.role == 'admin' or request.user.role == 'manager' %}
+                            <a href="{% url 'issuance:manager:manager_preview' b.pk %}"
+                               class="btn btn-sm btn-info">مشاهده</a>
+                        {% elif request.user.role == 'employee' %}
+                            <a href="{% url 'issuance:crud:preview' b.pk %}"
+                               class="btn btn-sm btn-info">مشاهده</a>
+                        {% endif %}
                     {% elif b.approval_status == 'approved' %}
                         <a href="{% url 'issuance:crud:print' b.pk %}" class="btn btn-sm btn-primary">چاپ</a>
-                        <a href="{% url 'issuance:manager:manager_preview' b.pk %}" class="btn btn-sm btn-info">مشاهده</a>
+                        {% if b.cargo.weight_2 and b.cargo.weight_2 > 0 %}
+                            <a href="{% url 'issuance:crud:print_weight2' b.pk %}"
+                               class="btn btn-sm btn-success">چاپ با وزن دوم</a>
+                        {% endif %}
                         <a href="{% url 'issuance:crud:preview' b.pk %}" class="btn btn-sm btn-info">مشاهده</a>
                     {% elif b.approval_status == 'rejected' %}
                         <a href="{% url 'issuance:crud:edit_bijak' b.pk %}" class="btn btn-sm btn-warning">ویرایش</a>
-                        <a href="{% url 'issuance:manager:manager_preview' b.pk %}" class="btn btn-sm btn-info">مشاهده</a>
-                        <a href="{% url 'issuance:crud:preview' b.pk %}" class="btn btn-sm btn-info">مشاهده</a>
+                        {% if request.user.role == 'admin' or request.user.role == 'manager' %}
+                            <a href="{% url 'issuance:manager:manager_preview' b.pk %}"
+                               class="btn btn-sm btn-info">مشاهده</a>
+                        {% elif request.user.role == 'employee' %}
+                            <a href="{% url 'issuance:crud:preview' b.pk %}"
+                               class="btn btn-sm btn-info">مشاهده</a>
+                        {% endif %}
                     {% endif %}
                 </td>
             </tr>
@@ -85,12 +108,13 @@
         {% endfor %}
         </tbody>
     </table>
-    
+
     <!-- کارت موبایل -->
     <div id="mobile-results">
-    {% for b in bijaks %}
-        <div class="bijak-card">
-            <div class="bijak-header"><b>ردیف:</b> {{ b.id }} | <b>شماره بارنامه:</b> {{ b.tracking_code }} | <b>زمان صدور:</b> {{ b.issuance_datetime }}</div>
+        {% for b in bijaks %}
+            <div class="bijak-card">
+                <div class="bijak-header"><b>ردیف:</b> {{ b.id }} | <b>شماره بارنامه:</b> {{ b.tracking_code }} | <b>زمان
+                    صدور:</b> {{ b.issuance_datetime }}</div>
                 <div class="bijak-row">
                     <span></span>
                 </div>
@@ -113,8 +137,8 @@
                     <span><b>وزن محموله:</b> {{ b.cargo.weight }}</span>
                 </div>
                 <div class="bijak-row">
-                    <span><b>مبدا:</b> {{ b.cargo.origin }}</span>
-                    <span><b>مقصد:</b> {{ b.cargo.destination }}</span>
+                    <span><b>مبدا:</b> {{ b.cargo.origin.name }}</span>
+                    <span><b>مقصد:</b> {{ b.cargo.destination.name }}</span>
                 </div>
                 <div class="bijak-row">
                     <span><b>توضیحات:</b>{{ b.final_description }}</span>
@@ -125,88 +149,93 @@
                     <span><b>وضعیت نهایی:</b> {{ b.get_type_display }}</span>
                     <span><b>ثبت کننده:</b> {{ b.created_by }}</span>
                 </div>
-            <div class="btn-group-card">
-                <a href="{% url 'issuance:crud:print' b.pk %}" class="btn btn-sm btn-primary w-100">چاپ</a>
-                <a href="{% url 'issuance:manager:manager_preview' b.pk %}" class="btn btn-sm btn-info w-100">مشاهده</a>
-                <a href="{% url 'issuance:crud:edit_bijak' b.pk %}" class="btn btn-sm btn-warning w-100">ویرایش</a>
+                <div class="btn-group-card">
+                    <a href="{% url 'issuance:crud:print' b.pk %}" class="btn btn-sm btn-primary w-100">چاپ</a>
+                    {% if b.approval_status == 'approved' and b.cargo.weight_2 and b.cargo.weight_2 > 0 %}
+                        <a href="{% url 'issuance:crud:print_weight2' b.pk %}"
+                           class="btn btn-sm btn-success w-100">چاپ با وزن دوم</a>
+                    {% endif %}
+                    <a href="{% url 'issuance:manager:manager_preview' b.pk %}"
+                       class="btn btn-sm btn-info w-100">مشاهده</a>
+                    <a href="{% url 'issuance:crud:edit_bijak' b.pk %}" class="btn btn-sm btn-warning w-100">ویرایش</a>
+                </div>
             </div>
-        </div>
-    {% empty %}
-        <p class="text-center mt-4 text-muted">
-            نتیجه‌ای یافت نشد
-        </p>
-    {% endfor %}
+        {% empty %}
+            <p class="text-center mt-4 text-muted">
+                نتیجه‌ای یافت نشد
+            </p>
+        {% endfor %}
     </div>
 
 {% endblock %}
 
 {% block extra_js %}
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script>
-$(document).ready(function() {
-    let searchTimeout = null;
-    const searchInput = $('#search-input');
-    const desktopTbody = $('#desktop-tbody');
-    const mobileResults = $('#mobile-results');
-    const resultsCount = $('#search-results-count');
-    
-    // تابع به‌روزرسانی نتایج
-    function updateResults(html, count) {
-        // استخراج محتوای جدول و کارت‌ها از HTML دریافتی
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(html, 'text/html');
-        
-        // به‌روزرسانی جدول دسکتاپ
-        const desktopRows = $(doc).find('.desktop-table tbody tr').length ? 
-            $(doc).find('.desktop-table tbody').html() : 
-            '<tr><td colspan="11" class="text-center text-muted">نتیجه‌ای یافت نشد</td></tr>';
-        desktopTbody.html(desktopRows);
-        
-        // به‌روزرسانی کارت‌های موبایل
-        const mobileCards = $(doc).find('.bijak-card');
-        if (mobileCards.length > 0) {
-            mobileResults.html(mobileCards.toArray().map(el => el.outerHTML).join(''));
-        } else {
-            mobileResults.html('<p class="text-center mt-4 text-muted">نتیجه‌ای یافت نشد</p>');
-        }
-        
-        // نمایش تعداد نتایج
-        if (count > 0) {
-            resultsCount.text(count + ' نتیجه یافت شد');
-        } else {
-            resultsCount.text('');
-        }
-    }
-    
-    // رویداد تایپ در فیلد جستجو - جستجوی زنده
-    searchInput.on('input', function() {
-        const query = $(this).val().trim();
-        
-        // پاک کردن تایمر قبلی
-        if (searchTimeout) {
-            clearTimeout(searchTimeout);
-        }
-        
-        // اگر خالی بود
-        if (query.length === 0) {
-            resultsCount.text('');
-            return;
-        }
-        
-        // تأخیر 300 میلی‌ثانیه برای جلوگیری از درخواست‌های زیاد
-        searchTimeout = setTimeout(function() {
-            $.ajax({
-                url: "{% url 'issuance:search:ajax_search_shipment' %}",
-                data: { q: query },
-                success: function(response) {
-                    updateResults(response.html, response.count);
-                },
-                error: function() {
-                    console.error('خطا در جستجو');
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            let searchTimeout = null;
+            const searchInput = $('#search-input');
+            const desktopTbody = $('#desktop-tbody');
+            const mobileResults = $('#mobile-results');
+            const resultsCount = $('#search-results-count');
+
+            // تابع به‌روزرسانی نتایج
+            function updateResults(html, count) {
+                // استخراج محتوای جدول و کارت‌ها از HTML دریافتی
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+
+                // به‌روزرسانی جدول دسکتاپ
+                const desktopRows = $(doc).find('.desktop-table tbody tr').length ?
+                    $(doc).find('.desktop-table tbody').html() :
+                    '<tr><td colspan="11" class="text-center text-muted">نتیجه‌ای یافت نشد</td></tr>';
+                desktopTbody.html(desktopRows);
+
+                // به‌روزرسانی کارت‌های موبایل
+                const mobileCards = $(doc).find('.bijak-card');
+                if (mobileCards.length > 0) {
+                    mobileResults.html(mobileCards.toArray().map(el => el.outerHTML).join(''));
+                } else {
+                    mobileResults.html('<p class="text-center mt-4 text-muted">نتیجه‌ای یافت نشد</p>');
                 }
+
+                // نمایش تعداد نتایج
+                if (count > 0) {
+                    resultsCount.text(count + ' نتیجه یافت شد');
+                } else {
+                    resultsCount.text('');
+                }
+            }
+
+            // رویداد تایپ در فیلد جستجو - جستجوی زنده
+            searchInput.on('input', function () {
+                const query = $(this).val().trim();
+
+                // پاک کردن تایمر قبلی
+                if (searchTimeout) {
+                    clearTimeout(searchTimeout);
+                }
+
+                // اگر خالی بود
+                if (query.length === 0) {
+                    resultsCount.text('');
+                    return;
+                }
+
+                // تأخیر 300 میلی‌ثانیه برای جلوگیری از درخواست‌های زیاد
+                searchTimeout = setTimeout(function () {
+                    $.ajax({
+                        url: "{% url 'issuance:search:ajax_search_shipment' %}",
+                        data: {q: query},
+                        success: function (response) {
+                            updateResults(response.html, response.count);
+                        },
+                        error: function () {
+                            console.error('خطا در جستجو');
+                        }
+                    });
+                }, 300);
             });
-        }, 300);
-    });
-});
-</script>
+        });
+    </script>
 {% endblock %}

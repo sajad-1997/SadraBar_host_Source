@@ -7,7 +7,12 @@ from django.shortcuts import get_object_or_404, redirect
 from django.shortcuts import render
 from django.views.decorators.cache import never_cache
 
-from ..forms import *
+from ..forms import ShipmentForm
+from ..models import Bijak
+from customers.forms import CustomerForm
+from drivers.forms import DriverForm
+from fleet.forms import VehicleForm
+from cargo.forms import CargoForm
 
 
 @login_required(login_url='/accounts/login/')

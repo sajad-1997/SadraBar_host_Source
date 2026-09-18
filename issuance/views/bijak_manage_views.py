@@ -7,7 +7,8 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.views.decorators.cache import never_cache
 
 from .utils import show_form_errors
-from ..forms import ShipmentForm, CargoForm
+from ..forms import ShipmentForm
+from cargo.forms import CargoForm
 from ..models import Bijak
 
 

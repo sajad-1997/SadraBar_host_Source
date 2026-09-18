@@ -1,5 +1,8 @@
 from django.contrib import admin
-from .models import Customer, Driver, Vehicle, Bijak, BijakApprovalLog
+from .models import Bijak, BijakApprovalLog
+from customers.models import Customer
+from drivers.models import Driver
+from fleet.models import Vehicle
 from django.utils import timezone
 from django.db.models import Count, Sum
 from django.db.models.functions import TruncDay, TruncWeek, TruncMonth, TruncYear

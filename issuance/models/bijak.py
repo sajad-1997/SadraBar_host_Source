@@ -142,7 +142,9 @@ class Bijak(UserTrackingModel):
     @property
     def num_in_words(self):
         try:
-            return digits.convert_to_word(int(self.total_fare.replace(',', ''))) + " ریال"
+            # total_fare is a DecimalField, convert to int
+            fare_value = int(self.total_fare) if self.total_fare else 0
+            return digits.convert_to_word(fare_value) + " ریال"
         except Exception:
             return ""
 

@@ -6,9 +6,9 @@
 <p>وضعیت: {{ bijak.get_status_display }}</p>
 <p>وضعیت تأیید: {{ bijak.get_approval_status_display }}</p>
 
-{% if user.is_staff %}
+{% if user.role in 'manager admin' %}
     <h3>عملیات مدیریتی</h3>
     {% include 'issuance/partials/approval_buttons.html' %}
 {% elif bijak.can_print %}
-    <a href="{% url 'issuance:bijak:final_bijak' bijak.id %}" class="btn btn-primary">چاپ بارنامه</a>
+    <a href="{% url 'issuance:crud:print' bijak.id %}" class="btn btn-primary">چاپ بارنامه</a>
 {% endif %}

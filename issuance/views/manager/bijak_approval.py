@@ -8,7 +8,8 @@ from issuance.models import Bijak
 
 def is_manager(user):
     """فقط مدیر یا ادمین مجاز است"""
-    return user.is_superuser or getattr(user, 'role', None) in ['admin', 'manager']
+    from accounts.decorators import ROLE_ADMIN, ROLE_MANAGER
+    return user.is_superuser or getattr(user, 'role', None) in [ROLE_ADMIN, ROLE_MANAGER]
 
 
 @login_required

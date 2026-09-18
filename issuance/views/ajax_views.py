@@ -4,7 +4,8 @@ from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 
-from ..forms import CustomerForm, DriverForm
+from customers.forms import CustomerForm
+from drivers.forms import DriverForm
 
 
 @login_required

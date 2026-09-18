@@ -11,16 +11,31 @@ from django.views.decorators.cache import never_cache
 # دیگر نیازی به khayyam نیست
 # from khayyam import JalaliDatetime
 
-from .utils import persian_to_english_numbers, show_form_errors, normalize_caption
-from ..forms import ShipmentForm, CargoForm
-from ..models import Customer, Driver, Vehicle, Caption
-
+from .utils import persian_to_english_numbers, show_form_errors
+from accounts.decorators import ROLE_ADMIN, ROLE_MANAGER
+from system_control.services import check_issuance_allowed
+from ..forms import ShipmentForm
+from captions.models import Caption
+from captions.utils import normalize_caption
+from customers.models import Customer
+from drivers.models import Driver
+from fleet.models import Vehicle
+from cargo.forms import CargoForm
 
 @login_required
 @never_cache
 def create_new(request):
     captions = Caption.objects.all().order_by("-id")
-    user_role = getattr(request.user, "role", "staff")
+    user_role = getattr(request.user, "role", "employee")
+
+    # -------------------------------
+    # کنترل سهمیه صدور بارنامه
+    # (بر اساس آمار صدور و محدودیت‌های تعیین‌شده توسط سوپر ادمین)
+    # -------------------------------
+    quota_ok, quota_message, quota_statuses = check_issuance_allowed(request.user)
+    if not quota_ok:
+        messages.error(request, quota_message)
+        return redirect("issuance:crud:pending")
 
     # مقادیر پیش فرض برای نمایش مجدد فرم
     selected_caption_id = None
@@ -133,36 +148,19 @@ def create_new(request):
 
     # -------------------------------
     # بررسی تکراری بودن توضیح دستی
+    # (به جای متوقف کردن ثبت، توضیح موجود مجدداً استفاده می‌شود)
     # -------------------------------
+    existing_caption = None
+
     if custom_caption:
 
         normalized_input = normalize_caption(custom_caption)
 
-        duplicate_caption = Caption.objects.filter(
-            content__isnull=False
-        )
-
-        for caption in duplicate_caption:
+        for caption in Caption.objects.filter(content__isnull=False):
 
             if normalize_caption(caption.content) == normalized_input:
-
-                messages.warning(
-                    request,
-                    "این توضیح قبلاً ثبت شده است. لطفاً از لیست توضیحات آماده انتخاب کنید."
-                )
-
-                return render(
-                    request,
-                    "issuance/bijak/issuance_form.html",
-                    {
-                        "shipment_form": shipment_form,
-                        "cargo_form": cargo_form,
-                        "captions": captions,
-                        "user_role": user_role,
-                        "selected_caption_id": selected_caption_id,
-                        "custom_caption": custom_caption,
-                    },
-                )
+                existing_caption = caption
+                break
 
     # -------------------------------
     # دریافت اطلاعات
@@ -211,10 +209,14 @@ def create_new(request):
         # اگر توضیح دستی وارد شده باشد
         if custom_caption:
 
-            caption_obj = Caption.objects.create(
-                name=custom_caption[:100],
-                content=custom_caption,
-            )
+            if existing_caption:
+                # توضیح مشابه قبلاً ثبت شده؛ همان توضیح استفاده می‌شود
+                caption_obj = existing_caption
+            else:
+                caption_obj = Caption.objects.create(
+                    name=custom_caption[:100],
+                    content=custom_caption,
+                )
 
         # اگر توضیح آماده انتخاب شده باشد
         elif selected_caption_id:
@@ -239,13 +241,29 @@ def create_new(request):
 
         bijak.save()
 
+    # کاربران دارای نقش ادمین/مدیریت (و سوپریوزر) مستقیماً به صفحه پیش‌نمایش
+    # مدیریتی (تصمیم‌گیری تأیید یا رد بارنامه) هدایت می‌شوند
+    is_manager_role = (
+        request.user.is_superuser
+        or user_role in [ROLE_ADMIN, ROLE_MANAGER]
+    )
+
+    if is_manager_role:
+        messages.success(
+            request,
+            "بارنامه با موفقیت ثبت شد. برای تأیید یا رد، تصمیم‌گیری کنید."
+        )
+
+        return redirect(
+            "issuance:manager:manager_preview",
+            pk=bijak.id,
+        )
+
+    # کاربران با نقش کارمند همان پیش‌نمایش عادی بارنامه را می‌بینند
     messages.success(
         request,
         "بارنامه با موفقیت ثبت شد و در انتظار تأیید مدیریت است."
     )
-
-    if user_role == "staff":
-        return redirect("issuance:crud:pending")
 
     return redirect(
         "issuance:crud:preview",

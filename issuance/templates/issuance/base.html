@@ -8,12 +8,15 @@
     <title>{% block title %}مؤسسه حمل و نقل صدرابار خراسان{% endblock %}</title>
 
     <link rel="stylesheet" href="{% static 'issuance/css/main.css' %}">
-<!--{#    <link rel="stylesheet" href="{% static 'issuance/css/form_new.css' %}">#}-->
-<!--{#    <link rel="stylesheet" href="{% static 'issuance/css/new_style_old.css' %}">#}-->
+    <!--{#    <link rel="stylesheet" href="{% static 'issuance/css/form_new.css' %}">#}-->
+    <!--{#    <link rel="stylesheet" href="{% static 'issuance/css/new_style_old.css' %}">#}-->
     <link rel="stylesheet" href="{% static 'issuance/css/page_link_style.css' %}">
 
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet"/>
+{#    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet"/>#}
 
+
+    <!-- Select2 -->
+    <link rel="stylesheet" href="{% static 'issuance/css/select2.min.css' %}">
 
     <!-- Bootstrap RTL -->
     <link rel="stylesheet" href="{% static 'issuance/css/bootstrap.rtl.min.css' %}">
@@ -21,8 +24,8 @@
     <!-- Persian Datepicker -->
     <link rel="stylesheet" href="{% static 'issuance/css/persian-datepicker.css' %}">
 
-{% block extra_css %}
-{% endblock %}
+    {% block extra_css %}
+    {% endblock %}
 
     <style>
         /* تمام استایل‌ها با پیشوند #custom-main-header محدود شده‌اند */
@@ -194,42 +197,42 @@
             #custom-main-header ul li a:hover {
                 color: #ffb347;
             }
-            
+
             body {
                 background-color: #181a1f;
                 color: #e4e4e4;
             }
-            
+
             .container {
                 color: #e4e4e4;
             }
-            
+
             .card {
                 background-color: #2b2e36;
                 border-color: #3d414a;
             }
-            
+
             .table {
                 color: #e4e4e4;
             }
-            
+
             .table thead th {
                 background-color: #2b2e36;
                 border-color: #3d414a;
             }
-            
+
             .form-control {
                 background-color: #2b2e36;
                 border-color: #3d414a;
                 color: #e4e4e4;
             }
-            
+
             .form-control:focus {
                 background-color: #2b2e36;
                 border-color: #8f94fb;
                 color: #e4e4e4;
             }
-            
+
             .btn-light {
                 background-color: #2b2e36;
                 border-color: #3d414a;
@@ -241,6 +244,7 @@
 
 <body>
 
+<!-- Header -->
 <div class="container" id="custom-main-header">
     <div class="stamp">
         <h2>سازمان راهداری و حمل و نقل جاده ای</h2>
@@ -248,18 +252,19 @@
     </div>
     <div>
         <ul>
-            <li><a href="{% url 'home' %}">صفحه اصلی</a></li>
-            <li><a href="{% url 'go_dashboard' %}">پنل کاربری</a></li>
+            <li><a href="{% url 'go_dashboard' %}">پنل عملیاتی</a></li>
             <li><a href="{% url 'drivers:driver_list' %}">لیست رانندگان</a></li>
-            <li><a href="{% url 'drivers:add_driver' %}">افزودن راننده</a></li>
             <li><a href="{% url 'customers:customer_list' %}">لیست مشتریان</a></li>
+        </ul>
+        <ul>
+            <li><a href="{% url 'drivers:add_driver' %}">افزودن راننده</a></li>
             <li><a href="{% url 'customers:add_customer' %}">افزودن مشتری</a></li>
         </ul>
     </div>
 </div>
 
-{% block content %}
-{% endblock %}
+<!-- Main Content -->
+{% block content %}{% endblock %}
 
 
 <!-- اسکریپت‌ها -->
@@ -272,20 +277,21 @@
 <!-- Persian Datepicker -->
 <script src="{% static 'issuance/persian-datepicker.js' %}"></script>
 
-<script src="{% static 'issuance/shipment_form.js' %}"></script>
+<script src="{% static 'issuance/shipment_form.js' %}?v=20260912"></script>
 
 <script src="{% static 'issuance/bootstrap.bundle.min.js' %}"></script>
 
 
 <!--<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>-->
 
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+{#<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>#}
+<script src="{% static 'issuance/select2.min.js' %}"></script>
 
 <!-- Form Validation Utility -->
 <script src="{% static 'issuance/js/form_validation.js' %}"></script>
 
-{% block extra_scripts %}
-{% endblock %}
+{% block extra_scripts %}{% endblock %}
+
 {% include "pwa/scripts.html" %}
 
 </body>

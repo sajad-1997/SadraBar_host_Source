@@ -1,5 +1,10 @@
 {% extends "issuance/search/base.html" %}
+{% load static %}
 {% load filters %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'issuance/css/list_waiting_style.css' %}?v=3">
+{% endblock %}
 
 {% block content %}
     <h2>🗂️ مدیریت وضعیت نهایی بارنامه‌ها</h2>

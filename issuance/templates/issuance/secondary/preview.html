@@ -1,4 +1,5 @@
 {% load static %}
+{% load persian_numbers %}
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
@@ -29,6 +30,13 @@
                target="_blank">
                 چاپ بارنامه
             </a>
+            {% if can_use_digital_stamp %}
+                <a href="{% url 'issuance:crud:print_with_stamp' bijak.pk %}"
+                   class="btn btn-success"
+                   target="_blank">
+                    چاپ با مهر دیجیتال
+                </a>
+            {% endif %}
         {% endif %}
 
         <a href="{% url 'issuance:search:search_shipment' %}"
@@ -57,9 +65,9 @@
                 </tr>
                 <tr>
                     <td>{{ bijak.created_by }}</td>
-                    <td>{{ bijak.created_at }}</td>
+                    <td>{{ bijak.created_at|date:"Y/m/d H:i"|persian_numbers }}</td>
                     <td>{{ bijak.approved_by|default:"—" }}</td>
-                    <td>{{ bijak.approved_at|default:"—" }}</td>
+                    <td>{{ bijak.approved_at|date:"Y/m/d H:i"|persian_numbers|default:"—" }}</td>
                 </tr>
             </table>
 

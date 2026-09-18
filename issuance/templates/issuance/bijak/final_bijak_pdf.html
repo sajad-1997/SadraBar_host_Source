@@ -1,0 +1,340 @@
+{% load static %}
+{% load persian_numbers %}
+{% load jalali_filters %}
+
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>بارنامه PDF</title>
+    <style>
+        @import url('/static/fonts/IRANSansWeb.woff2');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'IRANSans', 'Tahoma', 'Arial', sans-serif;
+            font-size: 10px;
+            line-height: 1.2;
+            direction: rtl;
+            text-align: right;
+        }
+        
+        .page {
+            width: 210mm;
+            height: 297mm;
+            page-break-after: always;
+            padding: 10mm;
+            background: white;
+        }
+        
+        .bijak-content {
+            width: 100%;
+            height: 100%;
+            border: 2px solid #000;
+            padding: 5mm;
+        }
+        
+        .header {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 5mm;
+            margin-bottom: 5mm;
+            border-bottom: 1px solid #000;
+            padding-bottom: 3mm;
+        }
+        
+        .company-info {
+            text-align: center;
+            font-size: 9px;
+        }
+        
+        .bijak-info {
+            text-align: center;
+            font-size: 9px;
+        }
+        
+        .contact-info {
+            font-size: 8px;
+            line-height: 1.4;
+        }
+        
+        .section {
+            margin-bottom: 3mm;
+        }
+        
+        .section-title {
+            font-weight: bold;
+            font-size: 9px;
+            margin-bottom: 1mm;
+            background: #f0f0f0;
+            padding: 1mm;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 8px;
+        }
+        
+        th, td {
+            border: 1px solid #000;
+            padding: 1mm;
+            text-align: center;
+        }
+        
+        th {
+            background: #f0f0f0;
+            font-weight: bold;
+        }
+        
+        .signature-section {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 5mm;
+            padding-top: 3mm;
+            border-top: 1px solid #000;
+        }
+        
+        .signature-box {
+            width: 30%;
+            text-align: center;
+            font-size: 8px;
+        }
+        
+        .digital-stamp {
+            width: 40mm;
+            height: 40mm;
+            margin-top: 2mm;
+        }
+
+        .digital-signature {
+            width: 45mm;
+            height: 20mm;
+            margin-top: 1mm;
+            object-fit: contain;
+        }
+        
+        .user-code {
+            font-size: 7px;
+            font-weight: bold;
+            margin-top: 1mm;
+        }
+    </style>
+</head>
+<body>
+    <div class="page">
+        <div class="bijak-content">
+            <!-- Header -->
+            <div class="header">
+                <div class="contact-info">
+                    <div>۰۵۱۳۵۴۲۰۷۰۳</div>
+                    <div>۰۵۱۳۵۴۲۰۷۰۴</div>
+                    <div>۰۹۳۰۹۸۴۳۷۰۴</div>
+                    <div>۰۹۱۵۹۱۷۵۲۰۳</div>
+                </div>
+                <div class="company-info">
+                    <div>اتحادیه وانت بارهای مشهد و حومه</div>
+                    <div>حواله جاده ای داخلی</div>
+                    <div>موسسه حمل و نقل صدرا بار خراسان</div>
+                    <div>شماره ثبت: ۲۵۱</div>
+                </div>
+                <div class="bijak-info">
+                    <div>ارزش محموله: {{ shipment.value|persian_numbers }} ریال</div>
+                    <div>شماره بارنامه: {{ shipment.tracking_code|persian_numbers }}</div>
+                    <div>تاریخ و ساعت صدور: {{ shipment.issuance_datetime|date:"Y/m/d H:i"|persian_numbers }}</div>
+                </div>
+            </div>
+            
+            <!-- Sender -->
+            <div class="section">
+                <div class="section-title">فرستنده</div>
+                <table>
+                    <tr>
+                        <th>نام</th>
+                        <th>کد ملی</th>
+                        <th>کد پستی</th>
+                        <th>آدرس</th>
+                        <th>تلفن</th>
+                    </tr>
+                    <tr>
+                        <td>{{ shipment.sender.name }}</td>
+                        <td>{{ shipment.sender.national_id|persian_numbers|default:"—" }}</td>
+                        <td>{{ shipment.sender.postal|persian_numbers|default:"—" }}</td>
+                        <td>{{ shipment.sender.address|persian_numbers }}</td>
+                        <td>{{ shipment.sender.phone|persian_numbers|default:"—" }}</td>
+                    </tr>
+                </table>
+            </div>
+            
+            <!-- Receiver -->
+            <div class="section">
+                <div class="section-title">گیرنده</div>
+                <table>
+                    <tr>
+                        <th>نام</th>
+                        <th>کد ملی</th>
+                        <th>کد پستی</th>
+                        <th>آدرس</th>
+                        <th>تلفن</th>
+                    </tr>
+                    <tr>
+                        <td>{{ shipment.receiver.name }}</td>
+                        <td>{{ shipment.receiver.national_id|persian_numbers }}</td>
+                        <td>{{ shipment.receiver.postal|persian_numbers }}</td>
+                        <td>{{ shipment.receiver.address|persian_numbers }}</td>
+                        <td>{{ shipment.receiver.phone|persian_numbers }}</td>
+                    </tr>
+                </table>
+            </div>
+            
+            <!-- Driver -->
+            <div class="section">
+                <div class="section-title">راننده</div>
+                <table>
+                    <tr>
+                        <th>نام</th>
+                        <th>کد ملی</th>
+                        <th>تاریخ تولد</th>
+                        <th>نام پدر</th>
+                        <th>گواهینامه</th>
+                        <th>تاریخ صدور</th>
+                    </tr>
+                    <tr>
+                        <td>{{ shipment.driver.name }}</td>
+                        <td>{{ shipment.driver.national_id|persian_numbers }}</td>
+                        <td>{{ shipment.driver.birth_date|date:"Y/m/d"|persian_numbers }}</td>
+                        <td>{{ shipment.driver.father_name|default:"—" }}</td>
+                        <td>{{ shipment.driver.certificate|persian_numbers }}</td>
+                        <td>{{ shipment.driver.certificate_date|date:"Y/m/d"|persian_numbers }}</td>
+                    </tr>
+                </table>
+                <table style="margin-top: 1mm;">
+                    <tr>
+                        <th>تلفن</th>
+                        <th>تلفن دوم</th>
+                        <th>ساکن شهر</th>
+                        <th>بیمه نامه</th>
+                        <th>تاریخ انقضا</th>
+                    </tr>
+                    <tr>
+                        <td>{{ shipment.driver.phone|persian_numbers }}</td>
+                        <td>{{ shipment.driver.phone2|persian_numbers|default:"—" }}</td>
+                        <td>{{ shipment.driver.residence|default:"—" }}</td>
+                        <td>{{ shipment.driver.insurance_policy_number|date:"Y/m/d"|persian_numbers|default:"—" }}</td>
+                        <td>{{ shipment.driver.insurance_policy_expiry|date:"Y/m/d"|persian_numbers|default:"—" }}</td>
+                    </tr>
+                </table>
+            </div>
+            
+            <!-- Vehicle -->
+            <div class="section">
+                <div class="section-title">خودرو</div>
+                <table>
+                    <tr>
+                        <th>نوع ناوگان</th>
+                        <th>پلاک</th>
+                        <th>سری</th>
+                    </tr>
+                    <tr>
+                        <td>{{ shipment.vehicle.get_type_display }}</td>
+                        <td>{{ shipment.vehicle.license_plate_three_digit|persian_numbers }} {{ shipment.vehicle.license_plate_alphabet }} {{ shipment.vehicle.license_plate_two_digit|persian_numbers }}</td>
+                        <td>ایران {{ shipment.vehicle.license_plate_series|persian_numbers }}</td>
+                    </tr>
+                </table>
+            </div>
+            
+            <!-- Cargo -->
+            <div class="section">
+                <div class="section-title">محموله</div>
+                <table>
+                    <tr>
+                        <th>نام</th>
+                        <th>وزن</th>
+                        <th>نوع بسته</th>
+                        <th>تعداد</th>
+                        <th>مبدا</th>
+                        <th>مقصد</th>
+                    </tr>
+                    <tr>
+                        <td>{{ shipment.cargo.name }}</td>
+                        <td>
+                            {% if use_weight_2 %}
+                                {{ shipment.cargo.weight_2|floatformat:"-2"|persian_numbers|default:"—" }}
+                            {% else %}
+                                {{ shipment.cargo.weight|floatformat:"-2"|persian_numbers|default:"—" }}
+                            {% endif %}
+                        </td>
+                        <td>{{ shipment.cargo.package_type|default:"—" }}</td>
+                        <td>{{ shipment.cargo.number_of_packaging|persian_numbers|default:"—" }}</td>
+                        <td>{{ shipment.cargo.origin }}</td>
+                        <td>{{ shipment.cargo.destination }}</td>
+                    </tr>
+                </table>
+            </div>
+            
+            <!-- Financial -->
+            <div class="section">
+                <div class="section-title">اطلاعات مالی</div>
+                <table>
+                    <tr>
+                        <th>کرایه</th>
+                        <th>بیمه</th>
+                        <th>بارگیری</th>
+                        <th>تخلیه</th>
+                        <th>باسکول</th>
+                        <th>کل کرایه</th>
+                    </tr>
+                    <tr>
+                        <td>{{ shipment.freight|persian_numbers }}</td>
+                        <td>{{ shipment.insurance|persian_numbers }}</td>
+                        <td>{{ shipment.loading_fee|persian_numbers|default:"—" }}</td>
+                        <td>{{ shipment.unloading_fee|persian_numbers|default:"—" }}</td>
+                        <td>{{ shipment.scale_fee|persian_numbers|default:"—" }}</td>
+                        <td>{{ shipment.total_fare|persian_numbers }} ریال</td>
+                    </tr>
+                </table>
+                <div style="margin-top: 1mm; font-size: 8px;">
+                    <strong>مبلغ به حروف:</strong> {{ shipment.num_in_words }}
+                </div>
+            </div>
+            
+            <!-- Description -->
+            <div class="section">
+                <div class="section-title">توضیحات</div>
+                <div style="border: 1px solid #000; padding: 2mm; font-size: 8px;">
+                    {{ shipment.final_description }}
+                </div>
+            </div>
+            
+            <!-- Signature -->
+            <div class="signature-section">
+                <div class="signature-box">
+                    <div>امضاء راننده</div>
+                </div>
+                <div class="signature-box">
+                    <div>امضاء تحویل گیرنده</div>
+                </div>
+                <div class="signature-box">
+                    <div>مهر و امضاء</div>
+                    <div>شرکت حمل و نقل صدرابار خراسان</div>
+                    <div style="font-size: 7px;">مدیریت: سید سعید حسینی</div>
+                    {% if use_digital_stamp %}
+                        <img src="{% static 'digital_stamp/stamp.png' %}" alt="مهر دیجیتال" class="digital-stamp">
+                        <div class="user-code">کد کاربر: {{ shipment.created_by.user_code|default:"—" }}</div>
+                    {% endif %}
+                    {% if use_digital_signature %}
+                        <img src="{% static 'digital_stamp/signature.png' %}"
+                             alt="امضای دیجیتال موسسه حمل و نقل" class="digital-signature">
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

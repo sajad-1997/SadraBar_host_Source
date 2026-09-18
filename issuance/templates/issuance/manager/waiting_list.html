@@ -1,5 +1,6 @@
 {% extends "issuance/search/base.html" %}
 {% load humanize %}
+{% load persian_numbers %}
 
 {% block content %}
     <h2>{% block title %}🗂️ مدیریت بررسی بارنامه‌ها{% endblock %}</h2>
@@ -56,7 +57,7 @@
             {% for s in shipments_pending %}
                 <tr>
                     <td>{{ s.id }}</td>
-                    <td>{{ s.issuance_datetime|date:"Y/m/d H:i" }}</td>
+                    <td>{{ s.issuance_datetime|date:"Y/m/d H:i"|persian_numbers }}</td>
                     <td>{{ s.sender }}</td>
                     <td>{{ s.receiver }}</td>
                     <td>{{ s.driver }}</td>
@@ -81,7 +82,7 @@
             <div class="bijak-card">
                 <div class="bijak-header"><b>ردیف:</b> {{ s.id }} | <b>شماره بارنامه:</b> {{ s.tracking_code }}</div>
                 <div class="bijak-row">
-                    <span><b>زمان صدور:</b> {{ s.issuance_datetime }}</span>
+                    <span><b>زمان صدور:</b> {{ s.issuance_datetime|date:"Y/m/d H:i"|persian_numbers }}</span>
                 </div>
                 <div class="bijak-row">
                     <span><b>فرستنده:</b> {{ s.sender.name }}</span>
@@ -146,7 +147,7 @@
             {% for s in shipments_approved %}
                 <tr>
                     <td>{{ s.id }}</td>
-                    <td>{{ s.issuance_datetime|date:"Y/m/d H:i" }}</td>
+                    <td>{{ s.issuance_datetime|date:"Y/m/d H:i"|persian_numbers }}</td>
                     <td>{{ s.sender }}</td>
                     <td>{{ s.receiver }}</td>
                     <td>{{ s.driver }}</td>
@@ -170,7 +171,7 @@
             <div class="bijak-card">
                 <div class="bijak-header"><b>ردیف:</b> {{ s.id }} | <b>شماره بارنامه:</b> {{ s.tracking_code }}</div>
                 <div class="bijak-row">
-                    <span><b>زمان صدور:</b> {{ s.issuance_datetime }}</span>
+                    <span><b>زمان صدور:</b> {{ s.issuance_datetime|date:"Y/m/d H:i"|persian_numbers }}</span>
                 </div>
                 <div class="bijak-row">
                     <span><b>فرستنده:</b> {{ s.sender.name }}</span>
@@ -236,7 +237,7 @@
             {% for s in shipments_rejected %}
                 <tr>
                     <td>{{ s.id }}</td>
-                    <td>{{ s.issuance_datetime|date:"Y/m/d H:i" }}</td>
+                    <td>{{ s.issuance_datetime|date:"Y/m/d H:i"|persian_numbers }}</td>
                     <td>{{ s.sender }}</td>
                     <td>{{ s.receiver }}</td>
                     <td>{{ s.driver }}</td>
@@ -262,7 +263,7 @@
             <div class="bijak-card">
                 <div class="bijak-header"><b>ردیف:</b> {{ s.id }} | <b>شماره بارنامه:</b> {{ s.tracking_code }}</div>
                 <div class="bijak-row">
-                    <span><b>زمان صدور:</b> {{ s.issuance_datetime }}</span>
+                    <span><b>زمان صدور:</b> {{ s.issuance_datetime|date:"Y/m/d H:i"|persian_numbers }}</span>
                 </div>
                 <div class="bijak-row">
                     <span><b>فرستنده:</b> {{ s.sender.name }}</span>

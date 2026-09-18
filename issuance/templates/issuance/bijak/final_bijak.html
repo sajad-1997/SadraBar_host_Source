@@ -1,6 +1,6 @@
 {% load static %}
 {% load persian_numbers %}
-{% load jalali_tags %}
+{% load jalali_filters %}
 
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
@@ -16,6 +16,15 @@
     <div class="controls no-print">
         <!--<button onclick="togglePreview()">پیش‌نمایش A5 افقی</button>-->
         <button onclick="window.print()">چاپ فرم</button>
+        {% if can_use_digital_stamp %}
+            <button id="stampToggleBtn" onclick="toggleStamp()" class="btn btn-success">
+                {% if use_digital_stamp %}چاپ بدون مهر دیجیتال{% else %}چاپ با مهر دیجیتال{% endif %}
+            </button>
+            <button id="signatureToggleBtn" onclick="toggleSignature()" class="btn btn-success">
+                {% if use_digital_signature %}چاپ بدون امضای دیجیتال{% else %}چاپ با امضای دیجیتال{% endif %}
+            </button>
+        {% endif %}
+        <button onclick="downloadPDF()" class="secondary">دانلود PDF</button>
         <!--<button onclick="showFormData()" class="secondary">ویرایش اطلاعات</button>-->
     </div>
 
@@ -52,7 +61,7 @@
                     <div>
                         <label>ارزش محموله:</label>
                         <span>
-                        {{ shipment.value|persian_numbers }} ریال
+                        {{ shipment.value|persian_currency }} ریال
                         </span>
                     </div>
                     <div>
@@ -62,9 +71,9 @@
                         </span>
                     </div>
                     <div>
-                        <label>زمان صدور:</label>
+                        <label>تاریخ و ساعت صدور:</label>
                         <span>
-                        {{ shipment.issuance_datetime.date|date:"Y/m/d"|persian_numbers }}
+                        {{ shipment.issuance_datetime|date:"Y/m/d H:i"|persian_numbers }}
                         </span>
                     </div>
                     {#                    <div>#}
@@ -126,38 +135,26 @@
         <div class="section">
             <table class="form-table">
                 <tr>
-                    <th class="table-header" style="width: 20%">نام و نام خانوادگی راننده</th>
-                    <th class="table-header" style="width: 15%">کد ملی</th>
-                    <th class="table-header" style="width: 10%">تاریخ تولد</th>
+                    {#                    <th class="table-header" style="width: 20%">نام و نام خانوادگی راننده</th>#}
+                    <th class="table-header">نام و نام خانوادگی راننده</th>
+                    {#                    <th class="table-header" style="width: 15%">کد ملی</th>#}
+                    <th class="table-header">کد ملی</th>
+                    {#                    <th class="table-header" style="width: 10%">تاریخ تولد</th>#}
                     <th class="table-header">نام پدر</th>
-                    <th class="table-header">شماره گواهینامه</th>
-                    <th class="table-header">تاریخ صدور گواهینامه</th>
+                    <th class="table-header" style="width: 15%;">تلفن راننده</th>
+                    <th class="table-header" style="width: 15%">تلفن دوم راننده</th>
+                    <th class="table-header" style="width: 10%">ساکن شهر</th>
+                    {#                    <th class="table-header">تاریخ صدور گواهینامه</th>#}
                 </tr>
                 <tr>
                     <td class="table-cell">{{ shipment.driver.name }}</td>
                     <td class="table-cell">{{ shipment.driver.national_id|persian_numbers }}</td>
-                    <td class="table-cell">{{ shipment.driver.birth_date|date:"Y/m/d"|persian_numbers }}</td>
+                    {#                    <td class="table-cell">{{ shipment.driver.birth_date|date:"Y/m/d"|persian_numbers }}</td>#}
                     <td class="table-cell">{{ shipment.driver.father_name|default_if_none:"—" }}</td>
-                    <td class="table-cell">{{ shipment.driver.certificate|persian_numbers }}</td>
-                    <td class="table-cell">{{ shipment.driver.certificate_date|date:"Y/m/d"|persian_numbers }}</td>
-                </tr>
-            </table>
-            <table class="form-table">
-                <tr>
-                    <th class="table-header" style="width: 15%;">شماره تلفن راننده</th>
-                    <th class="table-header" style="width: 15%">شماره تلفن دوم راننده</th>
-                    <th class="table-header" style="width: 10%">ساکن شهر</th>
-                    <th class="table-header">آدرس راننده</th>
-                    <th class="table-header">شماره بیمه نامه</th>
-                    <th class="table-header">تاریخ انقضاء بیمه نامه</th>
-                </tr>
-                <tr>
                     <td class="table-cell">{{ shipment.driver.phone|persian_numbers }}</td>
                     <td class="table-cell">{{ shipment.driver.phone2|persian_numbers|default_if_none:"—" }}</td>
                     <td class="table-cell">{{ shipment.driver.residence|default_if_none:"—" }}</td>
-                    <td class="table-cell">{{ shipment.driver.address|persian_numbers|default_if_none:"—" }}</td>
-                    <td class="table-cell">{{ shipment.driver.insurance_policy_number|date:"Y/m/d"|persian_numbers|default_if_none:"—" }}</td>
-                    <td class="table-cell">{{ shipment.driver.insurance_policy_expiry|date:"Y/m/d"|persian_numbers|default_if_none:"—" }}</td>
+                    {#                    <td class="table-cell">{{ shipment.driver.certificate_date|date:"Y/m/d"|persian_numbers }}</td>#}
                 </tr>
             </table>
         </div>
@@ -166,13 +163,19 @@
         <div class="section">
             <table class="form-table">
                 <tr>
+                    <th class="table-header">شماره گواهینامه</th>
+                    {#                    <th class="table-header">شماره بیمه نامه</th>#}
+                    <th class="table-header">تاریخ انقضاء بیمه نامه</th>
                     <th class="table-header">نوع ناوگان</th>
                     <th class="table-header">شماره پلاک</th>
                     <th class="table-header">سری پلاک</th>
                     <th class="table-header">هوشمند ناوگان</th>
-                    <th class="table-header">هوشمند راننده</th>
+
                 </tr>
                 <tr>
+                    <td class="table-cell">{{ shipment.driver.certificate|persian_numbers }}</td>
+                    {#                    <td class="table-cell">{{ shipment.driver.insurance_policy_number|date:"Y/m/d"|persian_numbers|default_if_none:"—" }}</td>#}
+                    <td class="table-cell">{{ shipment.driver.insurance_policy_expiry|date:"Y/m/d"|persian_numbers|default_if_none:"—" }}</td>
                     <td class="table-cell">{{ shipment.vehicle.get_type_display }}</td>
                     <td class="table-cell">
                         {{ shipment.vehicle.license_plate_three_digit|persian_numbers }}
@@ -183,8 +186,8 @@
                         <span>ایران   </span>
                         {{ shipment.vehicle.license_plate_series|persian_numbers }}
                     </td>
-                    <td class="table-cell"></td>
-                    <td class="table-cell"></td>
+                    <td class="table-cell">{{ shipment.vehicle.vehicle_smart_card|persian_numbers|default_if_none:"—" }}</td>
+
                 </tr>
             </table>
         </div>
@@ -205,7 +208,13 @@
                 <tbody>
                 <tr class="green-boxes">
                     <td class="table-cell-cargo">{{ shipment.cargo.name }}</td>
-                    <td class="table-cell-cargo">{{ shipment.cargo.weight|persian_numbers|default:"-" }}</td>
+                    <td class="table-cell-cargo">
+                        {% if use_weight_2 %}
+                            {{ shipment.cargo.weight_2|floatformat:"-2"|persian_numbers|default:"-" }}
+                        {% else %}
+                            {{ shipment.cargo.weight|floatformat:"-2"|persian_numbers|default:"-" }}
+                        {% endif %}
+                    </td>
                     <td class="table-cell-cargo">{{ shipment.cargo.package_type|default:"-" }}</td>
                     <td class="table-cell-cargo">{{ shipment.cargo.number_of_packaging|persian_numbers|default:"-" }}</td>
                     <td class="table-cell-cargo">{{ shipment.cargo.origin }}</td>
@@ -221,42 +230,42 @@
             <div class="form-field">
                 <label>مبلغ کرایه:</label>
                 <span>
-                    {{ shipment.freight|persian_numbers }}
+                    {{ shipment.freight|persian_currency }}
                 </span>
             </div>
 
             <div class="form-field">
                 <label>بیمه:</label>
                 <span>
-                        {{ shipment.insurance|persian_numbers }}
+                        {{ shipment.insurance|persian_currency }}
                 </span>
             </div>
 
             <div class="form-field">
                 <label>بارگیری:</label>
                 <span>
-                        {{ shipment.loading_fee|persian_numbers }}
+                        {{ shipment.loading_fee|persian_currency }}
                 </span>
             </div>
 
             <div class="form-field">
                 <label>تخلیه:</label>
                 <span>
-                        {{ shipment.unloading_fee|persian_numbers }}
+                        {{ shipment.unloading_fee|persian_currency }}
                 </span>
             </div>
 
             <div class="form-field">
                 <label>باسکول:</label>
                 <span>
-                        {{ shipment.scale_fee|persian_numbers }}
+                        {{ shipment.scale_fee|persian_currency }}
                 </span>
             </div>
 
             <div class="form-field">
                 <label>کل کرایه پرداختی در مقصد:</label>
                 <span>
-                        {{ shipment.total_fare|persian_numbers }} ریال
+                        {{ shipment.total_fare|persian_currency }} ریال
                 </span>
             </div>
 
@@ -286,9 +295,20 @@
             <p>امضاء تحویل گیرنده</p>
         </div>
         <div class="signature-box">
-            <p>مهر و امضاء</p>
             <p>شرکت حمل و نقل صدرابار خراسان</p>
             <p style="font-size: 10px;">مدیریت: سید سعید حسینی</p>
+            {% if can_use_digital_stamp %}
+                <div class="digital-stamp-container" id="digitalStamp"
+                     style="{% if not use_digital_stamp %}display: none;{% endif %}">
+                    <img src="{% static 'digital_stamp/stamp.png' %}" alt="مهر دیجیتال" class="digital-stamp">
+                    <p class="user-code">کد کاربر: {{ shipment.created_by.user_code|default:"—" }}</p>
+                </div>
+                <div class="digital-signature-container" id="digitalSignature"
+                     style="{% if not use_digital_signature %}display: none;{% endif %}">
+                    <img src="{% static 'digital_stamp/signature.png' %}"
+                         alt="امضای دیجیتال موسسه حمل و نقل" class="digital-signature">
+                </div>
+            {% endif %}
         </div>
     </div>
 </div>
@@ -361,11 +381,47 @@
             });
     }
 
-    document.getElementById("id_amount").addEventListener("input", function () {
-        let val = this.value;
-        if (val) toWords(val);
-        else document.getElementById("id_amount_words").value = "";
-    });
+    // ===== مهر دیجیتال =====
+    let stampVisible = {% if use_digital_stamp %}true{% else %}false{% endif %};
+
+    function toggleStamp() {
+        const digitalStamp = document.getElementById('digitalStamp');
+        const stampBtn = document.getElementById('stampToggleBtn');
+        if (!digitalStamp || !stampBtn) return;
+
+        stampVisible = !stampVisible;
+        digitalStamp.style.display = stampVisible ? 'block' : 'none';
+        stampBtn.textContent = stampVisible ? 'چاپ بدون مهر دیجیتال' : 'چاپ با مهر دیجیتال';
+    }
+
+    // ===== امضای دیجیتال موسسه حمل و نقل =====
+    let signatureVisible = {% if use_digital_signature %}true{% else %}false{% endif %};
+
+    function toggleSignature() {
+        const digitalSignature = document.getElementById('digitalSignature');
+        const signatureBtn = document.getElementById('signatureToggleBtn');
+        if (!digitalSignature || !signatureBtn) return;
+
+        signatureVisible = !signatureVisible;
+        digitalSignature.style.display = signatureVisible ? 'block' : 'none';
+        signatureBtn.textContent = signatureVisible ? 'چاپ بدون امضای دیجیتال' : 'چاپ با امضای دیجیتال';
+    }
+
+    function downloadPDF() {
+        const bijakId = {{ shipment.pk }};
+        const useWeight2 = {% if use_weight_2 %}true{% else %}false{% endif %};
+
+        let params = [];
+        if (stampVisible) params.push('stamp=1');
+        if (signatureVisible) params.push('signature=1');
+        if (useWeight2) params.push('weight2=1');
+
+        let url = `/issuance/pdf/${bijakId}/`;
+        if (params.length) url += '?' + params.join('&');
+
+        // Download in same window instead of opening new tab
+        window.location.href = url;
+    }
 </script>
 </body>
 </html>

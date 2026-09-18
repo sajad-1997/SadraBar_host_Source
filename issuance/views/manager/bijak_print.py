@@ -4,11 +4,13 @@ from django.http import HttpResponseForbidden
 from django.shortcuts import get_object_or_404, render
 
 from issuance.models import Bijak
+from issuance.views.bijak_print_views import _print_context
 
 
 @login_required
-def bijak_print(request, pk):
-    bijak = get_object_or_404(Bijak, pk=pk)
+def bijak_print(request, bijak_id):
+    """صفحه چاپ بارنامه (نقطه ورود دکمه «چاپ بارنامه» در فرم صدور)."""
+    bijak = get_object_or_404(Bijak, pk=bijak_id)
 
     # جلوگیری از چاپ قبل از تایید
     if bijak.approval_status != "approved":
@@ -16,4 +18,9 @@ def bijak_print(request, pk):
         return HttpResponseForbidden("چاپ مجاز نیست")
 
     # در این مرحله بارنامه مجاز به چاپ است
-    return render(request, "issuance/bijak_print.html", {"bijak": bijak})
+    # (مهر و امضای دیجیتال بر اساس مجوز نقش کاربر فعال/غیرفعال می‌شود)
+    return render(
+        request,
+        'issuance/bijak/final_bijak.html',
+        _print_context(bijak, request)
+    )

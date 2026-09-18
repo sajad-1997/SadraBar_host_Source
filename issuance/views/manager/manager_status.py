@@ -8,6 +8,8 @@ ALLOWED_UNLOCK_ROLES = ['admin', 'manager']
 
 
 def is_manager(user):
+    from accounts.decorators import ROLE_ADMIN, ROLE_MANAGER
+    ALLOWED_UNLOCK_ROLES = [ROLE_ADMIN, ROLE_MANAGER]
     return user.is_superuser or getattr(user, 'role', None) in ALLOWED_UNLOCK_ROLES
 
 

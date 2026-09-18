@@ -1,4 +1,4 @@
-{% if user.is_superuser or user.is_staff %}
+{% if user.is_superuser or user.role in 'manager admin' %}
     <h4>تاریخچه تأیید و رد</h4>
 
     <table class="table table-bordered">

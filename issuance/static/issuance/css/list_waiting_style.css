@@ -1,0 +1,453 @@
+/* Modern Responsive Styles for Bijak List Waiting Page */
+
+/* Modern Variables */
+:root {
+    --primary-color: #2563eb !important;
+    --primary-hover: #1d4ed8 !important;
+    --secondary-color: #64748b !important;
+    --success-color: #10b981 !important;
+    --warning-color: #f59e0b !important;
+    --danger-color: #ef4444 !important;
+    --info-color: #06b6d4 !important;
+    --background-color: #f8fafc !important;
+    --card-background: #ffffff !important;
+    --text-primary: #1e293b !important;
+    --text-secondary: #64748b !important;
+    --border-color: #e2e8f0 !important;
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1) !important;
+    --radius-md: 0.5rem !important;
+    --radius-lg: 0.75rem !important;
+}
+
+/* Dark Mode Variables */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --background-color: #0f172a;
+        --card-background: #1e293b;
+        --text-primary: #f1f5f9;
+        --text-secondary: #94a3b8;
+        --border-color: #334155;
+    }
+}
+
+/* Base Container Styles - Higher specificity */
+body .container {
+    max-width: 100% !important;
+    padding: 0 1rem !important;
+    margin: 0 auto !important;
+    background: var(--background-color) !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+}
+
+@media (min-width: 768px) {
+    body .container {
+        padding: 0 1.5rem !important;
+    }
+}
+
+/* Modern Heading - Higher specificity */
+body .container h2 {
+    font-size: 1.75rem !important;
+    font-weight: 700 !important;
+    color: var(--text-primary) !important;
+    margin-bottom: 1.5rem !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.75rem !important;
+    text-align: right !important;
+}
+
+body .container h2::before {
+    content: '' !important;
+    width: 4px !important;
+    height: 1.75rem !important;
+    background: linear-gradient(180deg, var(--primary-color), var(--info-color)) !important;
+    border-radius: 2px !important;
+}
+
+body .container hr {
+    border: none !important;
+    height: 2px !important;
+    background: linear-gradient(90deg, var(--border-color), transparent) !important;
+    margin: 1.5rem 0 !important;
+}
+
+/* Modern Search Form - Higher specificity */
+body .container .mb-3.row.g-2 {
+    background: var(--card-background) !important;
+    padding: 1.25rem !important;
+    border-radius: var(--radius-lg) !important;
+    box-shadow: var(--shadow-sm) !important;
+    margin-bottom: 1.5rem !important;
+    border: 1px solid var(--border-color) !important;
+}
+
+body .container .form-control {
+    border: 1px solid var(--border-color) !important;
+    border-radius: var(--radius-md) !important;
+    padding: 0.75rem 1rem !important;
+    font-size: 0.95rem !important;
+    transition: all 0.2s ease !important;
+    background-color: var(--card-background) !important;
+    color: var(--text-primary) !important;
+    width: 100% !important;
+    margin: 0 !important;
+}
+
+body .container .form-control:focus {
+    border-color: var(--primary-color) !important;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1) !important;
+    outline: none !important;
+}
+
+/* Modern Buttons - Higher specificity */
+body .container .btn {
+    border-radius: var(--radius-md) !important;
+    font-weight: 500 !important;
+    padding: 0.75rem 1.5rem !important;
+    transition: all 0.2s ease !important;
+    border: none !important;
+    font-size: 0.95rem !important;
+}
+
+body .container .btn-primary {
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-hover)) !important;
+    color: white !important;
+}
+
+body .container .btn-primary:hover {
+    transform: translateY(-1px) !important;
+    box-shadow: var(--shadow-md) !important;
+}
+
+body .container .btn-secondary {
+    background: var(--secondary-color) !important;
+    color: white !important;
+}
+
+body .container .btn-secondary:hover {
+    background: #475569 !important;
+    transform: translateY(-1px) !important;
+}
+
+body .container .btn-success {
+    background: var(--success-color) !important;
+    color: white !important;
+}
+
+body .container .btn-success:hover {
+    background: #059669 !important;
+    transform: translateY(-1px) !important;
+}
+
+body .container .btn-info {
+    background: var(--info-color) !important;
+    color: white !important;
+}
+
+body .container .btn-info:hover {
+    background: #0891b2 !important;
+    transform: translateY(-1px) !important;
+}
+
+body .container .btn-warning {
+    background: var(--warning-color) !important;
+    color: white !important;
+}
+
+body .container .btn-warning:hover {
+    background: #d97706 !important;
+    transform: translateY(-1px) !important;
+}
+
+body .container .btn-sm {
+    padding: 0.5rem 1rem !important;
+    font-size: 0.875rem !important;
+}
+
+/* Modern Table Container - Higher specificity */
+body .container .table-responsive {
+    background: var(--card-background) !important;
+    border-radius: var(--radius-lg) !important;
+    box-shadow: var(--shadow-md) !important;
+    overflow: hidden !important;
+    border: 1px solid var(--border-color) !important;
+    margin-bottom: 1.5rem !important;
+}
+
+/* Modern Table Styles - Higher specificity */
+body .container .table {
+    margin: 0 !important;
+    font-size: 0.95rem !important;
+    color: var(--text-primary) !important;
+}
+
+body .container .table thead {
+    background: linear-gradient(135deg, #1e293b, #334155) !important;
+}
+
+body .container .table thead th {
+    color: white !important;
+    font-weight: 600 !important;
+    padding: 1rem !important;
+    border: none !important;
+    text-transform: uppercase !important;
+    font-size: 0.85rem !important;
+    letter-spacing: 0.5px !important;
+}
+
+body .container .table tbody tr {
+    border-bottom: 1px solid var(--border-color) !important;
+    transition: background-color 0.2s ease !important;
+}
+
+body .container .table tbody tr:hover {
+    background-color: rgba(37, 99, 235, 0.05) !important;
+}
+
+body .container .table tbody td {
+    padding: 1rem !important;
+    vertical-align: middle !important;
+}
+
+/* Modern Badges - Higher specificity */
+body .container .badge {
+    padding: 0.5rem 1rem !important;
+    border-radius: 9999px !important;
+    font-weight: 500 !important;
+    font-size: 0.85rem !important;
+}
+
+body .container .bg-warning.text-dark {
+    background: var(--warning-color) !important;
+    color: white !important;
+}
+
+body .container .bg-danger {
+    background: var(--danger-color) !important;
+}
+
+body .container .bg-success {
+    background: var(--success-color) !important;
+}
+
+/* Modern Pagination - Higher specificity */
+body .container .pagination {
+    gap: 0.5rem !important;
+    margin-top: 1.5rem !important;
+}
+
+body .container .page-link {
+    border: 1px solid var(--border-color) !important;
+    border-radius: var(--radius-md) !important;
+    padding: 0.625rem 1rem !important;
+    color: var(--text-primary) !important;
+    background: var(--card-background) !important;
+    transition: all 0.2s ease !important;
+    font-weight: 500 !important;
+}
+
+body .container .page-link:hover {
+    background: var(--primary-color) !important;
+    color: white !important;
+    border-color: var(--primary-color) !important;
+    transform: translateY(-1px) !important;
+}
+
+body .container .page-item.active .page-link {
+    background: var(--primary-color) !important;
+    border-color: var(--primary-color) !important;
+    color: white !important;
+}
+
+body .container .page-item.disabled .page-link {
+    background: var(--border-color) !important;
+    color: var(--text-secondary) !important;
+    cursor: not-allowed !important;
+}
+
+/* Mobile Responsive Styles */
+@media (max-width: 768px) {
+    h2 {
+        font-size: 1.5rem;
+    }
+    
+    h2::before {
+        height: 1.5rem;
+    }
+    
+    .container {
+        padding: 0 0.75rem;
+    }
+    
+    /* Search Form Mobile */
+    .mb-3.row.g-2 {
+        padding: 1rem;
+        border-radius: var(--radius-md);
+    }
+    
+    .col-md-8,
+    .col-md-2 {
+        width: 100%;
+        margin-bottom: 0.75rem;
+    }
+    
+    .form-control {
+        padding: 0.625rem 0.875rem;
+        font-size: 0.9rem;
+    }
+    
+    .btn {
+        padding: 0.625rem 1rem;
+        font-size: 0.9rem;
+    }
+    
+    /* Table Mobile */
+    .table {
+        font-size: 0.85rem;
+    }
+    
+    .table thead th,
+    .table tbody td {
+        padding: 0.75rem 0.5rem;
+    }
+    
+    /* Hide less important columns */
+    .table th:nth-child(5),
+    .table th:nth-child(10),
+    .table td:nth-child(5),
+    .table td:nth-child(10) {
+        display: none;
+    }
+
+    /* Horizontal scrolling for all tables on mobile */
+    body .container .table-responsive,
+    body .container .desktop-table {
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+
+    body .container .table,
+    body .container .desktop-table {
+        min-width: 800px !important;
+    }
+    
+    /* Buttons Mobile */
+    .btn-sm {
+        padding: 0.375rem 0.75rem;
+        font-size: 0.8rem;
+    }
+    
+    /* Pagination Mobile */
+    .pagination {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    
+    .page-link {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.85rem;
+    }
+    
+    /* Badges Mobile */
+    .badge {
+        font-size: 0.75rem;
+        padding: 0.375rem 0.75rem;
+    }
+}
+
+@media (max-width: 480px) {
+    h2 {
+        font-size: 1.25rem;
+    }
+    
+    h2::before {
+        height: 1.25rem;
+    }
+    
+    /* Hide more columns on very small screens */
+    .table th:nth-child(4),
+    .table th:nth-child(6),
+    .table th:nth-child(7),
+    .table th:nth-child(8),
+    .table th:nth-child(9),
+    .table th:nth-child(10),
+    .table th:nth-child(11),
+    .table td:nth-child(4),
+    .table td:nth-child(6),
+    .table td:nth-child(7),
+    .table td:nth-child(8),
+    .table td:nth-child(9),
+    .table td:nth-child(10),
+    .table td:nth-child(11) {
+        display: none;
+    }
+
+    /* Ensure horizontal scrolling works on very small screens */
+    body .container .table-responsive,
+    body .container .desktop-table {
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+    }
+    
+    /* Keep only essential columns */
+    .table th:nth-child(1),
+    .table th:nth-child(2),
+    .table th:nth-child(3),
+    .table th:nth-child(12),
+    .table td:nth-child(1),
+    .table td:nth-child(2),
+    .table td:nth-child(3),
+    .table td:nth-child(12) {
+        display: table-cell;
+    }
+    
+    .table {
+        font-size: 0.8rem;
+    }
+    
+    .table thead th,
+    .table tbody td {
+        padding: 0.5rem 0.375rem;
+    }
+    
+    .btn-sm {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.75rem;
+    }
+    
+    .page-link {
+        padding: 0.375rem 0.625rem;
+        font-size: 0.8rem;
+    }
+}
+
+/* Empty State */
+.text-center {
+    text-align: center;
+}
+
+.text-muted {
+    color: var(--text-secondary);
+}
+
+/* License Plate Formatting */
+td {
+    white-space: nowrap;
+}
+
+/* Smooth scrolling */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Focus styles for accessibility */
+*:focus-visible {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+}

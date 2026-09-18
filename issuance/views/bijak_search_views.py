@@ -1,5 +1,5 @@
 from django.contrib.auth.decorators import login_required
-from django.db.models import Q, Case, When, IntegerField, Value, Sum
+from django.db.models import Q, Case, When, IntegerField, Value, ExpressionWrapper
 from django.http import JsonResponse
 from django.template.loader import render_to_string
 from django.shortcuts import render
@@ -11,7 +11,8 @@ from ..models import Bijak
 def search_shipment(request):
     """صفحه اصلی جستجوی بارنامه‌ها"""
     template_name = "issuance/search/search.html"
-    
+    # template_name = "issuance/search/search_ajax.html"
+
     q = request.GET.get('q', '').strip()
     
     # نمایش اولیه بدون کوئری خاص
@@ -20,7 +21,9 @@ def search_shipment(request):
         'receiver',
         'driver',
         'vehicle',
-        'cargo'
+        'cargo',
+        'cargo__origin__province',
+        'cargo__destination__province',
     ).all().order_by('-created_at')[:50]  # محدود کردن نتایج اولیه برای سرعت بیشتر
     
     context = {
@@ -61,7 +64,9 @@ def ajax_search_shipment(request):
         'receiver',
         'driver',
         'vehicle',
-        'cargo'
+        'cargo',
+        'cargo__origin__province',
+        'cargo__destination__province',
     ).all()
     
     # فیلتر بر اساس تمام کلمات (AND logic)
@@ -91,8 +96,10 @@ def ajax_search_shipment(request):
             
             # اطلاعات محموله
             Q(cargo__name__icontains=term) |
-            Q(cargo__origin__icontains=term) |
-            Q(cargo__destination__icontains=term) |
+            Q(cargo__origin__name__icontains=term) |
+            Q(cargo__origin__province__name__icontains=term) |
+            Q(cargo__destination__name__icontains=term) |
+            Q(cargo__destination__province__name__icontains=term) |
             
             # اطلاعات خودرو
             Q(vehicle__license_plate_two_digit__icontains=term) |
@@ -129,9 +136,11 @@ def ajax_search_shipment(request):
                 When(sender__address__icontains=term, then=Value(35)),
                 When(receiver__address__icontains=term, then=Value(35)),
                 
-                # تطابق مبدا و مقصد
-                When(cargo__origin__icontains=term, then=Value(40)),
-                When(cargo__destination__icontains=term, then=Value(40)),
+                # تطابق مبدا و مقصد (شهر یا استان)
+                When(cargo__origin__name__icontains=term, then=Value(40)),
+                When(cargo__origin__province__name__icontains=term, then=Value(40)),
+                When(cargo__destination__name__icontains=term, then=Value(40)),
+                When(cargo__destination__province__name__icontains=term, then=Value(40)),
                 
                 # تطابق نام محموله
                 When(cargo__name__icontains=term, then=Value(30)),
@@ -148,9 +157,14 @@ def ajax_search_shipment(request):
         )
     
     # اعمال امتیازدهی و مرتب‌سازی
+    # جمع همه Caseها به‌صورت یک عبارت واحد (Sum تنها یک آرگومان می‌پذیرد)
+    combined_score = score_cases[0]
+    for case in score_cases[1:]:
+        combined_score = combined_score + case
+
     queryset = (
         queryset
-        .annotate(score=Sum(*score_cases))
+        .annotate(score=ExpressionWrapper(combined_score, output_field=IntegerField()))
         .filter(score__gt=0)
         .order_by("-score", "-created_at")
         .distinct()[:100]  # محدود کردن به 100 نتیجه برتر
