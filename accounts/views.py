@@ -7,21 +7,49 @@ from django.contrib.auth.views import LoginView
 from django.contrib.auth.views import LogoutView
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
+from .decorators import ROLE_ADMIN, ROLE_MANAGER, ROLE_EMPLOYEE, ROLE_DRIVER, ROLE_CUSTOMER
 
 logger = logging.getLogger(__name__)
 
 
 class CustomLoginView(LoginView):
     template_name = 'accounts/login.html'
+    redirect_authenticated_user = False
+
+    def dispatch(self, request, *args, **kwargs):
+        logger.info(f"Login view accessed - Method: {request.method}")
+        return super().dispatch(request, *args, **kwargs)
+
+    def form_invalid(self, form):
+        logger.warning(f"Login failed for username: {form.cleaned_data.get('username', 'unknown')}")
+        logger.warning(f"Form errors: {form.errors}")
+        logger.warning(f"Non-field errors: {form.non_field_errors}")
+        messages.error(self.request, 'نام کاربری یا رمز عبور اشتباه است.')
+        return super().form_invalid(form)
+
+    def form_valid(self, form):
+        logger.info(f"Login successful for username: {form.cleaned_data.get('username')}")
+        logger.info(f"User role: {form.get_user().role}")
+        logger.info(f"Redirecting to: {self.get_success_url()}")
+        return super().form_valid(form)
 
     def get_success_url(self):
         user = self.request.user
-        if user.role == 'admin':
+        if not user.is_authenticated:
+            logger.warning("User not authenticated in get_success_url")
+            return reverse_lazy('home')
+        
+        logger.info(f"Redirecting user {user.username} with role {user.role}")
+        if user.role == ROLE_ADMIN:
             return reverse_lazy('dashboard:admin_dashboard')
-        elif user.role == 'manager':
+        elif user.role == ROLE_MANAGER:
             return reverse_lazy('dashboard:manager_dashboard')
-        elif user.role == 'staff':
+        elif user.role == ROLE_EMPLOYEE:
             return reverse_lazy('dashboard:staff_dashboard')
+        elif user.role == ROLE_DRIVER:
+            return reverse_lazy('home')
+        elif user.role == ROLE_CUSTOMER:
+            return reverse_lazy('home')
         else:
             return reverse_lazy('home')
 
@@ -32,7 +60,7 @@ class SuperAdminLoginView(LoginView):
     def get_success_url(self):
         user = self.request.user
         # فقط کاربری با نقش admin اجازه ورود داره
-        if user.role == 'admin':
+        if user.role == ROLE_ADMIN:
             return reverse_lazy('home_dashboard')
         else:
             return reverse_lazy('home')
@@ -41,7 +69,6 @@ class SuperAdminLoginView(LoginView):
 class CustomLogoutView(LogoutView):
     """
     نسخه حرفه‌ای خروج:
-    - پشتیبانی از GET (بدون خطای CSRF)
     - ثبت لاگ خروج
     - پیام خروج به کاربر
     - ریدایرکت به صفحه اصلی
@@ -84,7 +111,7 @@ def go_to_dashboard(request):
         return redirect("dashboard:manager_dashboard")
 
     # کارمند → داشبورد کارمند
-    if user.is_staff_role():
+    if user.is_employee():
         return redirect("dashboard:staff_dashboard")
 
     # حالت fallback

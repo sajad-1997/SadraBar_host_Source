@@ -103,6 +103,29 @@
             transition: 0.3s;
         }
 
+        .password-container {
+            position: relative;
+        }
+
+        .toggle-password {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #94a3b8;
+            cursor: pointer;
+            font-size: 1.2rem;
+            padding: 0;
+            width: auto;
+            transition: 0.3s;
+        }
+
+        .toggle-password:hover {
+            color: #38bdf8;
+        }
+
         input::placeholder {
             color: #94a3b8;
         }
@@ -156,19 +179,67 @@
             h2 { font-size: 1.3rem; }
         }
     </style>
+    <script>
+        function togglePassword() {
+            const passwordInput = document.getElementById('password');
+            const toggleButton = document.querySelector('.toggle-password');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleButton.textContent = '🙈';
+            } else {
+                passwordInput.type = 'password';
+                toggleButton.textContent = '👁️';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const loginForm = document.querySelector('form');
+            if (loginForm) {
+                loginForm.addEventListener('submit', function(e) {
+                    console.log('Form submitting...');
+                    console.log('Username:', document.querySelector('input[name="username"]').value);
+                    console.log('Password length:', document.querySelector('input[name="password"]').value.length);
+                });
+            }
+        });
+    </script>
 </head>
 <body>
     <div class="login-container">
         <div class="logo"></div>
         <h2>ورود کاربران محترم</h2>
-        <form method="post">
+        <form method="post" action="{% url 'login' %}">
             {% csrf_token %}
-            {{ form.non_field_errors }}
+            {% if form.non_field_errors %}
+                <div class="error-messages" style="color: #ef4444; margin-bottom: 15px; font-size: 0.9rem;">
+                    {% for error in form.non_field_errors %}
+                        <p>{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+            {% if form.username.errors %}
+                <div class="error-messages" style="color: #ef4444; margin-bottom: 10px; font-size: 0.9rem;">
+                    {% for error in form.username.errors %}
+                        <p>{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+            {% if form.password.errors %}
+                <div class="error-messages" style="color: #ef4444; margin-bottom: 10px; font-size: 0.9rem;">
+                    {% for error in form.password.errors %}
+                        <p>{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
             <input type="text" name="username" placeholder="نام کاربری" required>
-            <input type="password" name="password" placeholder="رمز عبور" required>
-            <button type="submit">ورود به پنل عملیاتی</button>
+            <div class="password-container">
+                <input type="password" name="password" id="password" placeholder="رمز عبور" required>
+                <button type="button" class="toggle-password" onclick="togglePassword()">👁️</button>
+            </div>
+            <button type="submit" name="login_submit">ورود به پنل عملیاتی</button>
         </form>
-        <a href="#" class="forgot-password">فراموشی رمز عبور؟</a>
+        <a href="{% url 'password_reset' %}" class="forgot-password">فراموشی رمز عبور؟</a>
         <p class="footer-text">© سامانه مدیریت بارنامه صدرا بار خراسان | نسخه 1.0</p>
     </div>
 </body>
