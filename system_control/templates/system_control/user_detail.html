@@ -1,0 +1,216 @@
+{% extends 'system_control/base.html' %}
+{% load sc_tags %}
+{% block title %}جزئیات کاربر {{ target.username }}{% endblock %}
+{% block nav_users %}active{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h3 class="mb-4">
+        کاربر: {{ target.username }}
+        {% if target.is_superuser %}<span class="badge bg-dark">سوپر ادمین</span>{% endif %}
+        {% if target.is_active %}
+            <span class="badge bg-success">فعال</span>
+        {% else %}
+            <span class="badge badge-locked">قفل شده</span>
+        {% endif %}
+    </h3>
+
+    <div class="row">
+        <!-- اطلاعات و نقش -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header"><h5 class="mb-0">اطلاعات کاربر</h5></div>
+                <div class="card-body">
+                    <form method="post" class="mb-3">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="update_profile">
+                        <div class="row g-2">
+                            <div class="col-6">
+                                <label class="form-label">نام</label>
+                                <input type="text" name="first_name" value="{{ target.first_name }}" class="form-control">
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label">نام خانوادگی</label>
+                                <input type="text" name="last_name" value="{{ target.last_name }}" class="form-control">
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">ایمیل</label>
+                                <input type="email" name="email" value="{{ target.email }}" class="form-control">
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-custom mt-2">ذخیره اطلاعات</button>
+                    </form>
+
+                    <form method="post" class="row g-2 align-items-end border-top pt-3">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="change_role">
+                        <div class="col-8">
+                            <label class="form-label">تغییر نقش (فعلی: {{ target.role|role_label }})</label>
+                            <select name="new_role" class="form-select">
+                                {% for code, label in all_roles %}
+                                    <option value="{{ code }}" {% if target.role == code %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-4">
+                            <button type="submit" class="btn btn-outline-primary w-100" {% if target.is_superuser %}disabled{% endif %}>تغییر نقش</button>
+                        </div>
+                    </form>
+
+                    <form method="post" class="row g-2 align-items-end border-top pt-3 mt-2">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="set_password">
+                        <div class="col-4">
+                            <label class="form-label">رمز عبور جدید</label>
+                            <input type="password" name="password1" class="form-control">
+                        </div>
+                        <div class="col-4">
+                            <label class="form-label">تکرار رمز</label>
+                            <input type="password" name="password2" class="form-control">
+                        </div>
+                        <div class="col-4">
+                            <button type="submit" class="btn btn-outline-warning w-100">تغییر رمز</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">کیف پول</h5>
+                    <a href="{% url 'system_control:wallet_detail' target.id %}" class="btn btn-sm btn-outline-primary">مدیریت کیف پول</a>
+                </div>
+                <div class="card-body">
+                    موجودی فعلی:
+                    <strong>{{ target.wallet.balance }} تومان</strong>
+                    {% if target.wallet.is_frozen %}
+                        <span class="badge badge-locked">مسدود</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- سهمیه‌ها و قفل ماژول‌ها -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header"><h5 class="mb-0">سهمیه‌های اختصاصی صدور بارنامه</h5></div>
+                <div class="card-body">
+                    {% if target.is_superuser %}
+                        <p class="text-muted mb-0">سوپر ادمین از محدودیت‌ها مستثنی است.</p>
+                    {% else %}
+                        <table class="table table-sm text-center">
+                            <thead>
+                            <tr><th>دوره</th><th>سقف</th><th>مصرف</th><th>باقی‌مانده</th><th></th></tr>
+                            </thead>
+                            <tbody>
+                            {% for q in quota_statuses %}
+                                <tr>
+                                    <td>{{ q.label }} <small class="text-muted">({{ q.source }})</small></td>
+                                    <td>{{ q.limit }}</td>
+                                    <td>{{ q.used }}</td>
+                                    <td>{{ q.remaining }}</td>
+                                    <td></td>
+                                </tr>
+                            {% empty %}
+                                <tr><td colspan="5">سهمیه فعالی وجود ندارد (بدون محدودیت)</td></tr>
+                            {% endfor %}
+                            {% for q in user_quotas %}
+                                <tr>
+                                    <td>{{ q.get_period_display }} (اختصاصی)</td>
+                                    <td>{{ q.max_count }}</td>
+                                    <td colspan="2">{% if not q.is_active %}غیرفعال{% else %}ذخیره شده{% endif %}</td>
+                                    <td>
+                                        <form method="post" class="d-inline">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="action" value="remove_quota">
+                                            <input type="hidden" name="quota_id" value="{{ q.id }}">
+                                            <button class="btn btn-sm btn-outline-danger">حذف</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+
+                        <form method="post" class="row g-2 align-items-end">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="add_quota">
+                            <div class="col-4">
+                                <label class="form-label">دوره</label>
+                                <select name="period" class="form-select">
+                                    {% for value, label in period_choices %}
+                                        <option value="{{ value }}">{{ label }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-4">
+                                <label class="form-label">حداکثر تعداد (0 = ممنوع)</label>
+                                <input type="number" min="0" name="max_count" class="form-control" required>
+                            </div>
+                            <div class="col-4">
+                                <button type="submit" class="btn btn-custom w-100">ثبت/بروزرسانی</button>
+                            </div>
+                        </form>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header"><h5 class="mb-0">دسترسی اختصاصی به ماژول‌ها</h5></div>
+                <div class="card-body">
+                    <table class="table table-sm align-middle">
+                        <tbody>
+                        {% for o in user_overrides %}
+                            <tr>
+                                <td>{{ o.module.name }}</td>
+                                <td>
+                                    {% if o.mode == 'allow' %}
+                                        <span class="badge bg-success">اجازه دسترسی</span>
+                                    {% else %}
+                                        <span class="badge badge-locked">قفل</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <form method="post" class="d-inline">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="action" value="remove_module_override">
+                                        <input type="hidden" name="override_id" value="{{ o.id }}">
+                                        <button class="btn btn-sm btn-outline-danger">حذف</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr><td class="text-muted">دسترسی اختصاصی‌ای تعریف نشده است</td></tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+
+                    <form method="post" class="row g-2 align-items-end">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="add_module_override">
+                        <div class="col-5">
+                            <label class="form-label">ماژول</label>
+                            <select name="module_id" class="form-select">
+                                {% for m in all_modules %}
+                                    <option value="{{ m.id }}">{{ m.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-4">
+                            <label class="form-label">وضعیت</label>
+                            <select name="mode" class="form-select">
+                                <option value="deny">عدم دسترسی (قفل)</option>
+                                <option value="allow">اجازه دسترسی</option>
+                            </select>
+                        </div>
+                        <div class="col-3">
+                            <button type="submit" class="btn btn-custom w-100">ثبت</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

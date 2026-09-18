@@ -22,6 +22,8 @@ from django.urls import path, include
 from homePage import pwa_views
 
 
+
+
 def forbidden_view(request, exception=None):
     return render(request, 'errors/403.html', {'exception': exception}, status=403)
 
@@ -47,8 +49,9 @@ urlpatterns = [
     # path('publish/', include('publish.urls', namespace='publish')),
     path('otp/', include(('otp_verification.urls', 'otp_verification'), namespace='otp_verification')),
     path('printing/', include(('printing.urls', 'printing'), namespace='printing')),
-    path('driver-queue/', include(('driver_queue.urls', 'driver_queue'), namespace='driver_queue'))
-
+    path('driver-queue/', include(('driver_queue.urls', 'driver_queue'), namespace='driver_queue')),
+    path('user-management/', include(('user_management.urls', 'user_management'), namespace='user_management')),
+    path('system-control/', include(('system_control.urls', 'system_control'), namespace='system_control')),
 
 ]
 

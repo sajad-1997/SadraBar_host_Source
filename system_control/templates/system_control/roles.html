@@ -1,0 +1,92 @@
+{% extends 'system_control/base.html' %}
+{% load sc_tags %}
+{% block title %}نقش‌ها و مجوزها{% endblock %}
+{% block nav_roles %}active{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h3 class="mb-4">مدیریت نقش‌ها و مجوزهای آن‌ها</h3>
+
+    <!-- ایجاد نقش سفارشی -->
+    <div class="card mb-4">
+        <div class="card-header"><h5 class="mb-0">ایجاد نقش سفارشی جدید</h5></div>
+        <div class="card-body">
+            <p class="text-muted small mb-2">
+                نقش سفارشی، مجوزهای نقش پایه را به ارث می‌برد و سپس می‌توانید مجوزها،
+                قفل ماژول‌ها و سهمیه‌های اختصاصی برای آن تعریف کنید.
+            </p>
+            <form method="post" class="row g-2 align-items-end">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="create_role">
+                <div class="col-md-3">
+                    <label class="form-label">کد نقش (لاتین)</label>
+                    <input type="text" name="code" class="form-control" maxlength="20" required>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">نام نقش</label>
+                    <input type="text" name="name" class="form-control" required>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">نقش پایه</label>
+                    <select name="base_role" class="form-select">
+                        {% for field in role_form %}
+                            {% if field.name == 'base_role' %}
+                                {% for option in field.field.choices %}
+                                    <option value="{{ option.0 }}">{{ option.1 }}</option>
+                                {% endfor %}
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <button type="submit" class="btn btn-custom w-100">ایجاد نقش</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {% for card in role_cards %}
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">
+                    {{ card.label }}
+                    {% if card.custom %}
+                        <span class="badge bg-info">سفارشی (پایه: {{ card.custom.base_role }})</span>
+                    {% else %}
+                        <span class="badge bg-secondary">استاندارد</span>
+                    {% endif %}
+                    <small class="text-muted">({{ card.users_count }} کاربر)</small>
+                </h5>
+                {% if card.custom %}
+                    <form method="post" onsubmit="return confirm('با حذف نقش، کاربران آن به نقش پایه منتقل می‌شوند. مطمئن هستید؟');">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="delete_role">
+                        <input type="hidden" name="role" value="{{ card.code }}">
+                        <button type="submit" class="btn btn-sm btn-outline-danger">حذف نقش</button>
+                    </form>
+                {% endif %}
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="update_permissions">
+                    <input type="hidden" name="role" value="{{ card.code }}">
+                    <div class="row">
+                        {% for field_name, field_label in permission_fields %}
+                            <div class="col-md-4">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="{{ card.code }}_{{ field_name }}"
+                                           name="{{ field_name }}"
+                                           {% if card.perms and card.perms|attr:field_name %}checked{% endif %}>
+                                    <label class="form-check-label" for="{{ card.code }}_{{ field_name }}">{{ field_label }}</label>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <button type="submit" class="btn btn-custom mt-2">ذخیره مجوزها</button>
+                </form>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}

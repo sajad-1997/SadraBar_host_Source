@@ -1,0 +1,234 @@
+{% extends 'system_control/base.html' %}
+{% block title %}داشبورد{% endblock %}
+{% block nav_index %}active{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h3 class="mb-4">قوانین سراسری سیستم</h3>
+
+    <!-- قوانین سیستم -->
+    <div class="card">
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="save_rules">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="id_enforce_module_locks"
+                                   name="enforce_module_locks" {% if rule_form.enforce_module_locks.value %}checked{% endif %}>
+                            <label class="form-check-label" for="id_enforce_module_locks">اعمال قفل ماژول‌ها</label>
+                        </div>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="id_enforce_quotas"
+                                   name="enforce_quotas" {% if rule_form.enforce_quotas.value %}checked{% endif %}>
+                            <label class="form-check-label" for="id_enforce_quotas">اعمال سهمیه صدور بارنامه</label>
+                        </div>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="id_wallet_enabled"
+                                   name="wallet_enabled" {% if rule_form.wallet_enabled.value %}checked{% endif %}>
+                            <label class="form-check-label" for="id_wallet_enabled">فعال بودن کیف پول</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-check form-switch mb-2">
+                            <input class="form-check-input" type="checkbox" id="id_lock_all_modules"
+                                   name="lock_all_modules" {% if rule_form.lock_all_modules.value %}checked{% endif %}>
+                            <label class="form-check-label text-danger" for="id_lock_all_modules">
+                                ⛔ قفل کامل سیستم (فقط سوپر ادمین)
+                            </label>
+                        </div>
+                        <label class="form-label">سقف پیش‌فرض روزانه صدور بارنامه (برای همه نقش‌ها)</label>
+                        <input type="number" min="0" name="default_daily_limit" class="form-control"
+                               value="{{ rule_form.default_daily_limit.value|default_if_none:'' }}"
+                               placeholder="خالی = بدون محدودیت">
+                    </div>
+                    <div class="col-md-4 d-flex align-items-end">
+                        <button type="submit" class="btn btn-custom w-100">ذخیره قوانین</button>
+                    </div>
+                </div>
+                {% if rule.updated_by %}
+                    <small class="text-muted mt-2 d-block">آخرین تغییر: {{ rule.updated_by.username }} در {{ rule.updated_at|date:"Y/m/d H:i" }}</small>
+                {% endif %}
+            </form>
+        </div>
+    </div>
+
+    <!-- آمار کلی -->
+    <h3 class="mb-3 mt-4">نظارت بر آمار سیستم</h3>
+    <div class="row">
+        <div class="col-md-3">
+            <div class="card stat-card text-center">
+                <div class="card-body">
+                    <div class="stat-number">{{ today_bijaks }}</div>
+                    <div class="stat-label">بارنامه امروز</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stat-card text-center">
+                <div class="card-body">
+                    <div class="stat-number">{{ month_bijaks }}</div>
+                    <div class="stat-label">بارنامه این ماه</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stat-card text-center">
+                <div class="card-body">
+                    <div class="stat-number">{{ total_bijaks }}</div>
+                    <div class="stat-label">کل بارنامه‌ها</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stat-card text-center">
+                <div class="card-body">
+                    <div class="stat-number">{{ total_users }}</div>
+                    <div class="stat-label">کاربران ({{ active_users }} فعال)</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <div class="stat-number">{{ active_quotas }}</div>
+                    <div class="stat-label">سهمیه‌های فعال</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <div class="stat-number text-danger">{{ locked_modules }}</div>
+                    <div class="stat-label">ماژول‌های قفل کامل</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <div class="stat-number">{{ wallet_total_balance }}</div>
+                    <div class="stat-label">مجموع موجودی کیف پول‌ها</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <div class="stat-number">{{ frozen_wallets }}</div>
+                    <div class="stat-label">کیف پول‌های مسدود</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- آمار صدور بر اساس نقش -->
+    <div class="row mt-2">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header"><h5 class="mb-0">آمار صدور بارنامه بر اساس نقش</h5></div>
+                <div class="card-body">
+                    <table class="table table-hover text-center">
+                        <thead>
+                        <tr>
+                            <th>نقش</th>
+                            <th>امروز</th>
+                            <th>این ماه</th>
+                            <th>کل</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for row in role_stats %}
+                            <tr>
+                                <td>{{ row.label }}</td>
+                                <td>{{ row.today }}</td>
+                                <td>{{ row.month }}</td>
+                                <td>{{ row.total }}</td>
+                            </tr>
+                        {% empty %}
+                            <tr><td colspan="4" class="text-center">داده‌ای ثبت نشده است</td></tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- صادرکنندگان برتر این ماه + وضعیت سهمیه -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header"><h5 class="mb-0">صادرکنندگان برتر این ماه و وضعیت سهمیه</h5></div>
+                <div class="card-body">
+                    <table class="table table-hover">
+                        <thead>
+                        <tr>
+                            <th>کاربر</th>
+                            <th>نقش</th>
+                            <th>این ماه</th>
+                            <th>وضعیت سهمیه</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for row in top_users %}
+                            <tr>
+                                <td>{{ row.username }} <small class="text-muted">{{ row.full_name }}</small></td>
+                                <td>{{ row.role_label }}</td>
+                                <td>{{ row.count }}</td>
+                                <td>
+                                    {% if row.quotas %}
+                                        {% for q in row.quotas %}
+                                            <span class="badge {% if q.exceeded %}badge-locked{% else %}bg-success{% endif %}">
+                                                {{ q.label }}: {{ q.used }}/{{ q.limit }}
+                                            </span>
+                                        {% endfor %}
+                                    {% else %}
+                                        <span class="badge bg-secondary">بدون محدودیت</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr><td colspan="4" class="text-center">در این ماه بارنامه‌ای صادر نشده است</td></tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- آخرین عملیات -->
+    <div class="card">
+        <div class="card-header"><h5 class="mb-0">آخرین عملیات سوپر ادمین</h5></div>
+        <div class="card-body">
+            <table class="table table-hover">
+                <thead>
+                <tr>
+                    <th>زمان</th>
+                    <th>عملگر</th>
+                    <th>عملیات</th>
+                    <th>هدف</th>
+                    <th>توضیحات</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for log in recent_logs %}
+                    <tr>
+                        <td>{{ log.created_at|date:"Y/m/d H:i" }}</td>
+                        <td>{{ log.actor.username|default:'-' }}</td>
+                        <td>{{ log.action }}</td>
+                        <td>{{ log.target|default:'-' }}</td>
+                        <td>{{ log.description|default:'-' }}</td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="5" class="text-center">عملیاتی ثبت نشده است</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

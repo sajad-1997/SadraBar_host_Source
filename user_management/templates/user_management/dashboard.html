@@ -1,0 +1,250 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>داشبورد مدیریت کاربران</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/vazirmatn@33.003/index.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #f5f6fa;
+            --text-color: #333;
+            --sidebar-bg: #fff;
+            --navbar-bg: linear-gradient(90deg, #4e54c8, #8f94fb);
+            --link-hover: #4e54c8;
+            --card-bg: #fff;
+            --shadow: rgba(0, 0, 0, 0.05);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-color: #181a1f;
+                --text-color: #e4e4e4;
+                --sidebar-bg: #22252b;
+                --navbar-bg: linear-gradient(90deg, #2a2d55, #3c3f72);
+                --link-hover: #8f94fb;
+                --card-bg: #2b2e36;
+                --shadow: rgba(0, 0, 0, 0.4);
+            }
+        }
+
+        body {
+            font-family: 'Vazirmatn', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+        }
+
+        .navbar {
+            background: var(--navbar-bg);
+            color: #fff;
+            padding: 0.8rem 1.5rem;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px var(--shadow);
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            text-align: center;
+            padding: 25px;
+            transition: transform 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #4e54c8;
+        }
+
+        .stat-label {
+            font-size: 1rem;
+            color: var(--text-color);
+            margin-top: 10px;
+        }
+
+        .table {
+            background: var(--card-bg);
+        }
+
+        .btn-custom {
+            background: linear-gradient(90deg, #4e54c8, #8f94fb);
+            border: none;
+            color: white;
+        }
+
+        .btn-custom:hover {
+            background: linear-gradient(90deg, #3c3f72, #6366f1);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">مدیریت کاربران</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        {% if user.role == 'admin' or user.is_superuser %}
+                            <a class="nav-link active" href="{% url 'dashboard:admin_dashboard' %}">پنل عملیاتی</a>
+                        {% elif user.role == 'manager' %}
+                            <a class="nav-link active" href="{% url 'dashboard:manager_dashboard' %}">پنل عملیاتی</a>
+                        {% else %}
+                            <a class="nav-link active" href="{% url 'dashboard:staff_dashboard' %}">پنل عملیاتی</a>
+                        {% endif %}
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="{% url 'user_management:dashboard' %}">داشبورد مدیریت کاربران</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'user_management:user_list' %}">لیست کاربران</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'user_management:driver_block_list' %}">رانندگان مسدود شده</a>
+                    </li>
+                </ul>
+                <span class="navbar-text">
+                    {{ user.username }} - {{ user.get_role_display }}
+                </span>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <h2 class="mb-4">داشبورد مدیریت کاربران</h2>
+
+        <!-- آمار کلی -->
+        <div class="row">
+            <div class="col-md-3">
+                <div class="card stat-card">
+                    <div class="stat-number">{{ total_users }}</div>
+                    <div class="stat-label">کل کاربران</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card stat-card">
+                    <div class="stat-number">{{ admin_count }}</div>
+                    <div class="stat-label">مدیران سیستم</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card stat-card">
+                    <div class="stat-number">{{ manager_count }}</div>
+                    <div class="stat-label">مدیران</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card stat-card">
+                    <div class="stat-number">{{ employee_count }}</div>
+                    <div class="stat-label">کارمندان</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-3">
+            <div class="col-md-3">
+                <div class="card stat-card">
+                    <div class="stat-number">{{ driver_count }}</div>
+                    <div class="stat-label">رانندگان</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card stat-card">
+                    <div class="stat-number">{{ customer_count }}</div>
+                    <div class="stat-label">مشتریان</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card stat-card">
+                    <div class="stat-number text-danger">{{ blocked_driver_count }}</div>
+                    <div class="stat-label">رانندگان مسدود شده</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- آخرین کاربران -->
+        <div class="row mt-4">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">آخرین کاربران ثبت شده</h5>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>نام کاربری</th>
+                                    <th>نقش</th>
+                                    <th>تاریخ ثبت</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for u in recent_users %}
+                                <tr>
+                                    <td>{{ u.username }}</td>
+                                    <td>{{ u.get_role_display }}</td>
+                                    <td>{{ u.date_joined|date:"Y/m/d" }}</td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="3" class="text-center">کاربری یافت نشد</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- رانندگان مسدود شده اخیر -->
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">رانندگان مسدود شده اخیر</h5>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>نام راننده</th>
+                                    <th>تاریخ مسدودی</th>
+                                    <th>مسدود توسط</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for block in recent_blocked %}
+                                <tr>
+                                    <td>{{ block.driver.username }}</td>
+                                    <td>{{ block.blocked_at|date:"Y/m/d" }}</td>
+                                    <td>{{ block.blocked_by.username }}</td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="3" class="text-center">راننده مسدود شده‌ای یافت نشد</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

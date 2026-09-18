@@ -1,0 +1,274 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>جزئیات کاربر</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/vazirmatn@33.003/index.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #f5f6fa;
+            --text-color: #333;
+            --card-bg: #fff;
+            --shadow: rgba(0, 0, 0, 0.05);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-color: #181a1f;
+                --text-color: #e4e4e4;
+                --card-bg: #2b2e36;
+                --shadow: rgba(0, 0, 0, 0.4);
+            }
+        }
+
+        body {
+            font-family: 'Vazirmatn', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+        }
+
+        .navbar {
+            background: linear-gradient(90deg, #4e54c8, #8f94fb);
+            color: #fff;
+            padding: 0.8rem 1.5rem;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px var(--shadow);
+            margin-bottom: 20px;
+        }
+
+        .form-check-input:checked {
+            background-color: #4e54c8;
+            border-color: #4e54c8;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">مدیریت کاربران</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'user_management:dashboard' %}">داشبورد</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'user_management:user_list' %}">لیست کاربران</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'user_management:driver_block_list' %}">رانندگان مسدود شده</a>
+                    </li>
+                </ul>
+                <span class="navbar-text">
+                    {{ user.username }} - {{ user.get_role_display }}
+                </span>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>جزئیات کاربر: {{ user_obj.username }}</h2>
+            <a href="{% url 'user_management:user_list' %}" class="btn btn-secondary">بازگشت به لیست</a>
+        </div>
+
+        <!-- اطلاعات کاربر -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">اطلاعات کاربر</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>نام کاربری:</strong> {{ user_obj.username }}</p>
+                        <p><strong>نام:</strong> {{ user_obj.first_name|default:"—" }}</p>
+                        <p><strong>نام خانوادگی:</strong> {{ user_obj.last_name|default:"—" }}</p>
+                        <p><strong>ایمیل:</strong> {{ user_obj.email|default:"—" }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>نقش:</strong> {{ user_obj.get_role_display }}</p>
+                        <p><strong>کد کاربر:</strong> {{ user_obj.user_code|default:"—" }}</p>
+                        <p><strong>تاریخ ثبت:</strong> {{ user_obj.date_joined|date:"Y/m/d H:i" }}</p>
+                        <p><strong>وضعیت:</strong> 
+                            {% if user_obj.is_active %}
+                                <span class="badge bg-success">فعال</span>
+                            {% else %}
+                                <span class="badge bg-danger">غیرفعال</span>
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- تغییر نقش -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">تغییر نقش کاربر</h5>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="change_role">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <select name="new_role" class="form-select">
+                                <option value="admin" {% if user_obj.role == 'admin' %}selected{% endif %}>مدیر کل سیستم</option>
+                                <option value="manager" {% if user_obj.role == 'manager' %}selected{% endif %}>مدیریت</option>
+                                <option value="employee" {% if user_obj.role == 'employee' %}selected{% endif %}>کارمند</option>
+                                <option value="driver" {% if user_obj.role == 'driver' %}selected{% endif %}>راننده</option>
+                                <option value="customer" {% if user_obj.role == 'customer' %}selected{% endif %}>مشتری</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <button type="submit" class="btn btn-primary">تغییر نقش</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- مدیریت مجوزهای نقش -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">مجوزهای نقش: {{ role_permission.get_role_display }}</h5>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="update_permissions">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="mb-3">مجوزهای عمومی</h6>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="can_access_dashboard" id="can_access_dashboard" {% if role_permission.can_access_dashboard %}checked{% endif %}>
+                                <label class="form-check-label" for="can_access_dashboard">دسترسی به داشبورد اصلی</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="can_manage_shipments" id="can_manage_shipments" {% if role_permission.can_manage_shipments %}checked{% endif %}>
+                                <label class="form-check-label" for="can_manage_shipments">دسترسی به مدیریت بارنامه‌ها</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="can_issuance_shipments" id="can_issuance_shipments" {% if role_permission.can_issuance_shipments %}checked{% endif %}>
+                                <label class="form-check-label" for="can_issuance_shipments">دسترسی به صدور بارنامه‌ها</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="can_view_reports" id="can_view_reports" {% if role_permission.can_view_reports %}checked{% endif %}>
+                                <label class="form-check-label" for="can_view_reports">دسترسی به گزارش‌ها</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="can_manage_users" id="can_manage_users" {% if role_permission.can_manage_users %}checked{% endif %}>
+                                <label class="form-check-label" for="can_manage_users">دسترسی به مدیریت کاربران</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="can_manage_customers" id="can_manage_customers" {% if role_permission.can_manage_customers %}checked{% endif %}>
+                                <label class="form-check-label" for="can_manage_customers">دسترسی به لیست مشتریان</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="can_manage_drivers" id="can_manage_drivers" {% if role_permission.can_manage_drivers %}checked{% endif %}>
+                                <label class="form-check-label" for="can_manage_drivers">دسترسی به لیست رانندگان</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="can_use_digital_stamp" id="can_use_digital_stamp" {% if role_permission.can_use_digital_stamp %}checked{% endif %}>
+                                <label class="form-check-label" for="can_use_digital_stamp">اجازه چاپ بارنامه با مهر و امضای دیجیتال</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="mb-3">مجوزهای پیامک و OTP</h6>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="can_send_sms_verification" id="can_send_sms_verification" {% if role_permission.can_send_sms_verification %}checked{% endif %}>
+                                <label class="form-check-label" for="can_send_sms_verification">دسترسی به ارسال پیامک تایید</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="can_verify_sms_code" id="can_verify_sms_code" {% if role_permission.can_verify_sms_code %}checked{% endif %}>
+                                <label class="form-check-label" for="can_verify_sms_code">دسترسی به تایید کد پیامکی</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="can_manage_otp_settings" id="can_manage_otp_settings" {% if role_permission.can_manage_otp_settings %}checked{% endif %}>
+                                <label class="form-check-label" for="can_manage_otp_settings">دسترسی به تنظیمات OTP</label>
+                            </div>
+
+                            <h6 class="mb-3 mt-4">مجوزهای نوبت‌دهی رانندگان</h6>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="can_access_driver_queue" id="can_access_driver_queue" {% if role_permission.can_access_driver_queue %}checked{% endif %}>
+                                <label class="form-check-label" for="can_access_driver_queue">دسترسی به پنل نوبت‌دهی رانندگان</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="can_manage_queue_settings" id="can_manage_queue_settings" {% if role_permission.can_manage_queue_settings %}checked{% endif %}>
+                                <label class="form-check-label" for="can_manage_queue_settings">دسترسی به تنظیمات نوبت‌دهی</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="can_approve_queue_staff" id="can_approve_queue_staff" {% if role_permission.can_approve_queue_staff %}checked{% endif %}>
+                                <label class="form-check-label" for="can_approve_queue_staff">دسترسی به تایید کارکنان نوبت‌دهی</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="can_view_queue_reports" id="can_view_queue_reports" {% if role_permission.can_view_queue_reports %}checked{% endif %}>
+                                <label class="form-check-label" for="can_view_queue_reports">دسترسی به گزارش‌های نوبت‌دهی</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="can_manage_queue_announcements" id="can_manage_queue_announcements" {% if role_permission.can_manage_queue_announcements %}checked{% endif %}>
+                                <label class="form-check-label" for="can_manage_queue_announcements">دسترسی به مدیریت اعلان‌های نوبت‌دهی</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="can_override_queue_rules" id="can_override_queue_rules" {% if role_permission.can_override_queue_rules %}checked{% endif %}>
+                                <label class="form-check-label" for="can_override_queue_rules">دسترسی به نادیده گرفتن قوانین نوبت‌دهی</label>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary mt-3">ذخیره مجوزها</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- مدیریت مسدودی راننده -->
+        {% if user_obj.role == 'driver' and driver_block %}
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">مدیریت مسدودی راننده</h5>
+            </div>
+            <div class="card-body">
+                {% if driver_block.is_blocked %}
+                    <div class="alert alert-danger">
+                        <h6>این راننده مسدود شده است</h6>
+                        <p><strong>دلیل:</strong> {{ driver_block.block_reason|default:"—" }}</p>
+                        <p><strong>تاریخ مسدودی:</strong> {{ driver_block.blocked_at|date:"Y/m/d H:i" }}</p>
+                        <p><strong>مسدود توسط:</strong> {{ driver_block.blocked_by.username }}</p>
+                    </div>
+                    <form method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="unblock_driver">
+                        <button type="submit" class="btn btn-success">رفع مسدودی</button>
+                    </form>
+                {% else %}
+                    <div class="alert alert-success">
+                        این راننده فعال است و دسترسی به سیستم دارد.
+                    </div>
+                    <form method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="block_driver">
+                        <div class="mb-3">
+                            <label for="block_reason" class="form-label">دلیل مسدود شدن:</label>
+                            <textarea class="form-control" id="block_reason" name="block_reason" rows="3"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-danger">مسدود کردن راننده</button>
+                    </form>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

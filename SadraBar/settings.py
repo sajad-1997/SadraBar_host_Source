@@ -32,6 +32,7 @@ def env_list(name, default=""):
     value = os.getenv(name, default)
     return [item.strip() for item in value.split(",") if item.strip()]
 
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
@@ -44,10 +45,8 @@ SECRET_KEY = os.getenv(
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env_bool("DEBUG", default=True)
 
-
 ALLOWED_HOSTS = env_list("ALLOWED_HOSTS", "localhost,127.0.0.1")
 PUBLIC_DOMAIN = os.getenv("PUBLIC_DOMAIN", "http://localhost:8000")
-
 
 CSRF_FAILURE_VIEW = 'issuance.views.error_views.csrf_failure'
 
@@ -76,7 +75,9 @@ INSTALLED_APPS = [
     'duplicate_audit',
     'otp_verification',
     'printing',
-
+    'driver_queue',
+    'user_management',
+    'system_control',
 
 ]
 
@@ -84,7 +85,7 @@ CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL", "redis://localhost:6379/0")
 CELERY_RESULT_BACKEND = os.getenv("CELERY_RESULT_BACKEND", "redis://localhost:6379/0")
 
 AUTH_USER_MODEL = 'accounts.User'
-LOGIN_REDIRECT_URL = 'dashboard'   # صفحه‌ای که بعد از لاگین می‌ره
+LOGIN_REDIRECT_URL = 'home'  # صفحه‌ای که بعد از لاگین می‌ره (پیش‌فرض)
 LOGOUT_REDIRECT_URL = 'home'
 LOGIN_URL = 'login'
 
@@ -116,6 +117,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'system_control.middleware.ModuleAccessMiddleware',
     'issuance.middleware.CurrentUserMiddleware',
 
 ]
@@ -184,17 +186,16 @@ USE_TZ = False
 
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
-STATICFILES_DIRS = [ BASE_DIR / "static" ]
+STATICFILES_DIRS = [BASE_DIR / "static"]
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'public_html', 'media')
-
+PWA_CACHE_VERSION = os.getenv("PWA_CACHE_VERSION", "2026-08-12-1")
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 SITE_URL = os.getenv("SITE_URL", PUBLIC_DOMAIN)
-
 
 # ========== تنظیمات SMS.ir ==========
 SMS_IR_API_KEY = os.getenv("SMS_IR_API_KEY", "")
@@ -204,8 +205,18 @@ SMS_IR_LINE_NUMBER = os.getenv("SMS_IR_LINE_NUMBER", "")
 # برای محیط لوکال، ارسال واقعی را غیرفعال می‌کنیم
 SMS_IR_FAKE_MODE = env_bool("SMS_IR_FAKE_MODE", default=True)
 
-
 # تنظیمات لاگینگ
+
+# ========== Email Settings ==========
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # برای توسعه: ایمیل‌ها در کنسول نمایش داده می‌شوند
+# برای محیط تولید، از SMTP استفاده کنید:
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# EMAIL_HOST = 'smtp.gmail.com'
+# EMAIL_PORT = 587
+# EMAIL_USE_TLS = True
+# EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', '')
+# EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')
+# DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'noreply@sadrabar.ir')
 
 LOGGING = {
     'version': 1,
@@ -244,3 +255,22 @@ REST_FRAMEWORK = {
 # ========== Rate Limiting Settings ==========
 RATE_LIMIT_ENABLE = True
 RATE_LIMIT_REQUESTS = 10  # requests per minute per IP/user
+
+# ---------------- ماژول نوبت‌دهی ----------------
+# اگر app label اپ رانندگان شما "drivers" نیست، این مقدار را اصلاح کنید
+QUEUE_DRIVER_MODEL = "drivers.Driver"
+
+QUEUE_BASE_URL = "https://your-domain.com"  # دامنه لینک‌های پیامکی
+QUEUE_SMS_GATEWAY = "driver_queue.sms.ConsoleSmsGateway"
+# OFFICE_LOCATION = "35.6997,51.3380"  # مختصات مستقیم دفتر باربری
+# OFFICE_LOCATION = "https://maps.google.com/?q=35.6997,51.3380"  # یا لینک گوگل مپ
+OFFICE_LOCATION = "35.6997,51.3380"  # مختصات دفتر باربری (می‌تواند لینک هم باشد)
+# اختیاری (با پیش‌فرض):
+# QUEUE_START_TIME = "08:00"
+# QUEUE_END_TIME = "11:00"
+# QUEUE_ANNOUNCE_TIME = "11:00"
+# QUEUE_ANNOUNCE_WINDOW_MINUTES = 30
+# QUEUE_RESPONSE_GRACE_MINUTES = 15
+# QUEUE_GEOFENCE_RADIUS_KM = 5.0
+# QUEUE_WORKING_WEEKDAYS = (0, 1, 2, 3, 5, 6)  # شنبه تا پنج‌شنبه (جمعه=4 غیرفعال)
+# QUEUE_HOLIDAYS = ["2026-08-14"]

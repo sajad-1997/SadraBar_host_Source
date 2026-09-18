@@ -1,0 +1,165 @@
+{% extends 'system_control/base.html' %}
+{% load sc_tags %}
+{% block title %}کیف پول{% endblock %}
+{% block nav_wallets %}active{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h3 class="mb-4">مدیریت کیف پول کاربران و نقش‌ها</h3>
+
+    {% if not wallet_enabled %}
+        <div class="alert alert-warning">کیف پول از قوانین سیستم غیرفعال است (فقط مشاهده).</div>
+    {% endif %}
+
+    <!-- عملیات مالی -->
+    <div class="card mb-4">
+        <div class="card-header"><h5 class="mb-0">انجام تراکنش (شارژ / برداشت / اصلاحیه)</h5></div>
+        <div class="card-body">
+            <form method="post" class="row g-2 align-items-end">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="create_operation">
+                <div class="col-md-2">
+                    <label class="form-label">نوع هدف</label>
+                    <select name="target_kind" class="form-select" id="id_target_kind">
+                        <option value="user">کاربر</option>
+                        <option value="role">نقش</option>
+                    </select>
+                </div>
+                <div class="col-md-3" id="user_select_box">
+                    <label class="form-label">کاربر</label>
+                    <select name="user_id" class="form-select">
+                        {% for u in all_users %}
+                            <option value="{{ u.id }}">{{ u.username }} ({{ u.role|role_label }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3" id="role_select_box" style="display:none">
+                    <label class="form-label">نقش (کیف پول مشترک)</label>
+                    <select name="role_code" class="form-select">
+                        {% for code, label in all_roles %}
+                            <option value="{{ code }}">{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">نوع تراکنش</label>
+                    <select name="op_type" class="form-select">
+                        <option value="deposit">شارژ</option>
+                        <option value="withdraw">برداشت</option>
+                        <option value="adjust">اصلاحیه (تنظیم موجودی)</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">مبلغ (تومان)</label>
+                    <input type="number" min="1" name="amount" class="form-control" required>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">توضیح</label>
+                    <input type="text" name="note" class="form-control">
+                </div>
+                <div class="col-md-1">
+                    <button type="submit" class="btn btn-custom w-100">ثبت</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- کیف پول کاربران -->
+        <div class="col-md-7">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between">
+                    <h5 class="mb-0">کیف پول کاربران</h5>
+                    <span class="badge bg-primary">مجموع کل: {{ total_balance }} تومان</span>
+                </div>
+                <div class="card-body">
+                    <table class="table table-hover text-center align-middle">
+                        <thead>
+                        <tr>
+                            <th>کاربر</th>
+                            <th>نقش</th>
+                            <th>موجودی</th>
+                            <th>وضعیت</th>
+                            <th>عملیات</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for w in user_wallets %}
+                            <tr>
+                                <td>{{ w.user.username }}</td>
+                                <td>{{ w.user.role|role_label }}</td>
+                                <td>{{ w.balance }} تومان</td>
+                                <td>
+                                    {% if w.is_frozen %}
+                                        <span class="badge badge-locked">مسدود</span>
+                                    {% else %}
+                                        <span class="badge bg-success">آزاد</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        <a href="{% url 'system_control:wallet_detail' w.user.id %}" class="btn btn-outline-primary">جزئیات</a>
+                                        <form method="post" class="d-inline">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="action" value="toggle_freeze">
+                                            <input type="hidden" name="wallet_id" value="{{ w.id }}">
+                                            <button class="btn btn-outline-warning">
+                                                {% if w.is_frozen %}رفع مسدودی{% else %}مسدود{% endif %}
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr><td colspan="5" class="text-center">کیف پولی ایجاد نشده است</td></tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- کیف پول نقش‌ها -->
+        <div class="col-md-5">
+            <div class="card">
+                <div class="card-header"><h5 class="mb-0">کیف پول نقش‌ها (مشترک)</h5></div>
+                <div class="card-body">
+                    <table class="table table-hover text-center align-middle">
+                        <thead>
+                        <tr>
+                            <th>نقش</th>
+                            <th>موجودی</th>
+                            <th>عملیات</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for w in role_wallets %}
+                            <tr>
+                                <td>{{ w.role|role_label }}</td>
+                                <td>{{ w.balance }} تومان</td>
+                                <td>
+                                    <a href="{% url 'system_control:role_wallet_detail' w.role %}" class="btn btn-sm btn-outline-primary">جزئیات</a>
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr><td colspan="3" class="text-center">کیف پول نقشی ایجاد نشده است</td></tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.getElementById('id_target_kind').addEventListener('change', function () {
+        const isUser = this.value === 'user';
+        document.getElementById('user_select_box').style.display = isUser ? 'block' : 'none';
+        document.getElementById('role_select_box').style.display = isUser ? 'none' : 'block';
+    });
+</script>
+{% endblock %}
+

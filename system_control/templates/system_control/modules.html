@@ -1,0 +1,140 @@
+{% extends 'system_control/base.html' %}
+{% load sc_tags %}
+{% block title %}ماژول‌ها و قفل‌ها{% endblock %}
+{% block nav_modules %}active{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h3 class="mb-4">مدیریت ماژول‌ها و قفل دسترسی</h3>
+
+    <div class="alert alert-warning small">
+        قفل کامل = ماژول برای همه بجز سوپر ادمین بسته می‌شود.
+        قفل نقش = ماژول برای اعضای آن نقش بسته می‌شود.
+        دسترسی اختصاصی کاربر بر قفل نقش اولویت دارد.
+    </div>
+
+    {% for row in module_rows %}
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">
+                    {{ row.module.name }}
+                    <small class="text-muted">({{ row.module.url_prefix }})</small>
+                    {% if row.module.is_locked %}
+                        <span class="badge badge-locked">قفل کامل</span>
+                    {% else %}
+                        <span class="badge bg-success">باز</span>
+                    {% endif %}
+                </h5>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="save_module">
+                    <input type="hidden" name="module_id" value="{{ row.module.id }}">
+                    <div class="row align-items-center">
+                        <div class="col-md-3">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="lock_{{ row.module.id }}"
+                                       name="is_locked" {% if row.module.is_locked %}checked{% endif %}>
+                                <label class="form-check-label text-danger" for="lock_{{ row.module.id }}">
+                                    قفل کامل (همه بجز سوپر ادمین)
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label d-block mb-1">قفل برای نقش‌ها:</label>
+                            <div class="d-flex flex-wrap gap-3">
+                                {% for code, label in all_roles %}
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="rl_{{ row.module.id }}_{{ forloop.counter }}"
+                                               name="locked_roles" value="{{ code }}"
+                                               {% if code in row.locked_roles %}checked{% endif %}>
+                                        <label class="form-check-label" for="rl_{{ row.module.id }}_{{ forloop.counter }}">{{ label }}</label>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <button type="submit" class="btn btn-custom w-100">ذخیره قفل‌ها</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    {% endfor %}
+
+    <!-- دسترسی‌های اختصاصی کاربران -->
+    <div class="card mt-4">
+        <div class="card-header"><h5 class="mb-0">دسترسی اختصاصی کاربران به ماژول‌ها</h5></div>
+        <div class="card-body">
+            <form method="post" class="row g-2 align-items-end mb-3">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="add_override">
+                <div class="col-md-4">
+                    <label class="form-label">کاربر</label>
+                    <select name="user_id" class="form-select">
+                        {% for u in all_users %}
+                            <option value="{{ u.id }}">{{ u.username }} ({{ u.role|role_label }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">ماژول</label>
+                    <select name="module_id" class="form-select">
+                        {% for row in module_rows %}
+                            <option value="{{ row.module.id }}">{{ row.module.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">وضعیت</label>
+                    <select name="mode" class="form-select">
+                        <option value="deny">عدم دسترسی (قفل)</option>
+                        <option value="allow">اجازه دسترسی</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-custom w-100">ثبت</button>
+                </div>
+            </form>
+
+            <table class="table table-hover align-middle text-center">
+                <thead>
+                <tr>
+                    <th>کاربر</th>
+                    <th>ماژول</th>
+                    <th>وضعیت</th>
+                    <th>عملیات</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for o in overrides %}
+                    <tr>
+                        <td>{{ o.user.username }}</td>
+                        <td>{{ o.module.name }}</td>
+                        <td>
+                            {% if o.mode == 'allow' %}
+                                <span class="badge bg-success">اجازه دسترسی</span>
+                            {% else %}
+                                <span class="badge badge-locked">قفل</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <form method="post" class="d-inline">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="remove_override">
+                                <input type="hidden" name="override_id" value="{{ o.id }}">
+                                <button class="btn btn-sm btn-outline-danger">حذف</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="4" class="text-center">دسترسی اختصاصی‌ای تعریف نشده است</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

@@ -1,0 +1,98 @@
+{% extends 'system_control/base.html' %}
+{% load sc_tags %}
+{% block title %}جزئیات کیف پول{% endblock %}
+{% block nav_wallets %}active{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h3 class="mb-4">
+        کیف پول {% if owner_user %}کاربر {{ owner_user.username }} ({{ owner_user.role|role_label }}){% else %}نقش {{ owner_role }}{% endif %}
+        {% if wallet.is_frozen %}
+            <span class="badge badge-locked">مسدود</span>
+        {% else %}
+            <span class="badge bg-success">آزاد</span>
+        {% endif %}
+    </h3>
+
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card text-center">
+                <div class="card-body">
+                    <div class="stat-number">{{ wallet.balance }}</div>
+                    <div class="stat-label">موجودی فعلی (تومان)</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header"><h5 class="mb-0">تراکنش جدید</h5></div>
+                <div class="card-body">
+                    <form method="post" class="row g-2">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="wallet_operation">
+                        <div class="col-12">
+                            <label class="form-label">نوع تراکنش</label>
+                            <select name="op_type" class="form-select">
+                                <option value="deposit">شارژ</option>
+                                <option value="withdraw">برداشت</option>
+                                <option value="adjust">اصلاحیه (تنظیم موجودی)</option>
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">مبلغ (تومان)</label>
+                            <input type="number" min="1" name="amount" class="form-control" required>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">توضیح</label>
+                            <input type="text" name="note" class="form-control">
+                        </div>
+                        <div class="col-12">
+                            <button type="submit" class="btn btn-custom w-100">ثبت تراکنش</button>
+                        </div>
+                    </form>
+                    <form method="post" class="mt-2">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="toggle_freeze">
+                        <button type="submit" class="btn btn-outline-warning w-100">
+                            {% if wallet.is_frozen %}رفع مسدودی کیف پول{% else %}مسدود کردن کیف پول{% endif %}
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header"><h5 class="mb-0">تاریخچه تراکنش‌ها</h5></div>
+                <div class="card-body">
+                    <table class="table table-hover text-center">
+                        <thead>
+                        <tr>
+                            <th>زمان</th>
+                            <th>نوع</th>
+                            <th>مبلغ</th>
+                            <th>موجودی پس از تراکنش</th>
+                            <th>توضیح</th>
+                            <th>توسط</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for tx in transactions %}
+                            <tr>
+                                <td>{{ tx.created_at|date:"Y/m/d H:i" }}</td>
+                                <td>{{ tx.get_tx_type_display }}</td>
+                                <td>{{ tx.amount }}</td>
+                                <td>{{ tx.balance_after }}</td>
+                                <td>{{ tx.note|default:'-' }}</td>
+                                <td>{{ tx.created_by.username|default:'-' }}</td>
+                            </tr>
+                        {% empty %}
+                            <tr><td colspan="6" class="text-center">تراکنشی ثبت نشده است</td></tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

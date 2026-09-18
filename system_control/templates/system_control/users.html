@@ -1,0 +1,151 @@
+{% extends 'system_control/base.html' %}
+{% load sc_tags %}
+{% block title %}مدیریت کاربران{% endblock %}
+{% block nav_users %}active{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h3 class="mb-4">مدیریت کاربران (ایجاد / حذف / قفل)</h3>
+
+    <!-- فرم ایجاد کاربر -->
+    <div class="card mb-3">
+        <div class="card-header"><h5 class="mb-0">ایجاد کاربر جدید</h5></div>
+        <div class="card-body">
+            <form method="post" class="row g-2 align-items-end">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="create_user">
+                <div class="col-md-2">
+                    <label class="form-label">نام کاربری *</label>
+                    <input type="text" name="username" class="form-control {% if form.username.errors %}is-invalid{% endif %}" required>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">نام</label>
+                    <input type="text" name="first_name" class="form-control">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">نام خانوادگی</label>
+                    <input type="text" name="last_name" class="form-control">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">ایمیل</label>
+                    <input type="email" name="email" class="form-control">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">نقش *</label>
+                    <select name="role" class="form-select">
+                        {% for code, label in all_roles %}
+                            <option value="{{ code }}">{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">رمز عبور *</label>
+                    <input type="password" name="password1" class="form-control" required>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">تکرار رمز *</label>
+                    <input type="password" name="password2" class="form-control" required>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-custom w-100">ایجاد کاربر</button>
+                </div>
+            </form>
+            {% if form.errors %}
+                <ul class="text-danger mt-2 mb-0">
+                    {% for field, errors in form.errors.items %}
+                        <li>{{ errors.0 }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- فیلترها -->
+    <div class="card mb-3">
+        <div class="card-body">
+            <form method="get" class="row g-2 align-items-end">
+                <div class="col-md-6">
+                    <label class="form-label">جستجو</label>
+                    <input type="text" name="search" value="{{ search_query }}" class="form-control"
+                           placeholder="نام کاربری، نام، ایمیل یا کد کاربر...">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">نقش</label>
+                    <select name="role" class="form-select">
+                        <option value="">همه نقش‌ها</option>
+                        {% for code, label in all_roles %}
+                            <option value="{{ code }}" {% if role_filter == code %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-custom w-100">فیلتر</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- لیست کاربران -->
+    <div class="card">
+        <div class="card-body">
+            <table class="table table-hover align-middle text-center">
+                <thead>
+                <tr>
+                    <th>نام کاربری</th>
+                    <th>نام و نام خانوادگی</th>
+                    <th>نقش</th>
+                    <th>وضعیت</th>
+                    <th>تاریخ عضویت</th>
+                    <th>عملیات</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for u in users %}
+                    <tr>
+                        <td>
+                            {{ u.username }}
+                            {% if u.is_superuser %}<span class="badge bg-dark">سوپر ادمین</span>{% endif %}
+                        </td>
+                        <td>{{ u.first_name }} {{ u.last_name }}</td>
+                        <td>{{ u.role|role_label }}</td>
+                        <td>
+                            {% if u.is_active %}
+                                <span class="badge bg-success">فعال</span>
+                            {% else %}
+                                <span class="badge badge-locked">قفل شده</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ u.date_joined|date:"Y/m/d" }}</td>
+                        <td>
+                            <div class="btn-group btn-group-sm">
+                                <a href="{% url 'system_control:user_detail' u.id %}" class="btn btn-outline-primary">جزئیات</a>
+                                {% if not u.is_superuser and u != user %}
+                                    <form method="post" class="d-inline" onsubmit="return confirm('تغییر وضعیت قفل کاربر؟');">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="action" value="toggle_active">
+                                        <input type="hidden" name="user_id" value="{{ u.id }}">
+                                        <button type="submit" class="btn btn-outline-warning">
+                                            {% if u.is_active %}قفل{% else %}رفع قفل{% endif %}
+                                        </button>
+                                    </form>
+                                    {% if not u.is_superuser %}
+                                        <form method="post" class="d-inline" onsubmit="return confirm('کاربر به همراه همه داده‌هایش حذف شود؟');">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="action" value="delete_user">
+                                            <input type="hidden" name="user_id" value="{{ u.id }}">
+                                            <button type="submit" class="btn btn-outline-danger">حذف</button>
+                                        </form>
+                                    {% endif %}
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="6" class="text-center">کاربری یافت نشد</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

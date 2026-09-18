@@ -1,0 +1,140 @@
+{% extends 'system_control/base.html' %}
+{% load sc_tags %}
+{% block title %}سهمیه صدور بارنامه{% endblock %}
+{% block nav_quotas %}active{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h3 class="mb-4">مدیریت مجوز تعداد صدور بارنامه‌ها</h3>
+
+    <div class="alert alert-info small">
+        محدودیت‌ها بر اساس آمار واقعی صدور بارنامه‌ها در سیستم اعمال می‌شود
+        (سوپر ادمین مستثنی است). اولویت: سهمیه کاربر > سهمیه نقش > سقف پیش‌فرض سیستم.
+    </div>
+
+    <!-- ایجاد سهمیه -->
+    <div class="card mb-4">
+        <div class="card-header"><h5 class="mb-0">ایجاد سهمیه جدید</h5></div>
+        <div class="card-body">
+            <form method="post" class="row g-2 align-items-end">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="create_quota">
+                <div class="col-md-2">
+                    <label class="form-label">دامنه</label>
+                    <select name="scope" class="form-select" id="id_scope">
+                        <option value="role">نقش</option>
+                        <option value="user">کاربر</option>
+                    </select>
+                </div>
+                <div class="col-md-2" id="role_box">
+                    <label class="form-label">نقش</label>
+                    <select name="role" class="form-select">
+                        {% for field in form %}
+                            {% if field.name == 'role' %}
+                                {% for option in field.field.choices %}
+                                    <option value="{{ option.0 }}">{{ option.1 }}</option>
+                                {% endfor %}
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2" id="user_box" style="display:none">
+                    <label class="form-label">کاربر</label>
+                    <select name="user" class="form-select">
+                        {% for u in form.user.field.queryset %}
+                            <option value="{{ u.id }}">{{ u.username }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">دوره</label>
+                    <select name="period" class="form-select">
+                        {% for value, label in form.period.field.choices %}
+                            <option value="{{ value }}">{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">حداکثر تعداد (0 = ممنوع)</label>
+                    <input type="number" min="0" name="max_count" class="form-control" required>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-custom w-100">ایجاد سهمیه</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- لیست سهمیه‌ها -->
+    <div class="card">
+        <div class="card-header"><h5 class="mb-0">سهمیه‌های تعریف‌شده</h5></div>
+        <div class="card-body">
+            <table class="table table-hover text-center align-middle">
+                <thead>
+                <tr>
+                    <th>دامنه</th>
+                    <th>موضوع</th>
+                    <th>دوره</th>
+                    <th>سقف</th>
+                    <th>مصرف</th>
+                    <th>باقی‌مانده</th>
+                    <th>وضعیت</th>
+                    <th>عملیات</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for row in quota_rows %}
+                    <tr>
+                        <td>{{ row.quota.get_scope_display }}</td>
+                        <td>{{ row.target_label }}</td>
+                        <td>{{ row.quota.get_period_display }}</td>
+                        <td>{{ row.quota.max_count }}</td>
+                        <td>{{ row.used }}</td>
+                        <td>{{ row.remaining }}</td>
+                        <td>
+                            {% if row.quota.is_active %}
+                                <span class="badge bg-success">فعال</span>
+                            {% else %}
+                                <span class="badge bg-secondary">غیرفعال</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="btn-group btn-group-sm">
+                                <form method="post" class="d-inline">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="action" value="toggle_quota">
+                                    <input type="hidden" name="quota_id" value="{{ row.quota.id }}">
+                                    <button class="btn btn-outline-warning">
+                                        {% if row.quota.is_active %}غیرفعال{% else %}فعال{% endif %}
+                                    </button>
+                                </form>
+                                <form method="post" class="d-inline" onsubmit="return confirm('سهمیه حذف شود؟');">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="action" value="delete_quota">
+                                    <input type="hidden" name="quota_id" value="{{ row.quota.id }}">
+                                    <button class="btn btn-outline-danger">حذف</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="8" class="text-center">سهمیه‌ای تعریف نشده است (بدون محدودیت صدور)</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const scopeSelect = document.getElementById('id_scope');
+    scopeSelect.addEventListener('change', function () {
+        const isRole = this.value === 'role';
+        document.getElementById('role_box').style.display = isRole ? 'block' : 'none';
+        document.getElementById('user_box').style.display = isRole ? 'none' : 'block';
+    });
+</script>
+{% endblock %}
+
