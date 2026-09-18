@@ -1,0 +1,25 @@
+{% load static %}
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>آفلاین | صدرابار</title>
+    {% include "pwa/head.html" %}
+    <link rel="stylesheet" href="{% static 'pwa/offline.css' %}">
+</head>
+<body>
+<main class="offline-shell">
+    <section class="offline-panel" aria-labelledby="offline-title">
+        <img src="{% static 'pwa/icons/icon-192x192.png' %}" alt="" width="96" height="96">
+        <h1 id="offline-title">اتصال اینترنت برقرار نیست</h1>
+        <p>نسخه نصب شده صدرابار باز است، اما برای دریافت اطلاعات تازه یا ارسال فرم‌ها باید دوباره آنلاین شوید.</p>
+        <div class="offline-actions">
+            <a href="/" class="offline-button">بازگشت به صفحه اصلی</a>
+            <button type="button" class="offline-button offline-button-secondary" onclick="window.location.reload()">تلاش دوباره</button>
+        </div>
+    </section>
+</main>
+{% include "pwa/scripts.html" %}
+</body>
+</html>

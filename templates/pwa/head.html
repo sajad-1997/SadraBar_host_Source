@@ -1,0 +1,17 @@
+{% load static %}
+<meta name="application-name" content="صدرابار">
+<meta name="description" content="سامانه حمل و نقل، صدور بارنامه، نوبت دهی رانندگان و پیگیری بار صدرابار خراسان.">
+<meta name="theme-color" content="#0f766e">
+<meta name="color-scheme" content="light dark">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="صدرابار">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="msapplication-TileColor" content="#0f766e">
+<meta name="msapplication-config" content="{% url 'pwa_browserconfig' %}">
+<link rel="manifest" href="{% url 'pwa_manifest' %}">
+<link rel="icon" type="image/png" sizes="192x192" href="{% static 'pwa/icons/icon-192x192.png' %}">
+<link rel="icon" type="image/png" sizes="512x512" href="{% static 'pwa/icons/icon-512x512.png' %}">
+<link rel="apple-touch-icon" sizes="152x152" href="{% static 'pwa/icons/icon-152x152.png' %}">
+<link rel="apple-touch-icon" sizes="192x192" href="{% static 'pwa/icons/icon-192x192.png' %}">
+<link rel="stylesheet" href="{% static 'pwa/pwa.css' %}">

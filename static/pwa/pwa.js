@@ -1,237 +1,229 @@
-// PWA Installation and Management Script for SadraBar
+(() => {
+  "use strict";
 
-let deferredPrompt;
-let installButton = null;
+  let deferredPrompt = null;
+  let registrationRef = null;
+  let refreshing = false;
 
-// Detect if app is already installed
-function isAppInstalled() {
-  return window.matchMedia('(display-mode: standalone)').matches ||
-         window.navigator.standalone === true;
-}
+  const state = {
+    installDismissedAt: Number(localStorage.getItem("pwa_install_dismissed_at") || 0),
+  };
 
-// Initialize PWA
-document.addEventListener('DOMContentLoaded', () => {
-  // Register Service Worker
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('/static/pwa/sw.js')
-        .then((registration) => {
-          console.log('ServiceWorker registration successful:', registration.scope);
-          
-          // Check for updates periodically
-          setInterval(() => {
-            registration.update();
-          }, 60 * 60 * 1000); // Check every hour
-        })
-        .catch((err) => {
-          console.log('ServiceWorker registration failed:', err);
-        });
-    });
+  function isStandalone() {
+    return window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
   }
 
-  // Handle install prompt
-  window.addEventListener('beforeinstallprompt', (e) => {
-    e.preventDefault();
-    deferredPrompt = e;
-    showInstallButton();
-  });
+  function canShowInstallCard() {
+    const dismissedRecently = Date.now() - state.installDismissedAt < 7 * 24 * 60 * 60 * 1000;
+    return Boolean(deferredPrompt) && !isStandalone() && !dismissedRecently;
+  }
 
-  // Handle app installed event
-  window.addEventListener('appinstalled', () => {
-    console.log('PWA was installed');
-    hideInstallButton();
+  function ensureInstallCard() {
+    let card = document.getElementById("pwa-install-card");
+    if (card) {
+      return card;
+    }
+
+    card = document.createElement("section");
+    card.id = "pwa-install-card";
+    card.className = "pwa-install-card";
+    card.setAttribute("aria-live", "polite");
+    card.innerHTML = [
+      '<div>',
+      '<h2 class="pwa-install-title">نصب اپلیکیشن صدرابار</h2>',
+      '<p class="pwa-install-text">برای دسترسی سریع، اجرای تمام صفحه و استفاده بهتر در موبایل، نسخه PWA را نصب کنید.</p>',
+      '</div>',
+      '<div class="pwa-install-actions">',
+      '<button type="button" class="pwa-button pwa-button-primary" data-pwa-install>نصب</button>',
+      '<button type="button" class="pwa-button pwa-button-ghost" data-pwa-dismiss>بعدا</button>',
+      '</div>',
+    ].join("");
+
+    card.querySelector("[data-pwa-install]").addEventListener("click", install);
+    card.querySelector("[data-pwa-dismiss]").addEventListener("click", dismissInstall);
+    document.body.appendChild(card);
+    return card;
+  }
+
+  function showInstallCard() {
+    const card = ensureInstallCard();
+    card.classList.toggle("is-visible", canShowInstallCard());
+  }
+
+  function hideInstallCard() {
+    const card = document.getElementById("pwa-install-card");
+    if (card) {
+      card.classList.remove("is-visible");
+    }
+  }
+
+  async function install() {
+    if (!deferredPrompt) {
+      showIosInstallHint();
+      return null;
+    }
+
+    deferredPrompt.prompt();
+    const choice = await deferredPrompt.userChoice;
     deferredPrompt = null;
+    hideInstallCard();
+    return choice;
+  }
+
+  function dismissInstall() {
+    state.installDismissedAt = Date.now();
+    localStorage.setItem("pwa_install_dismissed_at", String(state.installDismissedAt));
+    hideInstallCard();
+  }
+
+  function showIosInstallHint() {
+    if (!/iphone|ipad|ipod/i.test(navigator.userAgent) || isStandalone()) {
+      return;
+    }
+    window.alert("در iOS از دکمه Share مرورگر، گزینه Add to Home Screen را انتخاب کنید.");
+  }
+
+  function ensureOfflineBanner() {
+    let banner = document.getElementById("pwa-offline-banner");
+    if (!banner) {
+      banner = document.createElement("div");
+      banner.id = "pwa-offline-banner";
+      banner.className = "pwa-offline-banner";
+      banner.setAttribute("role", "status");
+      banner.textContent = "اتصال اینترنت قطع است. اطلاعات ذخیره شده نمایش داده می شود.";
+      document.body.appendChild(banner);
+    }
+    return banner;
+  }
+
+  function updateOnlineStatus() {
+    ensureOfflineBanner().classList.toggle("is-visible", !navigator.onLine);
+  }
+
+  function showUpdateBanner(worker) {
+    let banner = document.getElementById("pwa-update-banner");
+    if (!banner) {
+      banner = document.createElement("div");
+      banner.id = "pwa-update-banner";
+      banner.className = "pwa-update-banner";
+      banner.innerHTML = '<span>نسخه تازه آماده است.</span><button type="button">به روزرسانی</button>';
+      document.body.appendChild(banner);
+    }
+
+    banner.querySelector("button").onclick = () => {
+      worker.postMessage({ type: "SKIP_WAITING" });
+    };
+    banner.classList.add("is-visible");
+  }
+
+  function trackInstallingWorker(worker) {
+    if (!worker) {
+      return;
+    }
+    worker.addEventListener("statechange", () => {
+      if (worker.state === "installed" && navigator.serviceWorker.controller) {
+        showUpdateBanner(worker);
+      }
+    });
+  }
+
+  async function registerServiceWorker() {
+    if (!("serviceWorker" in navigator)) {
+      return null;
+    }
+
+    registrationRef = await navigator.serviceWorker.register("/sw.js", { scope: "/" });
+    trackInstallingWorker(registrationRef.installing);
+    registrationRef.addEventListener("updatefound", () => {
+      trackInstallingWorker(registrationRef.installing);
+    });
+
+    setInterval(() => {
+      registrationRef.update();
+    }, 60 * 60 * 1000);
+
+    return registrationRef;
+  }
+
+  function requestNotificationPermission() {
+    if (!("Notification" in window)) {
+      return Promise.resolve("unsupported");
+    }
+    if (Notification.permission !== "default") {
+      return Promise.resolve(Notification.permission);
+    }
+    return Notification.requestPermission();
+  }
+
+  async function sendNotification(title, options = {}) {
+    const permission = await requestNotificationPermission();
+    if (permission !== "granted") {
+      return false;
+    }
+
+    const payload = {
+      body: options.body || "پیام جدید از سامانه صدرابار",
+      icon: options.icon || "/static/pwa/icons/icon-192x192.png",
+      badge: "/static/pwa/icons/icon-72x72.png",
+      dir: "rtl",
+      lang: "fa-IR",
+      data: { url: options.url || "/" },
+      tag: options.tag || "sadrabar-local",
+    };
+
+    if (registrationRef && registrationRef.showNotification) {
+      await registrationRef.showNotification(title || "صدرابار", payload);
+      return true;
+    }
+
+    new Notification(title || "صدرابار", payload);
+    return true;
+  }
+
+  window.addEventListener("beforeinstallprompt", (event) => {
+    event.preventDefault();
+    deferredPrompt = event;
+    showInstallCard();
   });
 
-  // Update theme color based on system preference
-  updateThemeColor();
-});
+  window.addEventListener("appinstalled", () => {
+    deferredPrompt = null;
+    hideInstallCard();
+  });
 
-// Show install button
-function showInstallButton() {
-  // Create install button if it doesn't exist
-  if (!installButton) {
-    installButton = document.createElement('button');
-    installButton.id = 'install-pwa';
-    installButton.innerHTML = '📲 نصب اپلیکیشن';
-    installButton.style.cssText = `
-      position: fixed;
-      bottom: 20px;
-      left: 20px;
-      z-index: 9999;
-      padding: 12px 24px;
-      background: #4CAF50;
-      color: white;
-      border: none;
-      border-radius: 50px;
-      font-family: inherit;
-      font-size: 14px;
-      font-weight: bold;
-      cursor: pointer;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-      transition: all 0.3s ease;
-    `;
-    installButton.onclick = installPWA;
-    document.body.appendChild(installButton);
-  }
-}
+  window.addEventListener("online", updateOnlineStatus);
+  window.addEventListener("offline", updateOnlineStatus);
 
-// Hide install button
-function hideInstallButton() {
-  if (installButton) {
-    installButton.style.display = 'none';
-  }
-}
-
-// Install PWA
-async function installPWA() {
-  if (!deferredPrompt) {
-    console.log('Install prompt not available');
-    return;
-  }
-
-  deferredPrompt.prompt();
-  const { outcome } = await deferredPrompt.userChoice;
-  
-  console.log(`User response to install prompt: ${outcome}`);
-  
-  if (outcome === 'accepted') {
-    console.log('User accepted the install prompt');
-    hideInstallButton();
-  }
-  
-  deferredPrompt = null;
-}
-
-// Update theme color
-function updateThemeColor() {
-  const metaThemeColor = document.querySelector('meta[name="theme-color"]');
-  if (metaThemeColor) {
-    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-      metaThemeColor.setAttribute('content', '#212529');
-    } else {
-      metaThemeColor.setAttribute('content', '#4CAF50');
-    }
-  }
-}
-
-// Listen for system theme changes
-if (window.matchMedia) {
-  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', updateThemeColor);
-}
-
-// Request notification permission
-function requestNotificationPermission() {
-  if ('Notification' in window && Notification.permission === 'default') {
-    Notification.requestPermission().then(permission => {
-      console.log('Notification permission:', permission);
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.addEventListener("controllerchange", () => {
+      if (refreshing) {
+        return;
+      }
+      refreshing = true;
+      window.location.reload();
     });
   }
-}
 
-// Send notification (for testing)
-function sendNotification(title, body, icon, url) {
-  if ('Notification' in window && Notification.permission === 'granted') {
-    new Notification(title, {
-      body: body,
-      icon: icon,
-      badge: '/static/pwa/icons/icon-72x72.png',
-      vibrate: [200, 100, 200],
-      data: url,
-      tag: 'sadradar-notification',
-      requireInteraction: true,
-      actions: [
-        { action: 'open', title: 'باز کردن' },
-        { action: 'dismiss', title: 'بستن' }
-      ]
+  document.addEventListener("DOMContentLoaded", () => {
+    if (isStandalone()) {
+      document.body.classList.add("pwa-standalone");
+    }
+    updateOnlineStatus();
+    showInstallCard();
+  });
+
+  window.addEventListener("load", () => {
+    registerServiceWorker().catch((error) => {
+      console.warn("PWA registration failed", error);
     });
-  }
-}
+  });
 
-// Check online/offline status
-function updateOnlineStatus() {
-  const status = navigator.onLine ? 'آنلاین' : 'آفلاین';
-  console.log('Connection status:', status);
-  
-  // Show offline indicator
-  const offlineIndicator = document.getElementById('offline-indicator');
-  if (!navigator.onLine) {
-    if (!offlineIndicator) {
-      const indicator = document.createElement('div');
-      indicator.id = 'offline-indicator';
-      indicator.innerHTML = '⚠️ شما آفلاین هستید';
-      indicator.style.cssText = `
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        background: #ff9800;
-        color: white;
-        text-align: center;
-        padding: 8px;
-        font-size: 12px;
-        z-index: 10000;
-      `;
-      document.body.appendChild(indicator);
-    }
-  } else {
-    if (offlineIndicator) {
-      offlineIndicator.remove();
-    }
-  }
-}
-
-window.addEventListener('online', updateOnlineStatus);
-window.addEventListener('offline', updateOnlineStatus);
-
-// Add to home screen instructions modal
-function showAddToHomeInstructions() {
-  const modal = document.createElement('div');
-  modal.id = 'ath-modal';
-  modal.style.cssText = `
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0,0,0,0.8);
-    z-index: 10000;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  `;
-  
-  modal.innerHTML = `
-    <div style="
-      background: white;
-      padding: 24px;
-      border-radius: 16px;
-      max-width: 400px;
-      text-align: center;
-      direction: rtl;
-    ">
-      <h3 style="margin-top: 0;">نصب اپلیکیشن</h3>
-      <p>برای نصب اپلیکیشن، روی دکمه اشتراک‌گذاری کلیک کرده و گزینه "Add to Home Screen" را انتخاب کنید.</p>
-      <button onclick="document.getElementById('ath-modal').remove()" style="
-        background: #4CAF50;
-        color: white;
-        border: none;
-        padding: 10px 20px;
-        border-radius: 8px;
-        cursor: pointer;
-        margin-top: 16px;
-      ">متوجه شدم</button>
-    </div>
-  `;
-  
-  document.body.appendChild(modal);
-}
-
-// Export functions for external use
-window.SadraBarPWA = {
-  install: installPWA,
-  requestNotificationPermission,
-  sendNotification,
-  showAddToHomeInstructions,
-  isAppInstalled
-};
+  window.SadraBarPWA = {
+    install,
+    isInstalled: isStandalone,
+    requestNotificationPermission,
+    sendNotification,
+    getRegistration: () => registrationRef,
+    showInstall: showInstallCard,
+  };
+})();

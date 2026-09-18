@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>خطای CSRF</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Vazirmatn', sans-serif;
+        }
+
+        body {
+            background: radial-gradient(circle at top left, #0f172a, #020617);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .error-container {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.37);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            width: 95%;
+            max-width: 500px;
+            padding: 50px 35px;
+            color: #e2e8f0;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 4rem;
+            color: #ef4444;
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            color: #f87171;
+            margin-bottom: 15px;
+        }
+
+        p {
+            color: #94a3b8;
+            margin-bottom: 25px;
+            line-height: 1.6;
+        }
+
+        .reason {
+            background: rgba(239, 68, 68, 0.1);
+            border-right: 4px solid #ef4444;
+            padding: 15px;
+            margin-bottom: 25px;
+            text-align: right;
+            color: #fca5a5;
+            font-size: 0.9rem;
+        }
+
+        button {
+            background: linear-gradient(90deg, #0ea5e9, #38bdf8);
+            border: none;
+            padding: 12px 30px;
+            border-radius: 12px;
+            color: white;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.3s;
+            text-decoration: none;
+        }
+
+        button:hover {
+            background: linear-gradient(90deg, #38bdf8, #0ea5e9);
+            transform: scale(1.03);
+        }
+
+        .footer-text {
+            margin-top: 25px;
+            font-size: 0.85rem;
+            color: #64748b;
+        }
+    </style>
+</head>
+<body>
+    <div class="error-container">
+        <h1>403</h1>
+        <h2>خطای امنیتی CSRF</h2>
+        
+        {% if reason %}
+            <div class="reason">
+                <strong>دلیل خطا:</strong> {{ reason }}
+            </div>
+        {% endif %}
+        
+        <p>
+            درخواست شما به دلیل مشکلات امنیتی رد شد. این معمولاً زمانی اتفاق می‌افتد که توکن امنیتی منقضی شده باشد یا صفحه برای مدت طولانی باز مانده باشد.
+        </p>
+        
+        <button onclick="window.location.href='/'">بازگشت به صفحه اصلی</button>
+        
+        <p class="footer-text">© سامانه مدیریت بارنامه صدرا بار خراسان</p>
+    </div>
+</body>
+</html>
