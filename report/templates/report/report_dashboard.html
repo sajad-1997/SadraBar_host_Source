@@ -375,6 +375,27 @@
         text-align: left;
     }
 
+    /* ---------- دکمه مشاهده بارنامه ---------- */
+    .rp-btn-view {
+        font-size: 0.76rem;
+        font-weight: 700;
+        padding: 6px 14px;
+        border-radius: 999px;
+        text-decoration: none;
+        white-space: nowrap;
+        color: #fff;
+        background: linear-gradient(135deg, #0d6efd, #6366f1);
+        box-shadow: 0 2px 8px rgba(13, 110, 253, 0.25);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        flex: 0 0 auto;
+    }
+
+    .rp-btn-view:hover {
+        color: #fff;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(13, 110, 253, 0.4);
+    }
+
     /* ---------- نمودارها ---------- */
     .rp-section-title {
         font-weight: 800;
@@ -571,12 +592,16 @@
                             <div class="rp-result-code">#{{ item.tracking_code }}</div>
                             <span class="rp-badge rp-badge-{{ item.approval_status }}">{{ item.approval_display }}</span>
                             <span class="rp-badge rp-badge-neutral">{{ item.type_display }}</span>
-                            <div class="ms-auto">
-                                <div class="rp-issuer">
-                                    {{ item.issuer }}
-                                    <small class="rp-issuer-role">({{ item.issuer_role }})</small>
+                            <div class="ms-auto d-flex align-items-center gap-3">
+                                <div>
+                                    <div class="rp-issuer">
+                                        {{ item.issuer }}
+                                        <small class="rp-issuer-role">({{ item.issuer_role }})</small>
+                                    </div>
+                                    <div class="rp-datetime">🕓 تاریخ و ساعت واقعی صدور: {{ item.issued_at }}</div>
                                 </div>
-                                <div class="rp-datetime">🕓 تاریخ و ساعت واقعی صدور: {{ item.issued_at }}</div>
+                                <a href="{% url 'issuance:manager:manager_preview' item.id %}"
+                                   class="rp-btn-view" target="_blank">مشاهده بارنامه</a>
                             </div>
                         </div>
                     {% empty %}

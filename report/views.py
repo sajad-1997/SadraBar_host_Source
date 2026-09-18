@@ -351,6 +351,7 @@ def report_dashboard(request):
         for b in filtered_queryset[:RESULT_ITEMS_LIMIT]:
             issuer = b.created_by
             result_items.append({
+                'id': b.id,
                 'tracking_code': b.tracking_code,
                 'approval_status': b.approval_status or 'unknown',
                 'approval_display': b.get_approval_status_display() or 'نامشخص',
