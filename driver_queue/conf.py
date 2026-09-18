@@ -5,6 +5,8 @@
 """
 from django.conf import settings
 
+from .utils import extract_coordinates_from_url
+
 
 def __getattr__(name):
     if name == "DRIVER_MODEL":
@@ -27,10 +29,20 @@ def __getattr__(name):
         return tuple(getattr(settings, "QUEUE_WORKING_WEEKDAYS", (0, 1, 2, 3, 5, 6)))
     if name == "HOLIDAYS":
         return set(getattr(settings, "QUEUE_HOLIDAYS", []))
+    if name == "OFFICE_LOCATION":
+        # لینک لوکیشن یا مختصات مستقیم دفتر باربری
+        location_input = getattr(settings, "OFFICE_LOCATION", "35.6997,51.3380")
+        coords = extract_coordinates_from_url(location_input)
+        if coords:
+            return coords
+        # اگر استخراج نشد، مقدار پیش‌فرض را برگردان
+        return (35.6997, 51.3380)
     if name == "OFFICE_LAT":
-        return float(getattr(settings, "OFFICE_LAT", 35.6892))
+        location = __getattr__("OFFICE_LOCATION")
+        return float(location[0])
     if name == "OFFICE_LNG":
-        return float(getattr(settings, "OFFICE_LNG", 51.3890))
+        location = __getattr__("OFFICE_LOCATION")
+        return float(location[1])
     if name == "GEOFENCE_RADIUS_KM":
         return float(getattr(settings, "QUEUE_GEOFENCE_RADIUS_KM", 5.0))
     if name == "BASE_URL":

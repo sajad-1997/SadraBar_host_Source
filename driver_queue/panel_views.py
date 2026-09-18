@@ -1,10 +1,12 @@
 from datetime import date as date_type
+from datetime import timedelta
 
 from django.apps import apps
 from django.contrib import messages
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.views.decorators.http import require_POST
+from persiantools.jdatetime import JalaliDate
 
 from . import conf, services
 from .forms import StaffUserAddForm
@@ -18,10 +20,24 @@ def _driver_model():
 
 
 def _parse_day(value):
+    if not value:
+        return tehran_now().date()
+    
     try:
+        # Try to parse as Gregorian date (YYYY-MM-DD)
         return date_type.fromisoformat(value)
     except (TypeError, ValueError):
-        return tehran_now().date()
+        try:
+            # Try to parse as Jalali date (YYYY/MM/DD)
+            parts = value.split('/')
+            if len(parts) == 3:
+                jy, jm, jd = int(parts[0]), int(parts[1]), int(parts[2])
+                jalali_date = JalaliDate(jy, jm, jd)
+                return jalali_date.to_gregorian()
+        except (ValueError, TypeError):
+            pass
+    
+    return tehran_now().date()
 
 
 def _base_context(request):
@@ -40,11 +56,26 @@ def _panel_redirect(day):
 def dashboard(request):
     now = tehran_now()
     services.run_due_jobs(now)  # اعلان ۱۱:۰۰ / حذف ۱۱:۱۵ بدون Celery
-    day = _parse_day(request.GET.get("date"))
+    # Try to get Gregorian date first, then fall back to Jalali date
+    date_value = request.GET.get("date_gregorian") or request.GET.get("date")
+    day = _parse_day(date_value)
     q = request.GET.get("q", "").strip()
+
+    # Use today's date if no parameter provided
+    if not date_value:
+        day = now.date()
 
     tickets = (QueueTicket.objects.filter(date=day)
                .select_related("driver").order_by("number", "joined_at"))
+    
+    # اگر برای امروز نوبتی وجود نداشت، آخرین روزی که نوبت داشته را پیدا کن
+    if not tickets.exists():
+        latest_ticket = QueueTicket.objects.filter(date__lte=day).order_by('-date').first()
+        if latest_ticket:
+            day = latest_ticket.date
+            tickets = (QueueTicket.objects.filter(date=day)
+                       .select_related("driver").order_by("number", "joined_at"))
+    
     approved_ids = set(QueueProfile.objects.filter(
         driver_id__in=tickets.values_list("driver_id", flat=True),
         office_approved=True).values_list("driver_id", flat=True))
@@ -143,12 +174,37 @@ def driver_approve(request, pk):
 
 @manager_required
 def users_list(request):
+    now = tehran_now()
+    today = now.date()
+    
+    # Get drivers who have taken tickets today
+    drivers_with_tickets = (QueueTicket.objects
+                           .filter(date=today)
+                           .select_related("driver")
+                           .values("driver_id", "driver__name", "driver__national_id", "driver__phone")
+                           .distinct())
+    
+    # Get all tickets for today with full driver details
+    today_tickets = (QueueTicket.objects
+                    .filter(date=today)
+                    .select_related("driver")
+                    .order_by("number", "joined_at"))
+    
+    # Get approved driver IDs for status display
+    approved_ids = set(QueueProfile.objects.filter(
+        driver_id__in=today_tickets.values_list("driver_id", flat=True),
+        office_approved=True).values_list("driver_id", flat=True))
+    
     context = {
         **_base_context(request),
         "active_tab": "users",
         "staff_list": QueueStaff.objects.select_related("user", "approved_by")
         .order_by("-created_at"),
         "form": StaffUserAddForm(),
+        "drivers_with_tickets": drivers_with_tickets,
+        "today_tickets": today_tickets,
+        "approved_ids": approved_ids,
+        "today": today,
     }
     return render(request, "driver_queue/panel/users.html", context)
 

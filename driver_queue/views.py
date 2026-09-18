@@ -72,17 +72,26 @@ def register(request):
             form.add_error("phone", "این شماره تماس قبلا ثبت شده است.")
         elif driver_model.objects.filter(certificate=data["certificate"]).exists():
             form.add_error("certificate", "این شماره گواهینامه قبلا ثبت شده است.")
+        elif driver_model.objects.filter(national_id=data["national_id"]).exists():
+            form.add_error("national_id", "کد ملی وارد شده قبلا در سیستم ثبت شده است.")
         else:
-            driver = driver_model.objects.create(
-                name=data["name"],
-                phone=data["phone"],
-                certificate=data["certificate"],
-                created_by_role="queue",  # نشانه ثبت‌نام از صفحه نوبت‌دهی
-            )
-            QueueProfile.objects.create(driver=driver, office_approved=False)
-            request.session[SESSION_DRIVER] = driver.pk
-            request.session.pop(SESSION_PREREG, None)
-            return redirect("driver_queue:register_done")
+            try:
+                driver = driver_model.objects.create(
+                    name=data["name"],
+                    phone=data["phone"],
+                    certificate=data["certificate"],
+                    national_id=data["national_id"],
+                    created_by_role="queue",  # نشانه ثبت‌نام از صفحه نوبت‌دهی
+                )
+                QueueProfile.objects.create(driver=driver, office_approved=False)
+                request.session[SESSION_DRIVER] = driver.pk
+                request.session.pop(SESSION_PREREG, None)
+                return redirect("driver_queue:register_done")
+            except Exception as e:
+                if "national_id" in str(e) and "UNIQUE" in str(e):
+                    form.add_error("national_id", "کد ملی وارد شده قبلا در سیستم ثبت شده است.")
+                else:
+                    form.add_error(None, f"خطا در ثبت اطلاعات: {str(e)}")
     return render(request, "driver_queue/register.html", {"form": form})
 
 

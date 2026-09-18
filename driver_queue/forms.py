@@ -41,6 +41,9 @@ class RegisterForm(forms.Form):
     certificate = forms.CharField(
         label="شماره گواهینامه", max_length=50,
         widget=forms.TextInput(attrs={**FIELD_ATTRS, "placeholder": "شماره گواهینامه"}))
+    national_id = forms.CharField(
+        label="کد ملی", max_length=50,
+        widget=forms.TextInput(attrs={**FIELD_ATTRS, "placeholder": "کد ملی ۱۰ رقمی"}))
 
     def clean_name(self):
         return " ".join(self.cleaned_data["name"].split())
@@ -53,6 +56,12 @@ class RegisterForm(forms.Form):
 
     def clean_certificate(self):
         return normalize_digits(self.cleaned_data["certificate"]).strip()
+
+    def clean_national_id(self):
+        national_id = normalize_digits(self.cleaned_data["national_id"]).strip()
+        if len(national_id) != 10:
+            raise forms.ValidationError("کد ملی باید ۱۰ رقم باشد.")
+        return national_id
 
 
 class StaffUserAddForm(forms.Form):

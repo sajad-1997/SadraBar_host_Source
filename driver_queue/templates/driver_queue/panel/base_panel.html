@@ -74,7 +74,13 @@
                class="btn btn-sm {% if active_tab == 'users' %}btn-primary{% else %}btn-outline{% endif %}">کاربران
                 مجاز</a>
         {% endif %}
-        <a href="{% url 'driver_queue:landing' %}" class="btn btn-sm btn-outline">صفحه رانندگان</a>
+        {% if request.user.role == 'manager' %}
+            <a href="{% url 'dashboard:manager_dashboard' %}" class="btn btn-sm btn-outline">داشبورد عملیاتی</a>
+        {% elif request.user.role == 'employee' %}
+            <a href="{% url 'dashboard:staff_dashboard' %}" class="btn btn-sm btn-outline">داشبورد عملیاتی</a>
+        {% elif request.user.role == 'admin' %}
+            <a href="{% url 'dashboard:admin_dashboard' %}" class="btn btn-sm btn-outline">داشبورد عملیاتی</a>
+        {% endif %}
         <span class="muted" style="margin-right:auto;font-size:13px">کاربر: {{ request.user }}</span>
     </div>
     {% block panel %}{% endblock %}

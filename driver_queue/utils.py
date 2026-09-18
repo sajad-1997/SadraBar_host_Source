@@ -1,5 +1,7 @@
 from datetime import datetime
 from math import asin, cos, radians, sin, sqrt
+from re import search
+from urllib.parse import parse_qs, urlparse
 from zoneinfo import ZoneInfo
 
 from django.conf import settings
@@ -45,3 +47,65 @@ def tehran_now() -> datetime:
     if settings.USE_TZ:
         return timezone.now().astimezone(tz)
     return datetime.now(tz).replace(tzinfo=None)
+
+
+def extract_coordinates_from_url(location_url: str) -> tuple[float, float] | None:
+    """
+    استخراج مختصات (lat, lng) از لینک لوکیشن گوگل مپ یا سایر سرویس‌ها.
+    
+    پشتیبانی از فرمت‌های مختلف:
+    - Google Maps: https://maps.google.com/?q=35.6997,51.3380
+    - Google Maps: https://www.google.com/maps/@35.6997,51.3380,15z
+    - Google Maps: https://www.google.com/maps/place/35.6997,51.3380
+    - Waze: https://waze.com/ul?ll=35.6997,51.3380
+    - Direct coordinates: 35.6997,51.3380
+    
+    Returns:
+        tuple (lat, lng) یا None اگر نتوانست استخراج کند
+    """
+    if not location_url:
+        return None
+    
+    try:
+        # اگر مستقیماً مختصات باشد
+        if search(r'^-?\d+\.?\d*,-?\d+\.?\d*$', location_url.strip()):
+            lat, lng = map(float, location_url.strip().split(','))
+            return lat, lng
+        
+        # اگر URL باشد
+        parsed = urlparse(location_url)
+        
+        # بررسی query parameters
+        query_params = parse_qs(parsed.query)
+        
+        # Google Maps q parameter
+        if 'q' in query_params:
+            q_value = query_params['q'][0]
+            if search(r'^-?\d+\.?\d*,-?\d+\.?\d*$', q_value):
+                lat, lng = map(float, q_value.split(','))
+                return lat, lng
+        
+        # Google Maps @ parameter (in path)
+        if '@' in parsed.path:
+            coords_part = parsed.path.split('@')[1].split(',')[0:2]
+            if len(coords_part) == 2:
+                lat, lng = map(float, coords_part)
+                return lat, lng
+        
+        # Waze ll parameter
+        if 'll' in query_params:
+            ll_value = query_params['ll'][0]
+            if search(r'^-?\d+\.?\d*,-?\d+\.?\d*$', ll_value):
+                lat, lng = map(float, ll_value.split(','))
+                return lat, lng
+        
+        # جستجوی الگوی مختصات در کل URL
+        coords_match = search(r'(-?\d+\.?\d*),(-?\d+\.?\d*)', location_url)
+        if coords_match:
+            lat, lng = map(float, coords_match.groups())
+            return lat, lng
+            
+    except (ValueError, IndexError, AttributeError):
+        return None
+    
+    return None

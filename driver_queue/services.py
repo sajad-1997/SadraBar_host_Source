@@ -44,8 +44,15 @@ def is_working_day(day: date) -> bool:
 
 
 def queue_window(day: date):
-    """بازه نوبت‌دهی: ۸:۰۰ تا ۱۱:۰۰."""
-    return _combine(day, _parse_hhmm(conf.START_TIME)), _combine(day, _parse_hhmm(conf.END_TIME))
+    """
+    بازه نوبت‌دهی: ۸:۰۰ تا ۱۱:۰۰ و ۱۱:۳۰ تا پایان روز.
+    بین ۱۱:۰۰ تا ۱۱:۳۰ بازه اعلان است و نوبت‌دهی متوقف می‌شود.
+    """
+    start_morning = _combine(day, _parse_hhmm(conf.START_TIME))
+    end_morning = _combine(day, _parse_hhmm(conf.ANNOUNCE_TIME))
+    start_afternoon = _combine(day, _parse_hhmm(conf.ANNOUNCE_TIME)) + timedelta(minutes=conf.ANNOUNCE_WINDOW_MINUTES)
+    end_day = _combine(day + timedelta(days=1), _parse_hhmm("00:00"))
+    return (start_morning, end_morning), (start_afternoon, end_day)
 
 
 def announce_window(day: date):
@@ -58,8 +65,8 @@ def is_queue_open(now=None) -> bool:
     now = now or tehran_now()
     if not is_working_day(now.date()):
         return False
-    start, end = queue_window(now.date())
-    return start <= now <= end
+    (start_morning, end_morning), (start_afternoon, end_day) = queue_window(now.date())
+    return (start_morning <= now <= end_morning) or (start_afternoon <= now <= end_day)
 
 
 def is_announce_window(now=None) -> bool:
@@ -128,6 +135,67 @@ def renumber(day) -> None:
         if ticket.number != index:
             ticket.number = index
             ticket.save(update_fields=["number"])
+
+
+def is_first_saturday(day: date) -> bool:
+    """بررسی اینکه آیا روز وارد شده شنبه اول ماه است."""
+    if day.weekday() != 6:  # شنبه در Python = 6
+        return False
+    # اولین شنبه ماه است اگر روز ماه کمتر از 8 باشد
+    return day.day <= 7
+
+
+def weekly_queue_update(now=None) -> int:
+    """
+    بروزرسانی هفتگی لیست نوبت‌ها در شنبه اول ماه.
+    افراد حاضر در صف از هفته گذشته و افراد جدید در صف در هفته جدید
+    پشت سر هم به ترتیب زمان دریافت نوبت در لیست قرار می‌گیرند.
+    """
+    now = now or tehran_now()
+    day = now.date()
+    
+    if not is_first_saturday(day):
+        return 0
+    
+    # پیدا کردن آخرین شنبه قبل از امروز (برای گرفتن نوبت‌های هفته گذشته)
+    last_saturday = day - timedelta(days=7)
+    
+    # گرفتن نوبت‌های هفته گذشته که هنوز در وضعیت waiting هستند
+    last_week_tickets = list(
+        QueueTicket.objects
+        .filter(date=last_saturday, status=QueueTicket.Status.WAITING)
+        .select_related("driver")
+        .order_by("joined_at", "id")
+    )
+    
+    if not last_week_tickets:
+        return 0
+    
+    # ایجاد نوبت‌های جدید برای امروز برای رانندگان هفته گذشته
+    updated_count = 0
+    for old_ticket in last_week_tickets:
+        # بررسی اینکه آیا راننده برای امروز نوبت دارد
+        existing = QueueTicket.objects.filter(
+            driver=old_ticket.driver, 
+            date=day
+        ).first()
+        
+        if not existing:
+            # ایجاد نوبت جدید با همان زمان پیوستن
+            new_ticket = QueueTicket.objects.create(
+                driver=old_ticket.driver,
+                date=day,
+                number=0  # بعداً شماره‌گذاری می‌شود
+            )
+            # حفظ زمان پیوستن اصلی برای ترتیب‌بندی صحیح
+            new_ticket.joined_at = old_ticket.joined_at
+            new_ticket.save(update_fields=["joined_at"])
+            updated_count += 1
+    
+    # شماره‌گذاری مجدد همه نوبت‌های امروز (قدیمی + جدید)
+    renumber(day)
+    
+    return updated_count
 
 
 # ================================================================ اعلان ۱۱:۰۰
@@ -269,12 +337,17 @@ def run_due_jobs(now=None) -> None:
     idempotent هستند، فراخوانی مکرر بی‌خطر است:
       - اگر از ساعت ۱۱:۰۰ گذشته و اعلان امروز ارسال نشده -> ارسال می‌شود.
       - اگر از پایان مهلت ۱۵ دقیقه‌ای گذشته -> عدم‌پاسخ‌دهنده‌ها حذف می‌شوند.
+      - اگر شنبه اول ماه باشد -> بروزرسانی هفتگی لیست نوبت‌ها انجام می‌شود.
     برای اجرا رأس ساعت (حتی بدون بازدیدکننده) از cron استفاده کنید.
     """
     now = now or tehran_now()
     day = now.date()
     if not is_working_day(day):
         return
+    
+    # بروزرسانی هفتگی در شنبه اول ماه
+    weekly_queue_update(now)
+    
     announce_start, _end = announce_window(day)
     if now >= announce_start:
         send_announcements(now)

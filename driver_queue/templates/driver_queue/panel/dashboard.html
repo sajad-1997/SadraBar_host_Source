@@ -6,11 +6,11 @@
         <div class="toolbar" style="margin-top:10px">
             <form method="get" class="toolbar">
                 <label>تاریخ:</label>
-                <input type="date" class="field" style="width:auto;margin:0" name="date" value="{{ day|date:'Y-m-d' }}">
+                <input type="date" class="field" style="width:auto;margin:0" name="date_gregorian" value="{{ day|date:'Y-m-d' }}">
                 <button class="btn btn-outline btn-sm" type="submit">نمایش</button>
             </form>
             <form method="get" class="toolbar" style="margin-right:auto">
-                <input type="hidden" name="date" value="{{ day|date:'Y-m-d' }}">
+                <input type="hidden" name="date_gregorian" value="{{ day|date:'Y-m-d' }}">
                 <input type="text" class="field" style="width:240px;margin:0" name="q" value="{{ q }}"
                        placeholder="جستجو: نام / کد ملی / تلفن / گواهینامه">
                 <button class="btn btn-primary btn-sm" type="submit">جستجوی راننده</button>
@@ -74,6 +74,12 @@
 
     <div class="card">
         <h3 style="margin-top:0">لیست نوبت‌های {{ day|jalali_date }}</h3>
+        <p class="muted">تاریخ فیلتر (میلادی): {{ day|date:'Y-m-d' }} | امروز: {{ today|date:'Y-m-d' }}</p>
+        {% if day != today %}
+            <div class="alert alert-announce" style="margin-top:12px">
+                برای امروز نوبتی ثبت نشده است. نوبت‌های {{ day|jalali_date }} نمایش داده می‌شود.
+            </div>
+        {% endif %}
         {% if tickets %}
             <table>
                 <thead>
@@ -104,6 +110,7 @@
                         <td>{{ t.joined_at|date:"H:i" }}</td>
                         <td>
                             <div style="display:flex;gap:6px;flex-wrap:wrap">
+                                <a href="{% url 'drivers:edit_driver' t.driver_id %}" class="btn btn-outline btn-sm">ویرایش راننده</a>
                                 {% if t.status == "waiting" %}
                                     <form method="post" action="{% url 'driver_queue:panel_ticket_loaded' t.pk %}"
                                           class="inline-form">
@@ -133,6 +140,12 @@
             </table>
         {% else %}
             <p class="muted">برای این تاریخ نوبتی ثبت نشده است.</p>
+            <p class="muted" style="margin-top:10px">
+                <strong>اطلاعات دیباگ:</strong><br>
+                تاریخ فیلتر: {{ day|date:'Y-m-d' }}<br>
+                تاریخ امروز: {{ today|date:'Y-m-d' }}<br>
+                آیا برابر هستند؟ {% if day == today %}بله{% else %}خیر{% endif %}
+            </p>
         {% endif %}
     </div>
 
@@ -150,4 +163,22 @@
             <p class="muted">هنوز عملیاتی ثبت نشده است.</p>
         {% endfor %}
     </div>
+
+    <script>
+        $(document).ready(function() {
+            if ($('#jalaliDatepicker').length) {
+                $('#jalaliDatepicker').pDatepicker({
+                    format: 'YYYY/MM/DD',
+                    initialValue: true,
+                    autoClose: true,
+                    calendar: {
+                        persian: {
+                            locale: 'fa',
+                            leapYearMode: 'algorithmic'
+                        }
+                    }
+                });
+            }
+        });
+    </script>
 {% endblock %}

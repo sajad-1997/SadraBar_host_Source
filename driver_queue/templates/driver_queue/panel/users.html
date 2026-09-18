@@ -1,4 +1,5 @@
 {% extends "driver_queue/panel/base_panel.html" %}
+{% load jalali_filters %}
 {% block panel %}
     <div class="card">
         <h2 style="margin-top:0">کاربران مجاز پنل نوبت‌دهی</h2>
@@ -62,6 +63,91 @@
             </table>
         {% else %}
             <p class="muted">هنوز کاربری اضافه نشده است.</p>
+        {% endif %}
+    </div>
+
+    <div class="card">
+        <h3 style="margin-top:0">رانندگان با نوبت در تاریخ {{ today|jalali_date }}</h3>
+        {% if drivers_with_tickets %}
+            <table>
+                <thead>
+                <tr>
+                    <th>نام راننده</th>
+                    <th>کد ملی</th>
+                    <th>تلفن</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for driver in drivers_with_tickets %}
+                    <tr>
+                        <td>{{ driver.driver__name }}</td>
+                        <td>{{ driver.driver__national_id }}</td>
+                        <td>{{ driver.driver__phone }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p class="muted">هنوز راننده‌ای نوبت نگرفته است.</p>
+        {% endif %}
+    </div>
+
+    <div class="card">
+        <h3 style="margin-top:0">لیست نوبت‌های {{ today|jalali_date }}</h3>
+        <p class="muted">نوبت‌هایی که توسط رانندگان ثبت شده</p>
+        {% if today_tickets %}
+            <table>
+                <thead>
+                <tr>
+                    <th>ردیف</th>
+                    <th>راننده</th>
+                    <th>کد ملی</th>
+                    <th>تلفن</th>
+                    <th>گواهینامه</th>
+                    <th>وضعیت</th>
+                    <th>زمان ثبت</th>
+                    <th>عملیات</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for ticket in today_tickets %}
+                    <tr>
+                        <td><strong>{{ ticket.number }}</strong></td>
+                        <td>
+                            <a href="{% url 'driver_queue:panel_driver_detail' ticket.driver_id %}">{{ ticket.driver.name }}</a>
+                        </td>
+                        <td>{{ ticket.driver.national_id }}</td>
+                        <td>{{ ticket.driver.phone }}</td>
+                        <td>{{ ticket.driver.certificate }}</td>
+                        <td><span class="badge badge-{{ ticket.status }}">{{ ticket.get_status_display }}</span></td>
+                        <td>{{ ticket.joined_at|date:"H:i" }}</td>
+                        <td>
+                            <div style="display:flex;gap:6px;flex-wrap:wrap">
+                                {% if ticket.status == "waiting" %}
+                                    <form method="post" action="{% url 'driver_queue:panel_ticket_loaded' ticket.pk %}"
+                                          class="inline-form">
+                                        {% csrf_token %}
+                                        <button class="btn btn-outline btn-sm" type="submit">بار گرفت</button>
+                                    </form>
+                                    <form method="post" action="{% url 'driver_queue:panel_ticket_remove' ticket.pk %}"
+                                          class="inline-form"
+                                          onsubmit="return confirm('نوبت این راننده حذف شود؟')">
+                                        {% csrf_token %}
+                                        <button class="btn btn-danger btn-sm" type="submit">حذف</button>
+                                    </form>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            <p class="muted" style="margin-top:10px">
+                مجموع نوبت‌ها: <strong>{{ today_tickets|length }}</strong> |
+                در انتظار: <strong>{{ today_tickets|slice:":1" }}</strong>
+            </p>
+        {% else %}
+            <p class="muted">برای امروز نوبتی ثبت نشده است.</p>
         {% endif %}
     </div>
 {% endblock %}

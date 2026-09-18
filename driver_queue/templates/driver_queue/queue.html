@@ -2,190 +2,341 @@
 {% load jalali_filters %}
 {% block title %}صف نوبت امروز{% endblock %}
 {% block content %}
-    <div class="card profile-row">
-        <div>
-            <strong>{{ driver.name }}</strong><br>
-            <small class="muted">کد ملی: {{ driver.national_id }} | {{ driver.phone }}</small>
+<style>
+    .mobile-app-container {
+        max-width: 480px;
+        margin: 0 auto;
+        padding: 16px;
+    }
+    .mobile-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 20px;
+        border-radius: 16px;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+    .mobile-card {
+        background: white;
+        border-radius: 16px;
+        padding: 20px;
+        margin-bottom: 16px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+    .mobile-stat-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+        margin: 20px 0;
+    }
+    .mobile-stat {
+        text-align: center;
+        padding: 16px;
+        background: #f8f9fa;
+        border-radius: 12px;
+    }
+    .mobile-stat-number {
+        font-size: 28px;
+        font-weight: bold;
+        color: #667eea;
+        margin-bottom: 4px;
+    }
+    .mobile-stat-label {
+        font-size: 12px;
+        color: #6c757d;
+    }
+    .mobile-btn {
+        width: 100%;
+        padding: 16px;
+        border: none;
+        border-radius: 12px;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: transform 0.2s;
+    }
+    .mobile-btn:active {
+        transform: scale(0.98);
+    }
+    .mobile-btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+    .mobile-btn-danger {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        color: white;
+    }
+    .mobile-list-item {
+        display: flex;
+        align-items: center;
+        padding: 12px;
+        border-bottom: 1px solid #eee;
+    }
+    .mobile-list-item:last-child {
+        border-bottom: none;
+    }
+    .mobile-list-number {
+        width: 40px;
+        height: 40px;
+        background: #667eea;
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        margin-left: 12px;
+    }
+    .mobile-list-info {
+        flex: 1;
+    }
+    .mobile-list-name {
+        font-weight: bold;
+        color: #333;
+    }
+    .mobile-list-time {
+        font-size: 12px;
+        color: #6c757d;
+    }
+    .mobile-chip {
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: bold;
+    }
+    .mobile-chip-me {
+        background: #28a745;
+        color: white;
+    }
+    .mobile-alert {
+        padding: 16px;
+        border-radius: 12px;
+        margin-bottom: 16px;
+        border-left: 4px solid;
+    }
+    .mobile-alert-warning {
+        background: #fff3cd;
+        border-color: #ffc107;
+        color: #856404;
+    }
+    .mobile-alert-info {
+        background: #d1ecf1;
+        border-color: #17a2b8;
+        color: #0c5460;
+    }
+    .mobile-alert-urgent {
+        background: #f8d7da;
+        border-color: #dc3545;
+        color: #721c24;
+    }
+    .mobile-action-buttons {
+        display: flex;
+        gap: 12px;
+        margin-top: 16px;
+    }
+    .mobile-action-btn {
+        flex: 1;
+        padding: 14px;
+        border: none;
+        border-radius: 12px;
+        font-size: 14px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+</style>
+
+<div class="mobile-app-container">
+    <!-- Mobile Header -->
+    <div class="mobile-header">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <h2 style="margin: 0; font-size: 20px;">{{ driver.name }}</h2>
+                <small style="opacity: 0.9;">{{ driver.phone }}</small>
+            </div>
+            {% if office_approved %}
+                <span class="mobile-chip mobile-chip-me">✓ تاییدشده</span>
+            {% else %}
+                <span class="mobile-chip" style="background: #ffc107; color: #333;">⚠ نیاز به تایید</span>
+            {% endif %}
         </div>
-        {% if office_approved %}
-            <span class="chip chip-ok">تاییدشده توسط دفتر</span>
-        {% else %}
-            <span class="chip chip-warn">نیازمند تکمیل اطلاعات در دفتر</span>
-        {% endif %}
+        <div style="margin-top: 12px; font-size: 14px; opacity: 0.9;">
+            زمان امروز: {{ now|jalali_date }} | {{ now|date:"H:i" }}
+        </div>
     </div>
 
-    {% if not office_approved %}
-        <div class="alert alert-warning">جهت دریافت بار باید اطلاعات تکمیلی خود را به دفتر باربری ارائه دهید.</div>
-    {% endif %}
-
-    <div class="card">
-        <div class="profile-row" style="margin-bottom: 15px;">
-            <span class="muted">تاریخ امروز: {{ now|jalali_date }}</span>
-            <span class="muted">ساعت: {{ now|date:"H:i" }}</span>
+    <!-- Notification Messages -->
+    {% for notification in notification_messages %}
+        <div class="mobile-alert mobile-alert-{{ notification.type }}" id="notification-{{ forloop.counter }}">
+            <p style="margin: 0;">{{ notification.message }}</p>
         </div>
-        
-        <!-- Notification Messages -->
-        {% for notification in notification_messages %}
-            <div class="alert alert-{{ notification.type }}" id="notification-{{ forloop.counter }}">
-                <p>{{ notification.message }}</p>
-            </div>
-        {% endfor %}
-        
+    {% endfor %}
+
+    <!-- Main Content Card -->
+    <div class="mobile-card">
         {% if ticket %}
-            <h2>نوبت امروز شما</h2>
-            <div class="stat-row">
-                <div class="stat">
-                    <div class="big-number" id="ticket-number">{{ ticket.number }}</div>
-                    <div class="muted">شماره نوبت شما</div>
+            <h3 style="margin: 0 0 16px 0;">🎫 نوبت شما</h3>
+            <div class="mobile-stat-grid">
+                <div class="mobile-stat">
+                    <div class="mobile-stat-number" id="ticket-number">{{ ticket.number }}</div>
+                    <div class="mobile-stat-label">شماره نوبت</div>
                 </div>
-                <div class="stat">
-                    <div class="big-number" id="ahead-count">{{ ahead }}</div>
-                    <div class="muted">نفر جلوتر از شما</div>
+                <div class="mobile-stat">
+                    <div class="mobile-stat-number" id="ahead-count">{{ ahead }}</div>
+                    <div class="mobile-stat-label">نفر جلوتر</div>
                 </div>
-                <div class="stat">
-                    <div class="big-number" id="waiting-count">{{ state.waiting_count }}</div>
-                    <div class="muted">حاضر در صف</div>
+                <div class="mobile-stat">
+                    <div class="mobile-stat-number" id="waiting-count">{{ state.waiting_count }}</div>
+                    <div class="mobile-stat-label">حاضر در صف</div>
                 </div>
             </div>
 
             {% if pending_announcement and announce_links %}
-                <div class="alert alert-announce" id="announce-box">
-                    <p><strong>اعلان وضعیت:</strong> لطفا وضعیت خود را اعلام کنید (مهلت: ۱۵ دقیقه).</p>
-                    <p style="display:flex;gap:10px;flex-wrap:wrap">
-                        <a class="btn btn-danger" href="{{ announce_links.loaded }}">بار گرفته‌ام</a>
-                        <a class="btn btn-primary" href="{{ announce_links.waiting }}">هنوز در نوبت هستم</a>
-                    </p>
+                <div class="mobile-alert mobile-alert-urgent" id="announce-box">
+                    <p style="margin: 0 0 12px 0;"><strong>🔔 اعلان وضعیت:</strong> لطفا وضعیت خود را اعلام کنید (مهلت: ۱۵ دقیقه)</p>
+                    <div class="mobile-action-buttons">
+                        <a href="{{ announce_links.loaded }}" class="mobile-action-btn mobile-btn-danger">بار گرفتم</a>
+                        <a href="{{ announce_links.waiting }}" class="mobile-action-btn mobile-btn-primary">هنوز در نوبت هستم</a>
+                    </div>
                 </div>
             {% endif %}
 
             {% if state.announce_window %}
-                <p class="muted">📍 در بازه به‌روزرسانی صف، موقعیت مکانی شما برای حضور در محدوده {{ radius_km }} کیلومتری
-                    دفتر بررسی می‌شود.</p>
+                <div class="mobile-alert mobile-alert-info">
+                    <p style="margin: 0;">📍 در بازه به‌روزرسانی صف، موقعیت مکانی شما برای حضور در محدوده {{ radius_km }} کیلومتری دفتر بررسی می‌شود.</p>
+                </div>
             {% endif %}
         {% else %}
-            <h2>صف نوبت امروز</h2>
-            <p>تعداد حاضر در صف: <strong id="waiting-count">{{ state.waiting_count }}</strong> نفر</p>
+            <h3 style="margin: 0 0 16px 0;">📋 صف نوبت امروز</h3>
+            <div style="text-align: center; margin: 20px 0;">
+                <div style="font-size: 48px; font-weight: bold; color: #667eea;" id="waiting-count">{{ state.waiting_count }}</div>
+                <div style="color: #6c757d;">حاضر در صف</div>
+            </div>
+            
             {% if state.open %}
                 <form method="post" action="{% url 'driver_queue:join' %}">
                     {% csrf_token %}
-                    <button type="submit" class="btn btn-primary btn-lg">دریافت نوبت</button>
+                    <button type="submit" class="mobile-btn mobile-btn-primary">🎫 دریافت نوبت</button>
                 </form>
             {% elif state.announce_window %}
-                <div class="alert alert-announce">بازه به‌روزرسانی و اعلام حضور صف (۱۱:۰۰ تا ۱۱:۳۰) در جریان است؛ امکان
-                    ثبت نوبت جدید نیست.
+                <div class="mobile-alert mobile-alert-info">
+                    <p style="margin: 0;">⏰ بازه به‌روزرسانی (۱۱:۰۰ تا ۱۱:۳۰) در جریان است؛ امکان ثبت نوبت جدید نیست.</p>
                 </div>
             {% elif state.working_day %}
-                <p class="muted">نوبت‌دهی هر روز کاری از ساعت ۸:۰۰ تا ۱۱:۰۰ انجام می‌شود.</p>
+                <div class="mobile-alert mobile-alert-warning">
+                    <p style="margin: 0;">⏰ نوبت‌دهی: ۸:۰۰-۱۱:۰۰ و ۱۱:۳۰-۲۴:۰۰</p>
+                </div>
             {% else %}
-                <p class="muted">امروز روز کاری نیست؛ نوبت‌دهی از ساعت ۸:۰۰ اولین روز کاری فعال می‌شود.</p>
+                <div class="mobile-alert mobile-alert-warning">
+                    <p style="margin: 0;">📅 امروز روز کاری نیست</p>
+                    <p style="margin: 0;"> از فردا (شنبه) اقدام به نوبت گیری کنید.</p>
+                </div>
             {% endif %}
         {% endif %}
     </div>
 
-    <div class="card">
-        <h3>اعضای در صف امروز</h3>
+    <!-- Queue List -->
+    <div class="mobile-card">
+        <h3 style="margin: 0 0 16px 0;">👥 اعضای صف</h3>
         {% if waiting_list %}
-            <table>
-                <thead>
-                <tr>
-                    <th>ردیف</th>
-                    <th>نام و نام خانوادگی</th>
-                    <th>زمان ثبت</th>
-                </tr>
-                </thead>
-                <tbody>
-                {% for t in waiting_list %}
-                    <tr {% if ticket and t.pk == ticket.pk %}class="me"{% endif %}>
-                        <td>{{ t.number }}</td>
-                        <td>{{ t.driver.name }}{% if ticket and t.pk == ticket.pk %}
-                            <span class="chip chip-ok">شما</span>{% endif %}</td>
-                        <td>{{ t.joined_at|date:"H:i" }}</td>
-                    </tr>
-                {% endfor %}
-                </tbody>
-            </table>
+            {% for t in waiting_list %}
+                <div class="mobile-list-item {% if ticket and t.pk == ticket.pk %}style="background: #e8f5e9;"{% endif %}">
+                    <div class="mobile-list-number">{{ t.number }}</div>
+                    <div class="mobile-list-info">
+                        <div class="mobile-list-name">
+                            {{ t.driver.name }}
+                            {% if ticket and t.pk == ticket.pk %}
+                                <span class="mobile-chip mobile-chip-me">شما</span>
+                            {% endif %}
+                        </div>
+                        <div class="mobile-list-time">{{ t.joined_at|date:"H:i" }}</div>
+                    </div>
+                </div>
+            {% endfor %}
         {% else %}
-            <p class="muted">هنوز امروز کسی نوبت نگرفته است.</p>
+            <div style="text-align: center; color: #6c757d; padding: 20px;">
+                هنوز کسی نوبت نگرفته است
+            </div>
         {% endif %}
     </div>
+</div>
 
-    <script>
-        const csrf = "{{ csrf_token }}";
-        const statusUrl = "{% url 'driver_queue:status_api' %}";
-        const locationUrl = "{% url 'driver_queue:report_location' %}";
+<script>
+    const csrf = "{{ csrf_token }}";
+    const statusUrl = "{% url 'driver_queue:status_api' %}";
+    const locationUrl = "{% url 'driver_queue:report_location' %}";
 
-        async function refreshStatus() {
-            try {
-                const res = await fetch(statusUrl, {headers: {"X-Requested-With": "fetch"}});
-                const data = await res.json();
-                if (!data || data.authenticated === false) return;
-                const hasTicketEl = !!document.getElementById("ticket-number");
-                if ((data.ticket === null && hasTicketEl) || (data.ticket && !hasTicketEl)) {
+    async function refreshStatus() {
+        try {
+            const res = await fetch(statusUrl, {headers: {"X-Requested-With": "fetch"}});
+            const data = await res.json();
+            if (!data || data.authenticated === false) return;
+            const hasTicketEl = !!document.getElementById("ticket-number");
+            if ((data.ticket === null && hasTicketEl) || (data.ticket && !hasTicketEl)) {
+                location.reload();
+                return;
+            }
+            if (data.ticket) {
+                if (data.ticket.pending_announcement && !document.getElementById("announce-box")) {
                     location.reload();
                     return;
                 }
-                if (data.ticket) {
-                    if (data.ticket.pending_announcement && !document.getElementById("announce-box")) {
+                document.getElementById("ticket-number").textContent = data.ticket.number;
+                document.getElementById("ahead-count").textContent = data.ticket.ahead;
+            }
+            const wc = document.getElementById("waiting-count");
+            if (wc) wc.textContent = data.waiting_count;
+        } catch (e) {
+        }
+    }
+
+    // Auto-refresh every 30 seconds for better mobile experience
+    setInterval(refreshStatus, 30000);
+    
+    // Initial refresh
+    refreshStatus();
+
+    // Browser notification support
+    function requestNotificationPermission() {
+        if ("Notification" in window && Notification.permission === "default") {
+            Notification.requestPermission();
+        }
+    }
+
+    function showBrowserNotification(title, body) {
+        if ("Notification" in window && Notification.permission === "granted") {
+            new Notification(title, {
+                body: body,
+                icon: "/static/driver_queue/icons/icon-192.png"
+            });
+        }
+    }
+
+    // Request notification permission on page load
+    requestNotificationPermission();
+
+    {% if ticket and state.announce_window %}
+        function reportLocation() {
+            if (!navigator.geolocation) return;
+            navigator.geolocation.getCurrentPosition(pos => {
+                fetch(locationUrl, {
+                    method: "POST",
+                    headers: {"Content-Type": "application/json", "X-CSRFToken": csrf},
+                    body: JSON.stringify({lat: pos.coords.latitude, lng: pos.coords.longitude})
+                }).then(r => r.json()).then(d => {
+                    if (d.removed) {
+                        showBrowserNotification("حذف از صف", "شما به دلیل خارج شدن از محدوده دفتر از صف حذف شدید.");
                         location.reload();
-                        return;
                     }
-                    document.getElementById("ticket-number").textContent = data.ticket.number;
-                    document.getElementById("ahead-count").textContent = data.ticket.ahead;
-                }
-                const wc = document.getElementById("waiting-count");
-                if (wc) wc.textContent = data.waiting_count;
-            } catch (e) {
-            }
-        }
-
-        // Auto-refresh every 5 minutes (300000 ms)
-        setInterval(refreshStatus, 300000);
-        
-        // Initial refresh
-        refreshStatus();
-
-        // Browser notification support
-        function requestNotificationPermission() {
-            if ("Notification" in window && Notification.permission === "default") {
-                Notification.requestPermission();
-            }
-        }
-
-        function showBrowserNotification(title, body) {
-            if ("Notification" in window && Notification.permission === "granted") {
-                new Notification(title, {
-                    body: body,
-                    icon: "/static/driver_queue/icons/icon-192.png"
+                }).catch(() => {
                 });
-            }
+            });
         }
+        reportLocation();
+        setInterval(reportLocation, 60000);
+    {% endif %}
 
-        // Request notification permission on page load
-        requestNotificationPermission();
-
-        {% if ticket and state.announce_window %}
-            function reportLocation() {
-                if (!navigator.geolocation) return;
-                navigator.geolocation.getCurrentPosition(pos => {
-                    fetch(locationUrl, {
-                        method: "POST",
-                        headers: {"Content-Type": "application/json", "X-CSRFToken": csrf},
-                        body: JSON.stringify({lat: pos.coords.latitude, lng: pos.coords.longitude})
-                    }).then(r => r.json()).then(d => {
-                        if (d.removed) {
-                            showBrowserNotification("حذف از صف", "شما به دلیل خارج شدن از محدوده دفتر از صف حذف شدید.");
-                            location.reload();
-                        }
-                    }).catch(() => {
-                    });
-                });
-            }
-            reportLocation();
-            setInterval(reportLocation, 60000);
-        {% endif %}
-
-        {% if pending_announcement %}
-            showBrowserNotification("اعلان وضعیت", "لطفا وضعیت خود را اعلام کنید (مهلت: ۱۵ دقیقه).");
-        {% endif %}
-    </script>
+    {% if pending_announcement %}
+        showBrowserNotification("اعلان وضعیت", "لطفا وضعیت خود را اعلام کنید (مهلت: ۱۵ دقیقه).");
+    {% endif %}
+</script>
 {% endblock %}

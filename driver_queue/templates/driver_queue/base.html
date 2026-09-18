@@ -6,6 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     {% include "pwa/head.html" %}
     <title>{% block title %}نوبت‌دهی رانندگان{% endblock %}</title>
+    
+    <!-- Persian Datepicker CSS -->
+    <link rel="stylesheet" href="{% static 'issuance/css/persian-datepicker.css' %}">
     <style>
         :root {
             --primary: #0f766e;
@@ -243,6 +246,11 @@
         <div class="alert alert-{{ m.tags }}">{{ m }}</div>{% endfor %}{% endif %}
     {% block content %}{% endblock %}
 </main>
+
+<!-- Persian Datepicker JS -->
+<script src="{% static 'issuance/persian-date.js' %}"></script>
+<script src="{% static 'issuance/persian-datepicker.js' %}"></script>
+
 {% include "pwa/scripts.html" %}
 </body>
 </html>
