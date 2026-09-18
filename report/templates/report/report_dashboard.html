@@ -545,7 +545,7 @@
                     {% for user in all_users %}
                         <option value="{{ user.id }}"
                                 {% if filters.created_by == user.id|stringformat:"s" %}selected{% endif %}>
-                            {{ user.username }}
+                            {{ user.username }}{% if user.get_role_display %} ({{ user.get_role_display }}){% endif %}
                         </option>
                     {% endfor %}
                 </select>
@@ -572,19 +572,10 @@
                         <small class="rp-subtitle">بارنامه‌های صادرشده بر اساس فیلترهای انتخابی شما</small>
                     </div>
                     <div class="text-start">
-                        <div class="rp-subtitle mb-0">تعداد بارنامه‌های صادرشده</div>
+                        <div class="rp-subtitle mb-0">مجموع بارنامه‌های صادرشده</div>
                         <div class="rp-result-count">{{ filtered_count|intcomma }}</div>
                     </div>
                 </div>
-
-                <!-- تفکیک وضعیت تایید در نتایج -->
-                {% if approval_breakdown %}
-                    <div class="mb-3 d-flex flex-wrap gap-2">
-                        {% for item in approval_breakdown %}
-                            <span class="rp-chip">{{ item.label }}: {{ item.count|intcomma }}</span>
-                        {% endfor %}
-                    </div>
-                {% endif %}
 
                 <div class="rp-result-list">
                     {% for item in result_items %}

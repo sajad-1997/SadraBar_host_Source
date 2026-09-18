@@ -16,12 +16,6 @@ User = get_user_model()
 # حداکثر تعداد آیتم‌هایی که در کارت نتیجه فیلتر نمایش داده می‌شود
 RESULT_ITEMS_LIMIT = 100
 
-APPROVAL_LABELS = {
-    'approved': 'تایید شده',
-    'rejected': 'رد شده',
-    'pending': 'در انتظار',
-}
-
 
 def is_admin_or_manager(user):
     from accounts.decorators import ROLE_ADMIN, ROLE_MANAGER
@@ -98,6 +92,7 @@ def report_dashboard(request):
     # -----------------------
     # 🔹 Query پایه
     # -----------------------
+    # تمامی کاربران سیستم برای فیلتر کاربر صادرکننده (بدون هیچ محدودیتی)
     all_users = User.objects.all().order_by('username')
     TYPE_CHOICES = Bijak.TYPE_CHOICES
     VEHICLE_PREFIX = {
@@ -334,16 +329,6 @@ def report_dashboard(request):
     # -----------------------
     filtered_count = filtered_queryset.count() if has_filters else 0
 
-    # تفکیک وضعیت تایید در نتایج فیلتر
-    approval_breakdown = []
-    if has_filters:
-        for row in filtered_queryset.values('approval_status').annotate(count=Count('id')):
-            approval_breakdown.append({
-                'status': row['approval_status'] or 'unknown',
-                'label': APPROVAL_LABELS.get(row['approval_status'], row['approval_status'] or 'نامشخص'),
-                'count': row['count'],
-            })
-
     # آیتم‌های نتیجه فیلتر: با وضعیت، صادرکننده (کاربر/نقش) و تاریخ و ساعت
     # واقعی صدور (ثبت سیستمی) به شمسی — نه تاریخی که کاربر دستی وارد کرده است
     result_items = []
@@ -414,6 +399,9 @@ def report_dashboard(request):
     # 🔹 context
     # -----------------------
     context = {
+        # تمامی کاربران سیستم برای فیلتر کاربر صادرکننده
+        'all_users': all_users,
+
         # آمارها
         'daily_24_count': daily_24_count,
         'today_count': today_count,
@@ -442,7 +430,6 @@ def report_dashboard(request):
         # نتیجه فیلتر
         'has_filters': has_filters,
         'filtered_count': filtered_count,
-        'approval_breakdown': approval_breakdown,
         'result_items': result_items,
         'result_items_limit': RESULT_ITEMS_LIMIT,
 
