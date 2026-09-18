@@ -1,8 +1,10 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% include "pwa/head.html" %}
     <title>موسسه حمل و نقل صدرا بار خراسان | باربری مطمئن و هوشمند</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -38,15 +40,58 @@
                 </div>
             </div>
             <div class="hidden md:flex gap-6 text-sm font-medium text-gray-700">
+                <a href="{% url 'login' %}" class="hover:text-blue-700 transition">ورود</a>
                 <a href="#home" class="hover:text-blue-700 transition">خانه</a>
                 <a href="#services" class="hover:text-blue-700 transition">خدمات</a>
                 <a href="#booking" class="hover:text-blue-700 transition">رزرو بار</a>
                 <a href="#tracking" class="hover:text-blue-700 transition">پیگیری مرسوله</a>
                 <a href="#contact" class="hover:text-blue-700 transition">تماس با ما</a>
             </div>
-            <a href="tel:05135420703" class="bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded-full font-bold transition flex items-center gap-2">
-                <i class="fas fa-phone"></i> <span class="hidden sm:inline">۰۵۱-۳۵۴۲۰۷۰۳</span>
-            </a>
+            <div class="flex items-center gap-3">
+                <a href="tel:05135420703" class="bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded-full font-bold transition flex items-center gap-2">
+                    <i class="fas fa-phone"></i> <span class="hidden sm:inline">۰۵۱-۳۵۴۲۰۷۰۳</span>
+                </a>
+                <!-- Hamburger Menu Button (Mobile Only) -->
+                <button id="mobile-menu-btn" class="md:hidden text-gray-700 hover:text-blue-700 focus:outline-none p-2 rounded-lg transition" aria-label="منو">
+                    <i class="fas fa-bars text-2xl" id="hamburger-icon"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Menu (Hidden by default) -->
+        <div id="mobile-menu" class="md:hidden hidden bg-white border-t border-gray-100 shadow-lg absolute w-full left-0 top-full">
+            <div class="container mx-auto px-4 py-4 space-y-1">
+                <a href="{% url 'login' %}" class="mobile-nav-link flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition">
+                    <i class="fas fa-sign-in-alt w-5 text-center"></i>
+                    <span class="font-medium">ورود</span>
+                </a>
+                <a href="#home" class="mobile-nav-link flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition">
+                    <i class="fas fa-home w-5 text-center"></i>
+                    <span class="font-medium">خانه</span>
+                </a>
+                <a href="#services" class="mobile-nav-link flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition">
+                    <i class="fas fa-concierge-bell w-5 text-center"></i>
+                    <span class="font-medium">خدمات</span>
+                </a>
+                <a href="#booking" class="mobile-nav-link flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition">
+                    <i class="fas fa-clipboard-list w-5 text-center"></i>
+                    <span class="font-medium">رزرو بار</span>
+                </a>
+                <a href="#tracking" class="mobile-nav-link flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition">
+                    <i class="fas fa-search-location w-5 text-center"></i>
+                    <span class="font-medium">پیگیری مرسوله</span>
+                </a>
+                <a href="#contact" class="mobile-nav-link flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition">
+                    <i class="fas fa-phone-alt w-5 text-center"></i>
+                    <span class="font-medium">تماس با ما</span>
+                </a>
+                <div class="pt-3 border-t border-gray-100 mt-3">
+                    <a href="tel:05135420703" class="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-3 rounded-lg font-bold transition">
+                        <i class="fas fa-phone"></i>
+                        <span>تماس: ۰۵۱-۳۵۴۲۰۷۰۳</span>
+                    </a>
+                </div>
+            </div>
         </div>
     </nav>
 
@@ -57,6 +102,9 @@
             <h2 class="text-4xl md:text-5xl font-extrabold mb-6 leading-tight">حمل‌ونقل سریع، ایمن و هوشمند<br>در خراسان و سراسر کشور</h2>
             <p class="text-lg md:text-xl text-blue-100 mb-8 max-w-2xl mx-auto">با بیش از دو دهه سابقه درخشان، بار شما را با بیمه کامل و صدور بارنامه رسمی به مقصد می‌رسانیم.</p>
             <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="/driver-queue/" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-8 py-3 rounded-lg text-lg transition shadow-lg flex items-center justify-center gap-2">
+                    <i class="fas fa-truck"></i> نوبت‌دهی رانندگان
+                </a>
                 <a href="#booking" class="bg-yellow-500 hover:bg-yellow-600 text-blue-900 font-bold px-8 py-3 rounded-lg text-lg transition shadow-lg">رزرو آنلاین بار</a>
                 <a href="https://t.me/sadrabar_khorasan" target="_blank" class="bg-white/20 hover:bg-white/30 backdrop-blur border border-white/40 text-white font-bold px-8 py-3 rounded-lg text-lg transition flex items-center justify-center gap-2">
                     <i class="fab fa-telegram"></i> عضویت در کانال تلگرام
@@ -282,6 +330,54 @@
 
     <!-- Scripts -->
     <script>
+        // Mobile Menu Toggle
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const hamburgerIcon = document.getElementById('hamburger-icon');
+        const mobileNavLinks = document.querySelectorAll('.mobile-nav-link');
+
+        function toggleMobileMenu() {
+            const isOpen = !mobileMenu.classList.contains('hidden');
+            if (isOpen) {
+                mobileMenu.classList.add('hidden');
+                hamburgerIcon.classList.remove('fa-times');
+                hamburgerIcon.classList.add('fa-bars');
+                document.body.style.overflow = '';
+            } else {
+                mobileMenu.classList.remove('hidden');
+                hamburgerIcon.classList.remove('fa-bars');
+                hamburgerIcon.classList.add('fa-times');
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        mobileMenuBtn.addEventListener('click', toggleMobileMenu);
+
+        // Close mobile menu when a nav link is clicked
+        mobileNavLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                if (!mobileMenu.classList.contains('hidden')) {
+                    toggleMobileMenu();
+                }
+            });
+        });
+
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!mobileMenu.classList.contains('hidden') && 
+                !mobileMenu.contains(e.target) && 
+                !mobileMenuBtn.contains(e.target)) {
+                toggleMobileMenu();
+            }
+        });
+
+        // Close mobile menu on escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && !mobileMenu.classList.contains('hidden')) {
+                toggleMobileMenu();
+            }
+        });
+
         // Multi-step Form Logic
         let currentStep = 1;
         function nextStep(step) {
@@ -345,5 +441,6 @@
             });
         });
     </script>
+    {% include "pwa/scripts.html" %}
 </body>
 </html>

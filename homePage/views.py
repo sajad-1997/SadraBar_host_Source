@@ -21,7 +21,12 @@ class StaffOnlyView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
     template_name = 'issuance/bijak/issuance_form.html'
 
     def test_func(self):
-        return self.request.user.role in ['admin', 'staff']
+        from accounts.decorators import ROLE_ADMIN, ROLE_EMPLOYEE
+        return self.request.user.role in [ROLE_ADMIN, ROLE_EMPLOYEE]
+
+
+def login(request):
+    return render(request, 'accounts/login.html')
 
 
 def index(request):
@@ -68,30 +73,30 @@ def register(request):
 
 
 def contact_submit_view(request):
-        if request.method == 'POST':
-            # دریافت داده‌ها از فرم
-            name = request.POST.get('name')
-            email = request.POST.get('email')
-            subject = request.POST.get('subject')
-            message = request.POST.get('message')
+    if request.method == 'POST':
+        # دریافت داده‌ها از فرم
+        name = request.POST.get('name')
+        email = request.POST.get('email')
+        subject = request.POST.get('subject')
+        message = request.POST.get('message')
 
-            # منطق پردازش فرم (مثلاً ارسال ایمیل)
-            try:
-                send_mail(
-                    subject=f'پیام از طرف {name} - {subject}',
-                    message=f'نام: {name}\nایمیل: {email}\n\nپیام:\n{message}',
-                    from_email=settings.DEFAULT_FROM_EMAIL,  # یا ایمیلی که می‌خواهید نمایش داده شود
-                    recipient_list=['your_admin_email@example.com'],  # ایمیل مقصد
-                    fail_silently=False,
-                )
-                # پس از ارسال موفق، به صفحه تشکر یا صفحه اصلی هدایت کنید
-                # return redirect('contact_success') # اگر صفحه تشکر دارید
-                return redirect('contact')  # یا به همان صفحه تماس برگردید با پیام موفقیت
-            except Exception as e:
-                # مدیریت خطا در صورت بروز مشکل در ارسال ایمیل
-                logger.error(f"Error sending email: {e}")
-                # return render(request, 'contact.html', {'error': 'خطا در ارسال پیام.'})
-                return redirect('contact')  # یا به صفحه تماس برگردید با پیام خطا
+        # منطق پردازش فرم (مثلاً ارسال ایمیل)
+        try:
+            send_mail(
+                subject=f'پیام از طرف {name} - {subject}',
+                message=f'نام: {name}\nایمیل: {email}\n\nپیام:\n{message}',
+                from_email=settings.DEFAULT_FROM_EMAIL,  # یا ایمیلی که می‌خواهید نمایش داده شود
+                recipient_list=['your_admin_email@example.com'],  # ایمیل مقصد
+                fail_silently=False,
+            )
+            # پس از ارسال موفق، به صفحه تشکر یا صفحه اصلی هدایت کنید
+            # return redirect('contact_success') # اگر صفحه تشکر دارید
+            return redirect('contact')  # یا به همان صفحه تماس برگردید با پیام موفقیت
+        except Exception as e:
+            # مدیریت خطا در صورت بروز مشکل در ارسال ایمیل
+            logger.error(f"Error sending email: {e}")
+            # return render(request, 'contact.html', {'error': 'خطا در ارسال پیام.'})
+            return redirect('contact')  # یا به صفحه تماس برگردید با پیام خطا
 
-        # اگر متد POST نبود، به صفحه اصلی یا تماس هدایت کنید
-        return redirect('contact')  # یا render(request, 'contact.html')
+    # اگر متد POST نبود، به صفحه اصلی یا تماس هدایت کنید
+    return redirect('contact')  # یا render(request, 'contact.html')

@@ -5,15 +5,38 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ user.username }} | داشبورد کارمندان</title>
     <style>
+        :root {
+            --bg-color: #f6f7fb;
+            --text-color: #333;
+            --sidebar-bg: #fff;
+            --navbar-bg: linear-gradient(135deg, #0d47a1, #1976d2);
+            --link-hover: #0d47a1;
+            --card-bg: #fff;
+            --shadow: rgba(0, 0, 0, 0.05);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-color: #181a1f;
+                --text-color: #e4e4e4;
+                --sidebar-bg: #22252b;
+                --navbar-bg: linear-gradient(135deg, #1a237e, #283593);
+                --link-hover: #5c6bc0;
+                --card-bg: #2b2e36;
+                --shadow: rgba(0, 0, 0, 0.4);
+            }
+        }
+
         body {
             margin: 0;
             font-family: "Vazirmatn", sans-serif;
-            background-color: #f6f7fb;
-            color: #333;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: all 0.3s ease;
         }
 
         header {
-            background: linear-gradient(135deg, #0d47a1, #1976d2);
+            background: var(--navbar-bg);
             color: white;
             padding: 1rem 2rem;
             display: flex;
@@ -52,15 +75,27 @@
             background-color: #ffb300;
         }
 
+        /* Hamburger Menu */
+        .hamburger {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: #fff;
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+
         nav {
-            background-color: #fff;
+            background-color: var(--sidebar-bg);
             width: 250px;
             height: 100vh;
             padding: 2rem 1rem;
             position: fixed;
             top: 0;
             right: 0;
-            box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
+            box-shadow: -2px 0 10px var(--shadow);
+            transition: background-color 0.3s ease;
         }
 
         nav ul {
@@ -75,7 +110,7 @@
 
         nav ul li a {
             text-decoration: none;
-            color: #333;
+            color: var(--text-color);
             background-color: #f1f3f5;
             display: block;
             padding: 0.7rem 1rem;
@@ -84,8 +119,15 @@
             font-weight: 500;
         }
 
+        @media (prefers-color-scheme: dark) {
+            nav ul li a {
+                background-color: #2b2e36;
+                color: #e4e4e4;
+            }
+        }
+
         nav ul li a:hover {
-            background-color: #0d47a1;
+            background-color: var(--link-hover);
             color: white;
         }
 
@@ -95,31 +137,40 @@
         }
 
         .welcome {
-            background: #fff;
+            background: var(--card-bg);
             padding: 2rem;
             border-radius: 12px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 2px 10px var(--shadow);
+            transition: background-color 0.3s ease;
         }
 
         .welcome h2 {
-            color: #0d47a1;
+            color: var(--link-hover);
         }
 
         /* واکنش‌گرایی */
         @media (max-width: 900px) {
+            .hamburger {
+                display: block;
+            }
+
             nav {
                 position: static;
                 width: 100%;
                 height: auto;
                 box-shadow: none;
+                display: none;
+                flex-direction: column;
+            }
+
+            nav.active {
                 display: flex;
-                overflow-x: auto;
             }
 
             nav ul {
                 display: flex;
-                flex-direction: row;
-                gap: 1rem;
+                flex-direction: column;
+                gap: 0.5rem;
                 margin: 0;
             }
 
@@ -137,7 +188,10 @@
 <body>
 
 <header>
-    <h1>پنل کارمندان صدرا بار</h1>
+    <div class="d-flex align-items-center gap-3">
+        <button class="hamburger" id="hamburger">☰</button>
+        <h1>پنل کارمندان صدرا بار</h1>
+    </div>
     <div class="user-info">
         <span> سلام {{ user.username }} 👋</span>
         <form action="{% url 'logout' %}" method="post">
@@ -155,21 +209,24 @@
         {% endif %}
 
         {% if permissions.can_manage_shipments %}
-            <li><a href="{% url 'issuance:search:search_shipment' %}">🚚 جستجوی بارنامه‌ها</a></li>
+            <li><a href="{% url 'issuance:search:search_shipment' %}">📃 جستجوی بارنامه‌ها</a></li>
             <li><a href="{% url 'issuance:crud:pending' %}">✅ لیست بررسی بارنامه ها</a></li>
             <li><a href="{% url 'issuance:manager:status_list' %}">✅ تعین وضعیت بارنامه ها</a></li>
         {% endif %}
 
         <!--{% if permissions.can_edit_final_status %}-->
-        <!--{% endif %}-->
+            <!--{% endif %}-->
         {% if permissions.can_view_reports %}
             <li><a href="#">📈 گزارش‌ها</a></li>
         {% endif %}
         {% if permissions.can_manage_customers %}
-            <li><a href="{% url 'customers:customer_list' %}">📈 لیست مشتریان</a></li>
+            <li><a href="{% url 'customers:customer_list' %}">👥 لیست مشتریان</a></li>
+            <li><a href="{% url 'customers:add_customer' %}">👤 افزودن مشتریان</a></li>
         {% endif %}
         {% if permissions.can_manage_drivers %}
-            <li><a href="{% url 'issuance:manager:driver_list' %}">📈 لیست رانندگان</a></li>
+            <li><a href="{% url 'driver_queue:panel_dashboard' %}">🧾 مدیریت نوبت رانندگان</a></li>
+            <li><a href="{% url 'drivers:driver_list' %}">🚚 لیست رانندگان</a></li>
+            <li><a href="{% url 'drivers:add_driver' %}">🚛 افزودن رانندگان</a></li>
         {% endif %}
         <!--{#        {% if permissions.can_access_dashboard %}#}-->
         <!--{#            <li><a href="#">📊 داشبورد اصلی</a></li>#}-->
@@ -183,6 +240,18 @@
         <p>در این بخش می‌توانید وظایف، بارنامه‌ها و گزارش‌های خود را مشاهده و مدیریت کنید.</p>
     </div>
 </main>
+
+<script>
+    // Hamburger menu toggle
+    const hamburger = document.getElementById('hamburger');
+    const nav = document.querySelector('nav');
+    
+    if (hamburger) {
+        hamburger.addEventListener('click', () => {
+            nav.classList.toggle('active');
+        });
+    }
+</script>
 
 </body>
 </html>

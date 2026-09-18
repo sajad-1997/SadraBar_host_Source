@@ -1,7 +1,7 @@
 <div class="sidebar-header">
     <h5>پنل مدیریت</h5>
     <a href="{% url 'home' %}">صفحه اصلی</a>
-
+    <a href="{% url 'logout' %}">خروج از پنل عملیاتی</a>
 </div>
 <div class="sidebar-divider"></div>
 
@@ -22,6 +22,8 @@
 <div class="sidebar-divider"></div>
 
 <div class="sidebar-section">مشاهده</div>
-<a href="#">لیست کاربران</a>
+<a href="{% url 'user_management:dashboard' %}">لیست کاربران</a>
 <a href="{% url 'customers:customer_list' %}">لیست مشتریان</a>
-<a href="{% url 'issuance:manager:driver_list' %}">لیست رانندگان</a>
+<a href="{% url 'customers:add_customer' %}">افزودن مشتریان</a>
+<a href="{% url 'drivers:driver_list' %}">لیست رانندگان</a>
+<a href="{% url 'drivers:add_driver' %}">افزودن رانندگان</a>

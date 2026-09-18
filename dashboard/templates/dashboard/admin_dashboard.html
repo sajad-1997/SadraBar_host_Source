@@ -22,14 +22,16 @@
             --shadow: rgba(0, 0, 0, 0.05);
         }
 
-        body.dark-mode {
-            --bg-color: #181a1f;
-            --text-color: #e4e4e4;
-            --sidebar-bg: #22252b;
-            --navbar-bg: linear-gradient(90deg, #2a2d55, #3c3f72);
-            --link-hover: #8f94fb;
-            --card-bg: #2b2e36;
-            --shadow: rgba(0, 0, 0, 0.4);
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-color: #181a1f;
+                --text-color: #e4e4e4;
+                --sidebar-bg: #22252b;
+                --navbar-bg: linear-gradient(90deg, #2a2d55, #3c3f72);
+                --link-hover: #8f94fb;
+                --card-bg: #2b2e36;
+                --shadow: rgba(0, 0, 0, 0.4);
+            }
         }
 
         body {
@@ -62,10 +64,11 @@
         .logout-btn {
             background: #dc3545;
             color: #fff;
+            border: none;
             border-radius: 8px;
             padding: 0.4rem 0.9rem;
-            text-decoration: none;
             font-size: 0.9rem;
+            cursor: pointer;
             transition: background 0.3s ease;
         }
 
@@ -73,19 +76,15 @@
             background: #b02a37;
         }
 
-        .mode-toggle {
-            background: #fff;
+        /* Hamburger Menu */
+        .hamburger {
+            display: none;
+            background: none;
             border: none;
-            border-radius: 50%;
-            width: 36px;
-            height: 36px;
-            font-size: 18px;
+            font-size: 24px;
+            color: #fff;
             cursor: pointer;
-            transition: transform 0.3s ease;
-        }
-
-        .mode-toggle:hover {
-            transform: rotate(15deg);
+            padding: 0.5rem;
         }
 
         /* Sidebar */
@@ -102,7 +101,7 @@
             transition: background-color 0.3s ease;
         }
 
-        .sidebar h5 {
+        .sidebar h4 {
             font-weight: 700;
             color: var(--link-hover);
             margin-bottom: 1rem;
@@ -177,6 +176,10 @@
 
         /* Responsive */
         @media (max-width: 992px) {
+            .hamburger {
+                display: block;
+            }
+
             .dashboard-container {
                 flex-direction: column;
             }
@@ -185,6 +188,11 @@
                 width: 100%;
                 text-align: center;
                 box-shadow: none;
+                display: none;
+            }
+
+            .sidebar.active {
+                display: block;
             }
 
             .sidebar a {
@@ -199,12 +207,17 @@
 <!-- Navbar -->
 <nav class="navbar">
     <div class="container-fluid d-flex justify-content-between align-items-center">
-        <span class="navbar-brand">🚛 پنل مدیریت اپلیکیشن صدرابار</span>
+        <div class="d-flex align-items-center gap-3">
+            <button class="hamburger" id="hamburger">☰</button>
+            <span class="navbar-brand">🚛 پنل مدیریت اپلیکیشن صدرابار</span>
+        </div>
 
         <div class="user-info">
             <span>سلام، {{ user.username }} 👋🏻</span>
-            <a href="{% url 'logout' %}" class="logout-btn">خروج</a>
-            <button class="mode-toggle" id="modeToggle" title="تغییر حالت">🌙</button>
+            <form action="{% url 'logout' %}" method="post">
+                {% csrf_token %}
+                <button type="submit" class="logout-btn">خروج</button>
+            </form>
         </div>
     </div>
 </nav>
@@ -212,7 +225,7 @@
 <!-- Dashboard Layout -->
 <div class="dashboard-container">
     <!-- Sidebar -->
-    <div class="sidebar">
+    <div class="sidebar" id="sidebar">
         <h4>منوی دسترسی</h4>
         <a href="{% url 'issuance:crud:create_new' %}">📝 صدور بارنامه</a>
         <a href="{% url 'issuance:search:search_shipment' %}">🔍 جستجوی بارنامه‌ها</a>
@@ -221,9 +234,11 @@
         <a href="{% url 'report:report_dashboard' %}">📊 گزارش بارنامه‌ها</a>
 {#        <a href="{% url 'duplicate_audit:duplicate_audit_list' %}">🛠 بارنامه‌های تکراری</a>#}
         <a href="{% url 'customers:customer_list' %}">👥 لیست مشتریان</a>
+        <a href="{% url 'customers:add_customer' %}">👥 افزودن مشتریان</a>
         <a href="{% url 'drivers:driver_list' %}">🚛 لیست رانندگان</a>
-{#        <a href="{% url 'auth:user_list' %}">🧾 لیست کاربران</a>#}
-        <a href="#">🧾 لیست کاربران</a>
+        <a href="{% url 'drivers:add_driver' %}">🚛 افزودن رانندگان</a>
+        <a href="{% url 'driver_queue:panel_dashboard' %}">🧾 مدیریت نوبت رانندگان</a>
+        <a href="{% url 'user_management:dashboard' %}">🧾 مدیریت کاربران</a>
 {#        <a href="{% url 'issuance:manager:driver_location' %}">📍 موقعیت‌یابی رانندگان</a>#}
         <a href="#">📍 موقعیت‌یابی رانندگان</a>
 {#        <a href="{% url 'issuance:crud:insurance_report' %}">💰 گزارش مبالغ بیمه</a>#}
@@ -263,18 +278,14 @@
 
 <!-- JS -->
 <script>
-    const toggleBtn = document.getElementById('modeToggle');
-    toggleBtn.addEventListener('click', () => {
-        document.body.classList.toggle('dark-mode');
-        const isDark = document.body.classList.contains('dark-mode');
-        toggleBtn.textContent = isDark ? '☀️' : '🌙';
-        localStorage.setItem('theme', isDark ? 'dark' : 'light');
-    });
-
-    // حفظ حالت تم
-    if (localStorage.getItem('theme') === 'dark') {
-        document.body.classList.add('dark-mode');
-        toggleBtn.textContent = '☀️';
+    // Hamburger menu toggle
+    const hamburger = document.getElementById('hamburger');
+    const sidebar = document.getElementById('sidebar');
+    
+    if (hamburger) {
+        hamburger.addEventListener('click', () => {
+            sidebar.classList.toggle('active');
+        });
     }
 </script>
 

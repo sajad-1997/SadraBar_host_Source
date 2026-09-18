@@ -5,28 +5,31 @@ from django.db.models import Count, Sum
 from django.db.models.functions import TruncDay
 from django.utils import timezone
 from datetime import timedelta
+from decimal import Decimal
 import json
-from persiantools.jdatetime import JalaliDate
+from jdatetime import date as JalaliDate
 
-from accounts.decorators import role_required
+from accounts.decorators import role_required, get_user_permissions
 from accounts.models import RolePermission
 from issuance.models.bijak import Bijak
 
 
 def is_manager(user):
-    return user.is_superuser or user.role == 'manager'
+    from accounts.decorators import ROLE_MANAGER
+    if not user.is_authenticated:
+        return False
+    return user.is_superuser or user.role == ROLE_MANAGER
 
 
 @role_required(['admin'])
 def admin_dashboard(request):
-    return render(request, 'dashboard/admin_dashboard.html', {'user': request.user})
+    permissions = get_user_permissions(request.user)
+    return render(request, 'dashboard/admin_dashboard.html', {'user': request.user, 'permissions': permissions})
 
 
-@user_passes_test(is_manager)
+@role_required(['manager', 'admin'])
 def manager_dashboard(request):
-    permissions = None
-    if request.user.role == 'manager':
-        permissions = RolePermission.objects.filter(role='manager').first()
+    permissions = get_user_permissions(request.user)
 
     # ========================
     # 🔹 آمار هفتگی (شنبه تا شنبه)
@@ -76,7 +79,7 @@ def manager_dashboard(request):
         chart_counts.append(stat['count'] or 0)
         chart_insurance.append(int(stat['total_insurance'] or 0))
         # فرض: کمیسیون دفتر باربری ۵٪ از کرایه کل
-        commission = int((stat['total_freight'] or 0) * 0.05)
+        commission = int(float(stat['total_freight'] or 0) * 0.05)
         chart_commission.append(commission)
     
     # مجموع هفته
@@ -99,11 +102,9 @@ def manager_dashboard(request):
     return render(request, 'dashboard/manager_dashboard.html', context)
 
 
-@role_required(['staff', 'manager', 'admin'])
+@role_required(['employee', 'manager', 'admin'])
 def staff_dashboard(request):
-    permissions = None
-    if request.user.role == 'staff':
-        permissions = RolePermission.objects.filter(role='staff').first()
+    permissions = get_user_permissions(request.user)
 
     return render(request, 'dashboard/staff_dashboard.html', {
         'user': request.user,
@@ -111,11 +112,9 @@ def staff_dashboard(request):
     })
 
 
-@role_required(['staff', 'manager', 'admin'])
+@role_required(['employee', 'manager', 'admin'])
 def home_dashboard(request):
-    permissions = None
-    if request.user.role == 'staff':
-        permissions = RolePermission.objects.filter(role='staff').first()
+    permissions = get_user_permissions(request.user)
 
     return render(request, 'dashboard/home_dashboard.html', {
         'user': request.user,

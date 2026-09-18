@@ -9,29 +9,40 @@
     <!-- Bootstrap RTL -->
     <link  rel="stylesheet" href="{% static 'issuance/css/bootstrap.rtl.min.css' %}">
 
-    <!-- Font -->
-    <!--<link href="https://cdn.jsdelivr.net/npm/vazirmatn@33.003/index.css" rel="stylesheet">-->
-
     <style>
         :root {
-            --primary: #4e54c8;
-            --primary-soft: #eef0ff;
-            --bg: #f5f6fa;
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #8b5cf6;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg: #f8fafc;
             --sidebar-bg: #ffffff;
             --card-bg: #ffffff;
-            --text: #2c2c2c;
-            --muted: #6c757d;
-            --radius: 14px;
-            --shadow: 0 8px 24px rgba(0, 0, 0, .06);
+            --text: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --radius: 16px;
         }
 
-        body.dark {
-            --bg: #181a1f;
-            --sidebar-bg: #22252b;
-            --card-bg: #2b2e36;
-            --text: #e4e4e4;
-            --primary-soft: rgba(78, 84, 200, .15);
-            --shadow: 0 8px 24px rgba(0, 0, 0, .4);
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg: #0f172a;
+                --sidebar-bg: #1e293b;
+                --card-bg: #1e293b;
+                --text: #f1f5f9;
+                --text-muted: #94a3b8;
+                --border: #334155;
+                --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+                --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
+            }
+        }
+
+        * {
+            box-sizing: border-box;
         }
 
         body {
@@ -39,6 +50,9 @@
             background: var(--bg);
             color: var(--text);
             margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
 
         /* ===== Layout ===== */
@@ -49,60 +63,80 @@
 
         /* ===== Sidebar (Desktop) ===== */
         .sidebar {
-            width: 270px;
-            background: linear-gradient(180deg, var(--sidebar-bg) 0%, #f7f8ff 100%);
-            box-shadow: 0 12px 32px rgba(0, 0, 0, .08);
-            padding: 1.5rem 1rem;
+            width: 280px;
+            background: var(--sidebar-bg);
+            border-left: 1px solid var(--border);
+            padding: 2rem 1.5rem;
             height: 100vh;
             overflow-y: auto;
+            position: sticky;
+            top: 0;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
         }
 
-        body.dark .sidebar {
-            background: linear-gradient(180deg, #1f2229, #23262e);
+        .sidebar-header {
+            margin-bottom: 2rem;
+            text-align: center;
         }
 
-        /* ===== Links (both Desktop & Mobile) ===== */
-        .sidebar a, #mobileSidebar .sidebar-container a {
+        .sidebar-header h2 {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin: 0;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .sidebar-section {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin: 1.5rem 0 0.75rem;
+            letter-spacing: 0.5px;
+        }
+
+        .sidebar-divider {
+            height: 1px;
+            background: var(--border);
+            margin: 1.5rem 0;
+        }
+
+        .sidebar-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .sidebar-nav a {
             display: flex;
             align-items: center;
-            gap: .65rem;
-            padding: .65rem .95rem;
-            margin-bottom: .35rem;
+            gap: 0.75rem;
+            padding: 0.875rem 1rem;
             border-radius: 12px;
             color: var(--text);
             text-decoration: none;
-            font-size: .93rem;
-            position: relative;
-            transition: background .25s, color .25s, transform .15s;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
         }
 
-        .sidebar a::before, #mobileSidebar .sidebar-container a::before {
-            content: "";
-            position: absolute;
-            right: 0;
-            top: 50%;
-            width: 4px;
-            height: 0;
+        .sidebar-nav a:hover {
             background: var(--primary);
-            border-radius: 6px;
-            transform: translateY(-50%);
-            transition: height .25s;
+            color: white;
+            transform: translateX(-4px);
         }
 
-        .sidebar a:hover, #mobileSidebar .sidebar-container a:hover {
-            background: var(--primary-soft);
-            color: var(--primary);
-            transform: translateX(-2px);
+        .sidebar-nav a.active {
+            background: var(--primary);
+            color: white;
         }
 
-        .sidebar a.active, #mobileSidebar .sidebar-container a.active {
-            background: var(--primary-soft);
-            color: var(--primary);
-            font-weight: 700;
-        }
-
-        .sidebar a.active::before, #mobileSidebar .sidebar-container a.active::before {
-            height: 70%;
+        .sidebar-nav a span {
+            font-size: 1.25rem;
         }
 
         /* ===== Main ===== */
@@ -110,138 +144,256 @@
             flex: 1;
             display: flex;
             flex-direction: column;
+            overflow-x: hidden;
         }
 
         /* ===== Navbar ===== */
-        .topbar {
-            background: linear-gradient(90deg, #4e54c8, #8f94fb);
-            color: #fff;
-            padding: .8rem 1.5rem;
+        .navbar {
+            background: var(--sidebar-bg);
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 2rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
         }
 
-        .topbar .left {
+        .navbar-left {
             display: flex;
-            gap: 1rem;
             align-items: center;
+            gap: 1rem;
+        }
+
+        .hamburger {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--text);
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 8px;
+            transition: background-color 0.2s ease;
+        }
+
+        .hamburger:hover {
+            background: var(--border);
+        }
+
+        .user-greeting {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text);
         }
 
         .logout-btn {
-            background: #dc3545;
+            background: var(--danger);
+            color: white;
             border: none;
-            padding: .4rem .9rem;
+            padding: 0.625rem 1.25rem;
             border-radius: 10px;
-            color: #fff;
-            font-size: .9rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .logout-btn:hover {
+            background: #dc2626;
+            transform: translateY(-1px);
         }
 
         /* ===== Content ===== */
         .content {
             padding: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .page-header {
+            margin-bottom: 2rem;
         }
 
         .page-title {
-            font-weight: 700;
-            margin-bottom: 1.5rem;
-            color: var(--primary);
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: var(--text);
+            margin: 0;
+        }
+
+        .page-subtitle {
+            color: var(--text-muted);
+            margin-top: 0.5rem;
+            font-size: 0.95rem;
         }
 
         /* ===== Cards ===== */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
         .dashboard-card {
             background: var(--card-bg);
+            border: 1px solid var(--border);
             border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            padding: 1.5rem;
-            height: 100%;
-            transition: .25s;
-            cursor: pointer;
+            padding: 1.75rem;
+            text-decoration: none;
+            color: var(--text);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .dashboard-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
         }
 
         .dashboard-card:hover {
-            transform: translateY(-4px);
+            transform: translateY(-6px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--primary);
         }
 
-        .dashboard-card h5 {
+        .dashboard-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .card-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.75rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+        }
+
+        .card-title {
+            font-size: 1.125rem;
             font-weight: 700;
-            margin-bottom: .6rem;
+            margin: 0 0 0.5rem 0;
+            color: var(--text);
         }
 
-        .dashboard-card p {
-            color: var(--muted);
+        .card-description {
+            color: var(--text-muted);
+            font-size: 0.875rem;
             margin: 0;
-            font-size: .9rem;
+            line-height: 1.6;
+        }
+
+        /* ===== Mobile Sidebar ===== */
+        .mobile-sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .mobile-sidebar-overlay.active {
+            display: block;
+            opacity: 1;
+        }
+
+        .mobile-sidebar {
+            position: fixed;
+            top: 0;
+            right: -280px;
+            width: 280px;
+            height: 100vh;
+            background: var(--sidebar-bg);
+            z-index: 1000;
+            transition: right 0.3s ease;
+            overflow-y: auto;
+            padding: 2rem 1.5rem;
+        }
+
+        .mobile-sidebar.active {
+            right: 0;
+        }
+
+        .mobile-sidebar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .mobile-sidebar-header h3 {
+            margin: 0;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--text);
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 8px;
+            transition: background-color 0.2s ease;
+        }
+
+        .close-btn:hover {
+            background: var(--border);
         }
 
         /* ===== Responsive ===== */
         @media (max-width: 992px) {
-            .layout > .sidebar {
+            .sidebar {
                 display: none;
+            }
+
+            .hamburger {
+                display: block;
+            }
+
+            .content {
+                padding: 1.5rem;
+            }
+
+            .cards-grid {
+                grid-template-columns: 1fr;
             }
         }
 
-        /* ===== Mobile Sidebar Fullscreen ===== */
-        #mobileSidebar {
-            --bs-offcanvas-width: 100%;
-        }
+        @media (max-width: 576px) {
+            .navbar {
+                padding: 1rem;
+            }
 
-        #mobileSidebar .offcanvas-body {
-            padding: 0;
-            height: 100vh;
-        }
+            .content {
+                padding: 1rem;
+            }
 
-        #mobileSidebar .sidebar-container {
-            height: 100vh;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            padding: 1rem;
-            background: var(--sidebar-bg);
-        }
-
-        body.dark #mobileSidebar .sidebar-container {
-            background: var(--sidebar-bg);
-        }
-
-        #mobileSidebar .sidebar-header {
-            text-align: center;
-            margin-bottom: 1.6rem;
-        }
-
-        #mobileSidebar .sidebar-header h5 {
-            font-weight: 800;
-            color: var(--primary);
-            font-size: 1.2rem;
-            margin: 0;
-        }
-
-        #mobileSidebar .sidebar-section {
-            font-size: .75rem;
-            text-transform: uppercase;
-            color: var(--muted);
-            margin: 1rem 0 .5rem;
-        }
-
-        /* Divider */
-        .sidebar-divider, #mobileSidebar .sidebar-divider {
-            height: 1px;
-            background: rgba(0, 0, 0, .06);
-            margin: 1rem 0;
-        }
-
-        body.dark .sidebar-divider, body.dark #mobileSidebar .sidebar-divider {
-            background: rgba(255, 255, 255, .08);
-        }
-
-        /* Scrollbar for mobile sidebar */
-        #mobileSidebar .sidebar-container::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        #mobileSidebar .sidebar-container::-webkit-scrollbar-thumb {
-            background: rgba(78, 84, 200, 0.3);
-            border-radius: 3px;
+            .page-title {
+                font-size: 1.5rem;
+            }
         }
     </style>
 </head>
@@ -251,150 +403,243 @@
 
     <!-- Sidebar (Desktop) -->
     <aside class="sidebar d-none d-lg-block">
-        {% include "dashboard/sidebar_links.html" %}
+        <div class="sidebar-header">
+            <h2>🚛 صدرا بار</h2>
+            <a href="{% url 'home' %}" style="display: block; margin-top: 0.5rem; color: var(--text-muted); text-decoration: none; font-size: 0.875rem;">صفحه اصلی</a>
+        </div>
+        
+        <div class="sidebar-divider"></div>
+        
+        <div class="sidebar-section">گزارش‌گیری</div>
+        <nav class="sidebar-nav">
+            <a href="{% url 'report:report_dashboard' %}">
+                <span>📊</span>
+                گزارش بارنامه‌ها
+            </a>
+            <a href="#">
+                <span>💰</span>
+                گزارش بیمه
+            </a>
+        </nav>
+        
+        <div class="sidebar-divider"></div>
+        
+        <div class="sidebar-section">عملیاتی</div>
+        <nav class="sidebar-nav">
+            <a href="{% url 'issuance:crud:create_new' %}">
+                <span>📝</span>
+                صدور بارنامه
+            </a>
+            <a href="{% url 'issuance:manager:waiting_list' %}">
+                <span>✅</span>
+                تایید/رد بارنامه‌ها
+            </a>
+            <a href="{% url 'issuance:search:search_shipment' %}">
+                <span>🔍</span>
+                جستجوی بارنامه‌ها
+            </a>
+            <a href="{% url 'issuance:manager:status_list' %}">
+                <span>📋</span>
+                وضعیت بارنامه‌ها
+            </a>
+        </nav>
+        
+        <div class="sidebar-divider"></div>
+        
+        <div class="sidebar-section">مشاهده</div>
+        <nav class="sidebar-nav">
+            <a href="{% url 'user_management:dashboard' %}">
+                <span>👤</span>
+                مدیریت کاربران
+            </a>
+            <a href="{% url 'customers:customer_list' %}">
+                <span>👥</span>
+                لیست مشتریان
+            </a>
+            <a href="{% url 'issuance:manager:driver_list' %}">
+                <span>🚛</span>
+                لیست رانندگان
+            </a>
+            <a href="{% url 'driver_queue:panel_dashboard' %}">
+                <span>🚛</span>
+                نوبت دهی رانندگان
+            </a>
+        </nav>
     </aside>
 
     <!-- Main -->
     <div class="main">
 
         <!-- Navbar -->
-        <header class="topbar">
-            <div class="left">
-                <button class="btn btn-light btn-sm d-lg-none" data-bs-toggle="offcanvas"
-                        data-bs-target="#mobileSidebar">
-                    ☰
-                </button>
-                <span>سلام، {{ user.username }}</span>
+        <nav class="navbar">
+            <div class="navbar-left">
+                <button class="hamburger" id="hamburger">☰</button>
+                <span class="user-greeting">سلام، {{ user.username }} 👋</span>
             </div>
 
-            <div class="left">
-                <button class="btn btn-outline-light btn-sm" onclick="toggleTheme()">🌓</button>
-                <form method="post" action="{% url 'logout' %}">
-                    {% csrf_token %}
-                    <button class="logout-btn">خروج</button>
-                </form>
-            </div>
-        </header>
+            <form method="post" action="{% url 'logout' %}">
+                {% csrf_token %}
+                <button class="logout-btn">خروج</button>
+            </form>
+        </nav>
 
         <!-- Content -->
         <main class="content">
-            <h4 class="page-title">داشبورد مدیریتی</h4>
+            <div class="page-header">
+                <h1 class="page-title">داشبورد مدیریتی</h1>
+                <p class="page-subtitle">به پنل مدیریت صدرا بار خوش آمدید</p>
+            </div>
 
-            <div class="row g-4">
+            <div class="cards-grid">
+                <a href="{% url 'issuance:manager:waiting_list' %}" class="dashboard-card">
+                    <div class="card-icon">✅</div>
+                    <h3 class="card-title">تایید/رد بارنامه‌ها</h3>
+                    <p class="card-description">بررسی و اعمال نظر روی بارنامه‌های صادر شده</p>
+                </a>
 
-                <div class="col-md-4">
-                    <a href="{% url 'issuance:manager:waiting_list' %}" class="text-decoration-none">
-                        <div class="dashboard-card">
-                            <h5>تایید/رد بارنامه‌ها</h5>
-                            <p>بارنامه های صادر شده را بررسی و اعمال نظر کنید</p>
-                        </div>
-                    </a>
-                </div>
-                
-                <div class="col-md-4">
-                    <a href="{% url 'issuance:search:search_shipment' %}" class="text-decoration-none">
-                        <div class="dashboard-card">
-                            <h5>جستجوی بارنامه‌ها</h5>
-                            <p>بارنامه مورد نظر خود را پیدا کنید</p>
-                        </div>
-                    </a>
-                </div>
-                
-                <div class="col-md-4">
-                    <a href="{% url 'report:report_dashboard' %}" class="text-decoration-none">
-                        <div class="dashboard-card">
-                            <h5>گزارش بارنامه‌ها</h5>
-                            <p>آمار و گزارش‌های تحلیلی بارنامه‌ها را مشاهده کنید</p>
-                        </div>
-                    </a>
-                </div>
-                
-                <div class="col-md-4">
-                    <a href="{% url 'issuance:manager:status_list' %}" class="text-decoration-none">
-                        <div class="dashboard-card">
-                            <h5>وضعیت بارنامه‌ها</h5>
-                            <p>وضعیت بارنامه مورد نظر خود را مشخص کنید</p>
-                        </div>
-                    </a>
-                </div>
-                
-                <div class="col-md-4">
-                    <a href="{% url 'issuance:crud:create_new' %}" class="text-decoration-none">
-                        <div class="dashboard-card">
-                            <h5>صدور بارنامه ها</h5>
-                            <p>بارنامه جدید صادر کنید</p>
-                        </div>
-                    </a>
-                </div>
+                <a href="{% url 'issuance:search:search_shipment' %}" class="dashboard-card">
+                    <div class="card-icon">🔍</div>
+                    <h3 class="card-title">جستجوی بارنامه‌ها</h3>
+                    <p class="card-description">جستجو و پیدا کردن بارنامه مورد نظر</p>
+                </a>
 
-                <div class="col-md-4">
-                    <a href="{% url 'issuance:manager:driver_list' %}" class="text-decoration-none">
-                        <div class="dashboard-card">
-                            <h5>رانندگان</h5>
-                            <p>مدیریت و مشاهده اطلاعات رانندگان</p>
-                        </div>
-                    </a>
-                </div>
+                <a href="{% url 'report:report_dashboard' %}" class="dashboard-card">
+                    <div class="card-icon">📊</div>
+                    <h3 class="card-title">گزارش بارنامه‌ها</h3>
+                    <p class="card-description">آمار و گزارش‌های تحلیلی بارنامه‌ها</p>
+                </a>
 
-                <div class="col-md-4">
-                    <a href="{% url 'customers:customer_list' %}" class="text-decoration-none">
-                        <div class="dashboard-card">
-                            <h5>مشتریان</h5>
-                            <p>مدیریت و مشاهده اطلاعات مشتریان</p>
-                        </div>
-                    </a>
-                </div>
+                <a href="{% url 'issuance:manager:status_list' %}" class="dashboard-card">
+                    <div class="card-icon">📋</div>
+                    <h3 class="card-title">وضعیت بارنامه‌ها</h3>
+                    <p class="card-description">تعیین و مدیریت وضعیت بارنامه‌ها</p>
+                </a>
+
+                <a href="{% url 'issuance:crud:create_new' %}" class="dashboard-card">
+                    <div class="card-icon">📝</div>
+                    <h3 class="card-title">صدور بارنامه</h3>
+                    <p class="card-description">صدور بارنامه جدید در سیستم</p>
+                </a>
+
+                <a href="{% url 'issuance:manager:driver_list' %}" class="dashboard-card">
+                    <div class="card-icon">🚛</div>
+                    <h3 class="card-title">رانندگان</h3>
+                    <p class="card-description">مدیریت و مشاهده اطلاعات رانندگان</p>
+                </a>
+
+                <a href="{% url 'customers:customer_list' %}" class="dashboard-card">
+                    <div class="card-icon">👥</div>
+                    <h3 class="card-title">مشتریان</h3>
+                    <p class="card-description">مدیریت و مشاهده اطلاعات مشتریان</p>
+                </a>
             </div>
         </main>
     </div>
 </div>
 
-<!-- Mobile Sidebar Fullscreen -->
-<div class="offcanvas offcanvas-start" tabindex="-1" id="mobileSidebar">
-    <div class="offcanvas-header">
-        <h5 class="offcanvas-title">منوی مدیریت</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+<!-- Mobile Sidebar -->
+<div class="mobile-sidebar-overlay" id="sidebarOverlay"></div>
+<div class="mobile-sidebar" id="mobileSidebar">
+    <div class="mobile-sidebar-header">
+        <h3>🚛 صدرا بار</h3>
+        <button class="close-btn" id="closeSidebar">✕</button>
     </div>
-
-    <div class="offcanvas-body p-0">
-        <div class="sidebar-container">
-            {% include "dashboard/sidebar_links.html" %}
-        </div>
-    </div>
+    
+    <a href="{% url 'home' %}" style="display: block; margin-bottom: 1rem; color: var(--text-muted); text-decoration: none; font-size: 0.875rem;">صفحه اصلی</a>
+    
+    <div class="sidebar-divider"></div>
+    
+    <div class="sidebar-section">گزارش‌گیری</div>
+    <nav class="sidebar-nav">
+        <a href="{% url 'report:report_dashboard' %}">
+            <span>📊</span>
+            گزارش بارنامه‌ها
+        </a>
+        <a href="#">
+            <span>💰</span>
+            گزارش بیمه
+        </a>
+    </nav>
+    
+    <div class="sidebar-divider"></div>
+    
+    <div class="sidebar-section">عملیاتی</div>
+    <nav class="sidebar-nav">
+        <a href="{% url 'issuance:crud:create_new' %}">
+            <span>📝</span>
+            صدور بارنامه
+        </a>
+        <a href="{% url 'issuance:manager:waiting_list' %}">
+            <span>✅</span>
+            تایید/رد بارنامه‌ها
+        </a>
+        <a href="{% url 'issuance:search:search_shipment' %}">
+            <span>🔍</span>
+            جستجوی بارنامه‌ها
+        </a>
+        <a href="{% url 'issuance:manager:status_list' %}">
+            <span>📋</span>
+            وضعیت بارنامه‌ها
+        </a>
+    </nav>
+    
+    <div class="sidebar-divider"></div>
+    
+    <div class="sidebar-section">مشاهده</div>
+    <nav class="sidebar-nav">
+        <a href="{% url 'user_management:dashboard' %}">
+            <span>👤</span>
+            مدیریت کاربران
+        </a>
+        <a href="{% url 'customers:customer_list' %}">
+            <span>👥</span>
+            لیست مشتریان
+        </a>
+        <a href="{% url 'issuance:manager:driver_list' %}">
+            <span>🚛</span>
+            لیست رانندگان
+        </a>
+        <a href="{% url 'driver_queue:panel_dashboard' %}">
+            <span>🚛</span>
+            نوبت دهی رانندگان
+        </a>
+    </nav>
 </div>
 
-<!--<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>-->
-<script src="{% static 'issuance/bootstrap.bundle.min.js' %}"></script>
-
 <script>
-    /* ===== Dark Mode ===== */
-    function toggleTheme() {
-        document.body.classList.toggle('dark');
-        localStorage.setItem('theme',
-            document.body.classList.contains('dark') ? 'dark' : 'light'
-        );
+    // Mobile sidebar toggle
+    const hamburger = document.getElementById('hamburger');
+    const mobileSidebar = document.getElementById('mobileSidebar');
+    const sidebarOverlay = document.getElementById('sidebarOverlay');
+    const closeSidebar = document.getElementById('closeSidebar');
+
+    function openSidebar() {
+        mobileSidebar.classList.add('active');
+        sidebarOverlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
     }
 
-    if (localStorage.getItem('theme') === 'dark') {
-        document.body.classList.add('dark');
+    function closeSidebarMenu() {
+        mobileSidebar.classList.remove('active');
+        sidebarOverlay.classList.remove('active');
+        document.body.style.overflow = '';
     }
 
-    // Active Menu for mobile sidebar
-    document.querySelectorAll('#mobileSidebar .sidebar-container a').forEach(link => {
-        const linkPath = new URL(link.href).pathname;
-        if (window.location.pathname.startsWith(linkPath)) {
-            link.classList.add('active');
-        }
-    });
+    if (hamburger) {
+        hamburger.addEventListener('click', openSidebar);
+    }
 
-    // Auto close Offcanvas after click
-    document.querySelectorAll('#mobileSidebar .sidebar-container a').forEach(link => {
-        link.addEventListener('click', () => {
-            const offcanvas = bootstrap.Offcanvas.getInstance(
-                document.getElementById('mobileSidebar')
-            );
-            if (offcanvas) offcanvas.hide();
-        });
+    if (closeSidebar) {
+        closeSidebar.addEventListener('click', closeSidebarMenu);
+    }
+
+    if (sidebarOverlay) {
+        sidebarOverlay.addEventListener('click', closeSidebarMenu);
+    }
+
+    // Close sidebar when clicking on a link
+    document.querySelectorAll('.mobile-sidebar .sidebar-nav a').forEach(link => {
+        link.addEventListener('click', closeSidebarMenu);
     });
 </script>
 
