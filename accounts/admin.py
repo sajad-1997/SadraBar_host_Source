@@ -23,8 +23,23 @@ class CustomUserAdmin(UserAdmin):
 
 
 # ---------- پنل عملیاتی RolePermission ----------
+URBAN_FIELDS = [
+    'can_urban_access_dashboard', 'can_urban_view_customers', 'can_urban_add_customers',
+    'can_urban_view_requests', 'can_urban_add_requests', 'can_urban_edit_requests',
+    'can_urban_assign_requests', 'can_urban_view_queue', 'can_urban_manage_queue',
+    'can_urban_view_rates', 'can_urban_manage_rates', 'can_urban_view_locations',
+    'can_urban_manage_settlements', 'can_urban_view_reports',
+]
+
+
 @admin.register(RolePermission)
 class RolePermissionAdmin(admin.ModelAdmin):
-    list_display = ('role', 'can_access_dashboard', 'can_manage_shipments', 'can_view_reports', 'can_manage_users', 'can_manage_customers', 'can_manage_drivers')
-    list_editable = ('can_access_dashboard', 'can_manage_shipments', 'can_view_reports', 'can_manage_users', 'can_manage_customers', 'can_manage_drivers')
+    list_display = ('role', 'can_access_dashboard', 'can_manage_shipments', 'can_view_reports',
+                    'can_manage_users', 'can_manage_customers', 'can_manage_drivers',
+                    'can_use_digital_stamp', 'can_print_without_approval',
+                    *URBAN_FIELDS)
+    list_editable = ('can_access_dashboard', 'can_manage_shipments', 'can_view_reports',
+                     'can_manage_users', 'can_manage_customers', 'can_manage_drivers',
+                     'can_use_digital_stamp', 'can_print_without_approval',
+                     *URBAN_FIELDS)
 

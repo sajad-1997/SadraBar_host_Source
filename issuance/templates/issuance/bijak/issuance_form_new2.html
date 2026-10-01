@@ -123,7 +123,10 @@
             <!-- دکمه‌ها -->
             <div class="mt-4 text-center">
                 {% if bijak.id %}
-                    {% if bijak.approval_status == 'approved' %}
+                    {% if user.role in 'manager admin' %}
+                        {# مدیریت و مدیر کل بدون نیاز به تأیید، مستقیماً چاپ می‌گیرند #}
+                        <a href="{% url 'issuance:manager:bijak_print' bijak.id %}" class="btn btn-success">چاپ بارنامه</a>
+                    {% elif bijak.approval_status == 'approved' %}
                         <a href="{% url 'issuance:manager:bijak_print' bijak.id %}" class="btn btn-success">چاپ بارنامه</a>
                     {% elif bijak.approval_status == 'pending' %}
                         <button type="submit" name="action" value="send_for_approval" class="btn btn-primary">

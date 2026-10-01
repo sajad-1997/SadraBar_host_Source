@@ -3,6 +3,7 @@ from django.core.exceptions import ValidationError
 from django.db import models
 
 from accounts.models import User
+from .security_monitor import SecurityEvent, LoginAttempt
 
 
 # =========================================================
@@ -22,6 +23,7 @@ MODULE_DEFAULTS = [
     ('printing', 'چاپ بارنامه', '/printing/'),
     ('driver_queue', 'نوبت‌دهی رانندگان', '/driver-queue/'),
     ('user_management', 'مدیریت کاربران', '/user-management/'),
+    ('city_drivers', 'رانندگان شهری', '/city-drivers/'),
 ]
 
 

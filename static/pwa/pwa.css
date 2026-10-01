@@ -128,6 +128,73 @@ body.pwa-standalone {
   cursor: pointer;
 }
 
+.pwa-pending-indicator {
+  position: fixed;
+  top: calc(10px + env(safe-area-inset-top, 0px));
+  left: 16px;
+  z-index: 2147483001;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: #0f766e;
+  border-radius: 50%;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.2);
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.pwa-pending-indicator.is-visible {
+  display: flex;
+}
+
+.pwa-pull-to-refresh {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 2147483002;
+  height: 0;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(to bottom, rgba(15, 118, 110, 0.95), rgba(15, 118, 110, 0.8));
+  transition: height 0.2s ease-out;
+  pointer-events: none;
+}
+
+.pwa-pull-to-refresh.is-active {
+  height: 80px;
+}
+
+.pwa-pull-icon {
+  width: 32px;
+  height: 32px;
+  color: white;
+  transform: rotate(0deg);
+  transition: transform 0.3s ease;
+}
+
+.pwa-pull-to-refresh.is-refreshing .pwa-pull-icon {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.pwa-pull-text {
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+  margin-right: 12px;
+  direction: rtl;
+}
+
 @media (max-width: 520px) {
   .pwa-install-card {
     bottom: calc(10px + var(--pwa-safe-bottom));

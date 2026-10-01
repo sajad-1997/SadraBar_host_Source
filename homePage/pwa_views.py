@@ -1,9 +1,12 @@
+from datetime import datetime
+
 from django.conf import settings
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 from django.templatetags.static import static
 from django.urls import reverse
 from django.views.decorators.cache import cache_control
+from django.views.decorators.http import require_GET
 
 
 APP_NAME = "صدرابار خراسان"
@@ -83,25 +86,32 @@ def manifest(request):
 
 @cache_control(max_age=0, no_cache=True, no_store=True, must_revalidate=True)
 def service_worker(request):
+    context = {
+        "debug": settings.DEBUG,
+        "version": getattr(settings, "PWA_CACHE_VERSION", "2026-09-29-1"),
+        "offline_url": reverse("pwa_offline"),
+        "queued_url": reverse("pwa_queued"),
+        "ping_url": reverse("pwa_sync_ping"),
+        "sync_tag": getattr(settings, "PWA_SYNC_TAG", "sadrabar-outbox-sync"),
+        "sync_max_attempts": getattr(settings, "PWA_SYNC_MAX_ATTEMPTS", 40),
+        "sync_retry_delay_ms": getattr(settings, "PWA_SYNC_RETRY_DELAY_MS", 700),
+        "static_urls": [
+            _absolute_static("pwa/pwa.css"),
+            _absolute_static("pwa/pwa.js"),
+            _absolute_static("pwa/offline.css"),
+            _absolute_static("pwa/icons/icon-192x192.png"),
+            _absolute_static("pwa/icons/icon-512x512.png"),
+            _absolute_static("homePage/css/style.css"),
+            _absolute_static("dashboard/css/style.css"),
+            _absolute_static("issuance/css/main.css"),
+            _absolute_static("issuance/css/page_link_style.css"),
+        ],
+    }
+    
     response = render(
         request,
-        "pwa/sw.js",
-        {
-            "debug": settings.DEBUG,
-            "version": getattr(settings, "PWA_CACHE_VERSION", "2026-08-12-1"),
-            "offline_url": reverse("pwa_offline"),
-            "static_urls": [
-                _absolute_static("pwa/pwa.css"),
-                _absolute_static("pwa/pwa.js"),
-                _absolute_static("pwa/offline.css"),
-                _absolute_static("pwa/icons/icon-192x192.png"),
-                _absolute_static("pwa/icons/icon-512x512.png"),
-                _absolute_static("homePage/css/style.css"),
-                _absolute_static("dashboard/css/style.css"),
-                _absolute_static("issuance/css/main.css"),
-                _absolute_static("issuance/css/page_link_style.css"),
-            ],
-        },
+        "pwa/sw.js.jinja",
+        context,
         content_type="application/javascript; charset=utf-8",
     )
     response["Service-Worker-Allowed"] = "/"
@@ -112,6 +122,47 @@ def service_worker(request):
 @cache_control(max_age=3600, public=True)
 def offline(request):
     return render(request, "pwa/offline.html", status=503)
+
+
+@cache_control(max_age=3600, public=True)
+def queued(request):
+    """
+    صفحه «در صف همگام‌سازی».
+    سرویس‌ورکر وقتی فرمی در حالت آفلاین ثبت می‌شود، این صفحه را (از کش) به کاربر
+    نشان می‌دهد و درخواست اصلی را در صف IndexedDB برای ارسال بعدی نگه می‌دارد.
+    """
+    return render(request, "pwa/queued.html")
+
+
+@require_GET
+@cache_control(max_age=0, no_cache=True, no_store=True, must_revalidate=True)
+def sync_ping(request):
+    """
+    پینگ سبک برای تشخیص اتصال واقعی به سرور (navigator.onLine کافی نیست؛
+    مثلاً در وای‌فای بی‌اینترنت true برمی‌گرداند). سرویس‌ورکر این مسیر را
+    هیچ‌وقت کش نمی‌کند تا پاسخ همیشه از شبکه باشد.
+    """
+    return JsonResponse(
+        {
+            "ok": True,
+            "server_time": datetime.now().isoformat(timespec="seconds"),
+            "version": getattr(settings, "PWA_CACHE_VERSION", ""),
+        }
+    )
+
+
+@require_GET
+def sync_status(request):
+    """
+    بررسی وضعیت همگام‌سازی از سمت کلاینت (تعداد درخواست‌های در صف).
+    این endpoint برای نمایش وضعیت به کاربر استفاده می‌شود.
+    """
+    return JsonResponse(
+        {
+            "ok": True,
+            "message": "Sync status endpoint - client should check IndexedDB for pending items",
+        }
+    )
 
 
 def browserconfig(request):

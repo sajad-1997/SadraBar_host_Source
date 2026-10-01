@@ -36,14 +36,16 @@ def env_list(name, default=""):
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv(
-    "SECRET_KEY",
-    "django-insecure-local-development-key-change-me",
-)
-
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env_bool("DEBUG", default=True)
+
+# SECURITY WARNING: keep the secret key used in production secret!
+SECRET_KEY = os.getenv("SECRET_KEY")
+if not SECRET_KEY:
+    if DEBUG:
+        SECRET_KEY = 'django-insecure-local-development-key-change-me-in-production'
+    else:
+        raise ValueError("SECRET_KEY environment variable must be set in production")
 
 ALLOWED_HOSTS = env_list("ALLOWED_HOSTS", "localhost,127.0.0.1")
 PUBLIC_DOMAIN = os.getenv("PUBLIC_DOMAIN", "http://localhost:8000")
@@ -78,6 +80,7 @@ INSTALLED_APPS = [
     'driver_queue',
     'user_management',
     'system_control',
+    'city_drivers',
 
 ]
 
@@ -162,6 +165,9 @@ AUTH_PASSWORD_VALIDATORS = [
     },
     {
         'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        'OPTIONS': {
+            'min_length': 10,
+        }
     },
     {
         'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
@@ -189,7 +195,15 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_DIRS = [BASE_DIR / "static"]
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'public_html', 'media')
-PWA_CACHE_VERSION = os.getenv("PWA_CACHE_VERSION", "2026-08-12-1")
+PWA_CACHE_VERSION = os.getenv("PWA_CACHE_VERSION", "2026-09-28-1")
+
+# ========== PWA آفلاین + همگام‌سازی صف درخواست‌ها ==========
+# تگ Background Sync؛ درخواست‌های آفلاین با این تگ دوباره ارسال می‌شوند
+PWA_SYNC_TAG = os.getenv("PWA_SYNC_TAG", "sadrabar-outbox-sync")
+# حداکثر تلاش برای هر درخواست در صف؛ بعد از این تعداد از صف حذف می‌شود
+PWA_SYNC_MAX_ATTEMPTS = int(os.getenv("PWA_SYNC_MAX_ATTEMPTS", "40"))
+# فاصله بین ارسال هر آیتم صف (میلی‌ثانیه) تا سرور زیر فشار نرود
+PWA_SYNC_RETRY_DELAY_MS = int(os.getenv("PWA_SYNC_RETRY_DELAY_MS", "700"))
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
@@ -255,6 +269,19 @@ REST_FRAMEWORK = {
 # ========== Rate Limiting Settings ==========
 RATE_LIMIT_ENABLE = True
 RATE_LIMIT_REQUESTS = 10  # requests per minute per IP/user
+
+# ========== Security Headers ==========
+SECURE_SSL_REDIRECT = not DEBUG
+SECURE_HSTS_SECONDS = 31536000 if not DEBUG else 0
+SECURE_HSTS_INCLUDE_SUBDOMAINS = not DEBUG
+SECURE_HSTS_PRELOAD = not DEBUG
+SECURE_CONTENT_TYPE_NOSNIFF = True
+SECURE_BROWSER_XSS_FILTER = True
+X_FRAME_OPTIONS = 'DENY'
+CSRF_COOKIE_SECURE = not DEBUG
+SESSION_COOKIE_SECURE = not DEBUG
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SAMESITE = 'Lax'
 
 # ---------------- ماژول نوبت‌دهی ----------------
 # اگر app label اپ رانندگان شما "drivers" نیست، این مقدار را اصلاح کنید

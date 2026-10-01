@@ -441,14 +441,16 @@
                                 class="btn btn-primary">
                             صدور بارنامه جدید
                         </button>
-                    {% elif bijak.approval_status == 'waiting_approval' %}
-                        <button class="btn btn-secondary" disabled>
-                            در انتظار اقدام مدیریتی
-                        </button>
-                    {% elif bijak.approval_status == 'approved' %}
+                    {% else %}
+                        {# مدیریت و مدیر کل بدون نیاز به تأیید، مستقیماً چاپ می‌گیرند #}
                         <a href="{% url 'issuance:manager:bijak_print' bijak.id %}" class="btn btn-success">
                             چاپ بارنامه
                         </a>
+                        {% if bijak.approval_status == 'waiting_approval' %}
+                            <button class="btn btn-secondary" disabled>
+                                در انتظار اقدام مدیریتی
+                            </button>
+                        {% endif %}
                     {% endif %}
 
                     {# کارمند #}

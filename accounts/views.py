@@ -8,6 +8,7 @@ from django.contrib.auth.views import LogoutView
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from .decorators import ROLE_ADMIN, ROLE_MANAGER, ROLE_EMPLOYEE, ROLE_DRIVER, ROLE_CUSTOMER
+from system_control.security_monitor import SecurityMonitor
 
 logger = logging.getLogger(__name__)
 
@@ -16,21 +17,74 @@ class CustomLoginView(LoginView):
     template_name = 'accounts/login.html'
     redirect_authenticated_user = False
 
+    def _get_client_ip(self, request):
+        """Get client IP address from request."""
+        x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+        if x_forwarded_for:
+            ip = x_forwarded_for.split(',')[0]
+        else:
+            ip = request.META.get('REMOTE_ADDR')
+        return ip
+
     def dispatch(self, request, *args, **kwargs):
         logger.info(f"Login view accessed - Method: {request.method}")
         return super().dispatch(request, *args, **kwargs)
 
     def form_invalid(self, form):
-        logger.warning(f"Login failed for username: {form.cleaned_data.get('username', 'unknown')}")
+        username = form.cleaned_data.get('username', 'unknown')
+        ip_address = self._get_client_ip(self.request)
+        user_agent = self.request.META.get('HTTP_USER_AGENT', '')
+        
+        logger.warning(f"Login failed for username: {username}")
         logger.warning(f"Form errors: {form.errors}")
         logger.warning(f"Non-field errors: {form.non_field_errors}")
+        
+        # Log failed login attempt
+        SecurityMonitor.log_login_attempt(username, ip_address, False, user_agent)
+        SecurityMonitor.log_event(
+            'login_failure',
+            ip_address=ip_address,
+            user_agent=user_agent,
+            path=self.request.path,
+            severity='medium',
+            details={'username': username}
+        )
+        
+        # Check for brute force
+        if SecurityMonitor.check_brute_force(username, ip_address):
+            SecurityMonitor.log_event(
+                'brute_force_attempt',
+                ip_address=ip_address,
+                user_agent=user_agent,
+                path=self.request.path,
+                severity='high',
+                details={'username': username}
+            )
+            messages.error(self.request, 'تلاش‌های ناموفق زیاد. لطفاً چند دقیقه صبر کنید.')
+        
         messages.error(self.request, 'نام کاربری یا رمز عبور اشتباه است.')
         return super().form_invalid(form)
 
     def form_valid(self, form):
-        logger.info(f"Login successful for username: {form.cleaned_data.get('username')}")
+        username = form.cleaned_data.get('username')
+        ip_address = self._get_client_ip(self.request)
+        user_agent = self.request.META.get('HTTP_USER_AGENT', '')
+        
+        logger.info(f"Login successful for username: {username}")
         logger.info(f"User role: {form.get_user().role}")
         logger.info(f"Redirecting to: {self.get_success_url()}")
+        
+        # Log successful login
+        SecurityMonitor.log_login_attempt(username, ip_address, True, user_agent)
+        SecurityMonitor.log_event(
+            'login_success',
+            user=form.get_user(),
+            ip_address=ip_address,
+            user_agent=user_agent,
+            path=self.request.path,
+            severity='low'
+        )
+        
         return super().form_valid(form)
 
     def get_success_url(self):

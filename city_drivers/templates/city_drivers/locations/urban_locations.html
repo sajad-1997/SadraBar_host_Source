@@ -1,0 +1,117 @@
+{% extends 'city_drivers/base.html' %}
+
+{% block title %}موقعیت رانندگان{% endblock %}
+
+{% block content %}
+    <div class="d-flex justify-content-between align-items-center flex-wrap mb-3">
+        <h4 class="fw-bold text-primary mb-0">📍 موقعیت رانندگان</h4>
+        <small class="text-muted">بروزرسانی خودکار هر ۲۰ ثانیه</small>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-12 col-lg-6">
+            <div class="urban-card">
+                <h6>🔵 رانندگان در حال انجام سرویس</h6>
+                <div id="busy-list"><small class="text-muted">در حال بارگذاری…</small></div>
+            </div>
+        </div>
+        <div class="col-12 col-lg-6">
+            <div class="urban-card">
+                <h6>🟢 رانندگان بدون سرویس</h6>
+                <div id="idle-list"><small class="text-muted">در حال بارگذاری…</small></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="urban-card">
+        <h6>ثبت/بروزرسانی دستی موقعیت راننده (برای تست یا اتصال اپ راننده)</h6>
+        <form id="loc-form" class="row g-2 align-items-end">
+            <div class="col-md-3">
+                <label class="form-label">شناسه راننده</label>
+                <input type="number" name="driver_id" class="form-control" required>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">عرض جغرافیایی</label>
+                <input type="text" name="lat" class="form-control" placeholder="35.699700" required>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">طول جغرافیایی</label>
+                <input type="text" name="lng" class="form-control" placeholder="51.338000" required>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">وضعیت</label>
+                <select name="status" class="form-select">
+                    <option value="idle">بدون سرویس</option>
+                    <option value="busy">در حال انجام سرویس</option>
+                </select>
+            </div>
+            <div class="col-md-1">
+                <button type="submit" class="btn btn-primary w-100">ثبت</button>
+            </div>
+        </form>
+        <div id="loc-result" class="mt-2"></div>
+    </div>
+{% endblock %}
+
+{% block extra_js %}
+    <script>
+        function renderList(containerId, items, emptyText) {
+            const container = document.getElementById(containerId);
+            if (!items.length) {
+                container.innerHTML = '<small class="text-muted">' + emptyText + '</small>';
+                return;
+            }
+            let html = '';
+            items.forEach(function (item) {
+                html += '<div class="border-bottom py-2 d-flex justify-content-between align-items-center flex-wrap gap-1">';
+                html += '<div><strong>' + item.driver_name + '</strong>';
+                if (item.current_request) {
+                    html += ' <span class="badge-soft blue">سرویس ' + item.current_request + '</span>';
+                }
+                if (item.lat && item.lng) {
+                    html += '<div class="text-muted" style="font-size:.8rem">' + item.lat + ', ' + item.lng + '</div>';
+                }
+                html += '</div>';
+                html += '<div class="text-muted" style="font-size:.8rem">آخرین بروزرسانی: ' + item.updated_at;
+                if (item.maps_url) {
+                    html += ' — <a href="' + item.maps_url + '" target="_blank">مشاهده روی نقشه</a>';
+                }
+                html += '</div></div>';
+            });
+            container.innerHTML = html;
+        }
+
+        function loadLocations() {
+            fetch('{% url 'city_drivers:api_locations' %}')
+                .then(function (r) { return r.json(); })
+                .then(function (data) {
+                    renderList('busy-list', data.busy, 'راننده‌ای در حال انجام سرویس نیست');
+                    renderList('idle-list', data.idle, 'راننده آزادی ثبت نشده است');
+                })
+                .catch(function () {});
+        }
+
+        loadLocations();
+        setInterval(loadLocations, 20000);
+
+        document.getElementById('loc-form').addEventListener('submit', function (e) {
+            e.preventDefault();
+            const form = e.target;
+            const body = new URLSearchParams(new FormData(form));
+            fetch('{% url 'city_drivers:api_update_location' %}', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: body.toString()
+            }).then(function (r) { return r.json(); })
+              .then(function (data) {
+                  document.getElementById('loc-result').innerHTML =
+                      '<span class="' + (data.ok ? 'text-success' : 'text-danger') + '">' +
+                      (data.ok ? 'موقعیت با موفقیت ثبت شد.' : data.error) + '</span>';
+                  loadLocations();
+              });
+        });
+    </script>
+{% endblock %}

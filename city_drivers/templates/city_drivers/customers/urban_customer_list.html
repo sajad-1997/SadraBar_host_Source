@@ -1,0 +1,74 @@
+{% extends 'city_drivers/base.html' %}
+
+{% block title %}مشتریان شهری{% endblock %}
+
+{% block content %}
+    <div class="d-flex justify-content-between align-items-center flex-wrap mb-3">
+        <h4 class="fw-bold text-primary mb-0">👥 مشتریان شهری</h4>
+        {% if urban_perms.can_urban_add_customers %}
+            <a href="{% url 'city_drivers:urban_customer_create' %}" class="btn btn-primary">+ ثبت مشتری شهری جدید</a>
+        {% endif %}
+    </div>
+
+    <div class="urban-card">
+        <form method="get">
+            <div class="row g-2">
+                <div class="col-md-4">
+                    <input type="text" name="name" value="{{ filters.name }}" class="form-control" placeholder="نام مشتری">
+                </div>
+                <div class="col-md-4">
+                    <input type="text" name="national_id" value="{{ filters.national_id }}" class="form-control" placeholder="کد ملی">
+                </div>
+                <div class="col-md-4">
+                    <input type="text" name="phone" value="{{ filters.phone }}" class="form-control" placeholder="شماره تماس">
+                </div>
+            </div>
+            <div class="row g-2 mt-2">
+                <div class="col-6">
+                    <button type="submit" class="btn btn-primary w-100">اعمال فیلتر</button>
+                </div>
+                <div class="col-6">
+                    <a href="{% url 'city_drivers:urban_customer_list' %}" class="btn btn-outline-secondary w-100">پاکسازی فیلتر</a>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <div class="urban-card">
+        <div class="table-responsive">
+            <table class="urban-table">
+                <thead>
+                <tr>
+                    <th>نام</th>
+                    <th>کد ملی</th>
+                    <th>تلفن</th>
+                    <th>تلفن دوم</th>
+                    <th>آدرس</th>
+                    <th>تعداد سرویس‌های شهری</th>
+                    <th>عملیات</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for c in customers %}
+                    <tr>
+                        <td>{{ c.name }}</td>
+                        <td>{{ c.national_id|default:"---" }}</td>
+                        <td>{{ c.phone|default:"---" }}</td>
+                        <td>{{ c.phone2|default:"---" }}</td>
+                        <td>{{ c.address|truncatechars:40|default:"---" }}</td>
+                        <td>{{ c.urban_service_requests.count }}</td>
+                        <td>
+                            {% if urban_perms.can_urban_add_customers %}
+                                <a href="{% url 'city_drivers:urban_customer_edit' c.pk %}" class="btn btn-sm btn-warning">ویرایش</a>
+                            {% endif %}
+                            <a href="{% url 'city_drivers:urban_request_create' %}?customer={{ c.pk }}" class="btn btn-sm btn-outline-primary">سرویس جدید</a>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="7" class="text-center text-muted">هیچ مشتری‌ای یافت نشد</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}

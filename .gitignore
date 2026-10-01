@@ -118,6 +118,8 @@ dmypy.json
 # Django specific
 *.sqlite3
 *.sqlite3-journal
+*.db
+*.db3
 media/
 staticfiles/
 *.pot

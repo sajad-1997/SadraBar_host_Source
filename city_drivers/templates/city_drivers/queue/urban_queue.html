@@ -1,0 +1,120 @@
+{% extends 'city_drivers/base.html' %}
+
+{% block title %}نوبت و حضور رانندگان شهری{% endblock %}
+
+{% block content %}
+    <h4 class="fw-bold text-primary mb-3">🧾 مدیریت نوبت رانندگان شهری</h4>
+
+    <div class="urban-card">
+        <form method="get" class="row g-2 align-items-end">
+            <div class="col-auto">
+                <label class="form-label">تاریخ (شمسی)</label>
+                <input type="text" name="date" value="{{ selected_date }}" class="form-control" placeholder="1404/06/27">
+            </div>
+            <div class="col-auto">
+                <button type="submit" class="btn btn-primary">نمایش</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="urban-card">
+        <h6>حضور و غیاب روز - {{ selected_date }}</h6>
+        <div class="table-responsive">
+            <table class="urban-table">
+                <thead>
+                <tr>
+                    <th>راننده</th>
+                    <th>نوع ناوگان</th>
+                    <th>تلفن</th>
+                    <th>وضعیت امروز</th>
+                    {% if urban_perms.can_urban_manage_queue %}
+                        <th>ثبت وضعیت</th>
+                    {% endif %}
+                </tr>
+                </thead>
+                <tbody>
+                {% for row in rows %}
+                    <tr>
+                        <td>{{ row.driver.name }}</td>
+                        <td>
+                            {% if row.vehicle %}
+                                {% if 'nissan' in row.vehicle.type %}
+                                    <span class="badge bg-info">نیسان</span>
+                                {% elif 'pikan' in row.vehicle.type %}
+                                    <span class="badge bg-warning">پیکان</span>
+                                {% elif 'arisan' in row.vehicle.type or 'mazda' in row.vehicle.type or 'zamyad' in row.vehicle.type %}
+                                    <span class="badge bg-secondary">وانت</span>
+                                {% else %}
+                                    <span class="badge bg-light text-dark">{{ row.vehicle.get_type_display|truncatewords:2 }}</span>
+                                {% endif %}
+                            {% else %}
+                                <span class="badge bg-light text-dark">بدون ناوگان</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ row.driver.phone|default:"---" }}</td>
+                        <td>
+                            {% if row.attendance %}
+                                {% if row.attendance.status == 'present' %}
+                                    <span class="badge-soft green">{{ row.attendance.get_status_display }}</span>
+                                {% elif row.attendance.status == 'absent' %}
+                                    <span class="badge-soft red">{{ row.attendance.get_status_display }}</span>
+                                {% else %}
+                                    <span class="badge-soft gray">{{ row.attendance.get_status_display }}</span>
+                                {% endif %}
+                            {% else %}
+                                <span class="badge-soft gray">ثبت نشده</span>
+                            {% endif %}
+                        </td>
+                        {% if urban_perms.can_urban_manage_queue %}
+                            <td>
+                                <form method="post" action="{% url 'city_drivers:urban_queue_set_attendance' %}" class="d-flex gap-1">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="driver_id" value="{{ row.driver.pk }}">
+                                    <input type="hidden" name="date" value="{{ selected_date }}">
+                                    <select name="status" class="form-select form-select-sm" style="max-width: 120px;">
+                                        {% for value, label in status_choices %}
+                                            <option value="{{ value }}" {% if row.attendance and row.attendance.status == value %}selected{% endif %}>{{ label }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    <button type="submit" class="btn btn-sm btn-primary">ثبت</button>
+                                </form>
+                            </td>
+                        {% endif %}
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="5" class="text-center text-muted">راننده‌ای ثبت نشده است</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-md-6">
+            <div class="urban-card">
+                <h6>🟢 رانندگان بدون سرویس (آزاد)</h6>
+                {% for loc in idle_locations %}
+                    <div class="d-flex justify-content-between border-bottom py-1">
+                        <span>{{ loc.driver.name }}</span>
+                        <small class="text-muted">{{ loc.driver.phone|default:"---" }}</small>
+                    </div>
+                {% empty %}
+                    <small class="text-muted">راننده آزادی ثبت نشده است</small>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="urban-card">
+                <h6>🔵 رانندگان در حال انجام سرویس</h6>
+                {% for loc in busy_locations %}
+                    <div class="d-flex justify-content-between border-bottom py-1">
+                        <span>{{ loc.driver.name }}</span>
+                        <small class="text-muted">سرویس: {{ loc.current_request.tracking_code|default:"---" }}</small>
+                    </div>
+                {% empty %}
+                    <small class="text-muted">راننده‌ای در حال انجام سرویس نیست</small>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

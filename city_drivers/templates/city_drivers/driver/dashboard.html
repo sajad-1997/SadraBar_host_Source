@@ -1,0 +1,420 @@
+{% extends 'city_drivers/driver/base.html' %}
+{% load humanize %}
+
+{% block title %}داشبورد راننده{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- کارت لیست سرویس‌ها -->
+    <div class="col-12 col-lg-6">
+        <div class="card service-card" onclick="toggleServiceList()">
+            <div class="card-header">
+                <h5>📋 لیست سرویس‌های من</h5>
+                <span class="badge bg-primary">{{ service_stats.daily }} سرویس امروز</span>
+            </div>
+            <div class="card-body">
+                <div class="filter-tabs" id="serviceFilterTabs">
+                    <button class="filter-tab {% if period == 'daily' %}active{% endif %}" 
+                            onclick="filterServices('daily')">روزانه ({{ service_stats.daily }})</button>
+                    <button class="filter-tab {% if period == 'weekly' %}active{% endif %}" 
+                            onclick="filterServices('weekly')">هفتگی ({{ service_stats.weekly }})</button>
+                    <button class="filter-tab {% if period == 'monthly' %}active{% endif %}" 
+                            onclick="filterServices('monthly')">ماهانه ({{ service_stats.monthly }})</button>
+                    <button class="filter-tab {% if period == 'yearly' %}active{% endif %}" 
+                            onclick="filterServices('yearly')">سالانه ({{ service_stats.yearly }})</button>
+                </div>
+                
+                <div id="serviceListContent">
+                    {% for service in driver_services %}
+                    <div class="service-item">
+                        <div class="service-info">
+                            <h6>{{ service.tracking_code }}</h6>
+                            <p>{{ service.customer.name }} - {{ service.origin_address }}</p>
+                        </div>
+                        <div class="text-end">
+                            <span class="service-status status-{{ service.status }}">
+                                {{ service.get_status_display }}
+                            </span>
+                            <div class="mt-1 text-muted small">{{ service.jalali_created }}</div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="text-center text-muted py-4">
+                        سرویسی ثبت نشده است
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- کارت نمودار درآمد روزانه -->
+    <div class="col-12 col-lg-6">
+        <div class="card">
+            <div class="card-header">
+                <h5>💰 درآمد روزانه (۷ روز گذشته)</h5>
+                <span class="badge bg-success">{{ today_income|intcomma }} تومان امروز</span>
+            </div>
+            <div class="card-body">
+                <canvas id="incomeChart" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <!-- کارت لیست نوبت رانندگان نیسان -->
+    <div class="col-12 col-lg-6">
+        <div class="card">
+            <div class="card-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                <h5>🚚 لیست نوبت رانندگان نیسان</h5>
+                <div>
+                    <span class="badge bg-light text-dark" id="queueDate">در حال بارگذاری...</span>
+                    <span class="badge bg-warning text-dark" id="nissanCount">0 راننده</span>
+                </div>
+            </div>
+            <div class="card-body">
+                <div id="nissanQueueList">
+                    <div class="text-center text-muted py-4">
+                        در حال بارگذاری لیست نوبت‌ها...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- کارت لیست نوبت رانندگان پیکان -->
+    <div class="col-12 col-lg-6">
+        <div class="card">
+            <div class="card-header" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white;">
+                <h5>🚗 لیست نوبت رانندگان پیکان</h5>
+                <div>
+                    <span class="badge bg-light text-dark" id="queueDate2">در حال بارگذاری...</span>
+                    <span class="badge bg-info text-dark" id="peikanCount">0 راننده</span>
+                </div>
+            </div>
+            <div class="card-body">
+                <div id="peikanQueueList">
+                    <div class="text-center text-muted py-4">
+                        در حال بارگذاری لیست نوبت‌ها...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <!-- کارت سرویس جاری -->
+    <div class="col-12 col-lg-6">
+        <div class="card current-service-card">
+            <div class="card-header">
+                <h5>📍 سرویس در حال انجام</h5>
+                {% if current_service %}
+                    <span class="service-status status-in-progress">{{ current_service.get_status_display }}</span>
+                {% endif %}
+            </div>
+            <div class="card-body">
+                {% if current_service %}
+                    <div class="service-detail-row">
+                        <div class="detail-label">کد رهگیری:</div>
+                        <div class="detail-value">{{ current_service.tracking_code }}</div>
+                    </div>
+                    <div class="service-detail-row">
+                        <div class="detail-label">نوع سرویس:</div>
+                        <div class="detail-value">{{ current_service.service.title|default:"---" }}</div>
+                    </div>
+                    <div class="service-detail-row">
+                        <div class="detail-label">مشتری:</div>
+                        <div class="detail-value">{{ current_service.customer.name }}</div>
+                    </div>
+                    <div class="service-detail-row">
+                        <div class="detail-label">تلفن مشتری:</div>
+                        <div class="detail-value">{{ current_service.customer.phone|default:"---" }}</div>
+                    </div>
+                    <div class="service-detail-row">
+                        <div class="detail-label">مبدأ:</div>
+                        <div class="detail-value">{{ current_service.origin_address }}</div>
+                    </div>
+                    <div class="service-detail-row">
+                        <div class="detail-label">مقصد:</div>
+                        <div class="detail-value">{{ current_service.destination_address }}</div>
+                    </div>
+                    <div class="service-detail-row">
+                        <div class="detail-label">مسافر/گیرنده:</div>
+                        <div class="detail-value">{{ current_service.passenger_name|default:"---" }}</div>
+                    </div>
+                    <div class="service-detail-row">
+                        <div class="detail-label">تلفن مسافر/گیرنده:</div>
+                        <div class="detail-value">{{ current_service.passenger_phone|default:"---" }}</div>
+                    </div>
+                    <div class="service-detail-row">
+                        <div class="detail-label">زمان نوبت:</div>
+                        <div class="detail-value">{{ current_service.requested_time|default:"---" }}</div>
+                    </div>
+                    <div class="service-detail-row">
+                        <div class="detail-label">تاریخ ثبت:</div>
+                        <div class="detail-value">{{ current_service.jalali_created }}</div>
+                    </div>
+                    <div class="service-detail-row">
+                        <div class="detail-label">مسافت:</div>
+                        <div class="detail-value">{{ current_service.distance_km|default:"---" }} کیلومتر</div>
+                    </div>
+                    <div class="service-detail-row">
+                        <div class="detail-label">کرایه:</div>
+                        <div class="detail-value">{{ current_service.fare_amount|intcomma|default:"---" }} تومان</div>
+                    </div>
+                    <div class="service-detail-row">
+                        <div class="detail-label">کمیسیون آژانس:</div>
+                        <div class="detail-value">{{ current_service.commission_amount|intcomma|default:"0" }} تومان</div>
+                    </div>
+                    <div class="service-detail-row">
+                        <div class="detail-label">توضیحات:</div>
+                        <div class="detail-value">{{ current_service.note|default:"---" }}</div>
+                    </div>
+
+                    <form method="post" action="{% url 'city_drivers:driver_update_status' current_service.id %}">
+                        {% csrf_token %}
+                        <div class="action-buttons">
+                            <button type="submit" name="action" value="arrive_origin" class="action-btn btn-arrive">
+                                📍 رسیدن به مبدا بارگیری
+                            </button>
+                            <button type="submit" name="action" value="arrive_destination" class="action-btn btn-arrive-dest">
+                                🎯 رسیدن به مقصد
+                            </button>
+                            <button type="submit" name="action" value="unload" class="action-btn btn-unload">
+                                📦 تخلیه و تکمیل
+                            </button>
+                        </div>
+                    </form>
+                {% else %}
+                    <div class="text-center py-4">
+                        <p class="mb-0">در حال حاضر سرویس فعالی ندارید</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- کارت سرویس بعدی تخصیص داده شده به راننده -->
+    <div class="col-12 col-lg-6">
+        <div class="card">
+            <div class="card-header">
+                <h5>📝 سرویس بعدی تخصیص داده شده</h5>
+                {% if next_service %}
+                    <span class="service-status status-{{ next_service.status }}">{{ next_service.get_status_display }}</span>
+                {% endif %}
+            </div>
+            <div class="card-body">
+                {% if next_service %}
+                    <div class="service-detail-row">
+                        <div class="detail-label">کد رهگیری:</div>
+                        <div class="detail-value">{{ next_service.tracking_code }}</div>
+                    </div>
+                    <div class="service-detail-row">
+                        <div class="detail-label">نوع سرویس:</div>
+                        <div class="detail-value">{{ next_service.service.title|default:"---" }}</div>
+                    </div>
+                    <div class="service-detail-row">
+                        <div class="detail-label">مشتری:</div>
+                        <div class="detail-value">{{ next_service.customer.name }}</div>
+                    </div>
+                    <div class="service-detail-row">
+                        <div class="detail-label">تلفن مشتری:</div>
+                        <div class="detail-value">{{ next_service.customer.phone|default:"---" }}</div>
+                    </div>
+                    <div class="service-detail-row">
+                        <div class="detail-label">مبدأ:</div>
+                        <div class="detail-value">{{ next_service.origin_address }}</div>
+                    </div>
+                    <div class="service-detail-row">
+                        <div class="detail-label">مقصد:</div>
+                        <div class="detail-value">{{ next_service.destination_address }}</div>
+                    </div>
+                    <div class="service-detail-row">
+                        <div class="detail-label">مسافر/گیرنده:</div>
+                        <div class="detail-value">{{ next_service.passenger_name|default:"---" }}</div>
+                    </div>
+                    <div class="service-detail-row">
+                        <div class="detail-label">تلفن مسافر/گیرنده:</div>
+                        <div class="detail-value">{{ next_service.passenger_phone|default:"---" }}</div>
+                    </div>
+                    <div class="service-detail-row">
+                        <div class="detail-label">زمان نوبت:</div>
+                        <div class="detail-value">{{ next_service.requested_time|default:"---" }}</div>
+                    </div>
+                    <div class="service-detail-row">
+                        <div class="detail-label">تاریخ ثبت:</div>
+                        <div class="detail-value">{{ next_service.jalali_created }}</div>
+                    </div>
+                    <div class="service-detail-row">
+                        <div class="detail-label">مسافت:</div>
+                        <div class="detail-value">{{ next_service.distance_km|default:"---" }} کیلومتر</div>
+                    </div>
+                    <div class="service-detail-row">
+                        <div class="detail-label">کرایه:</div>
+                        <div class="detail-value">{{ next_service.fare_amount|intcomma|default:"---" }} تومان</div>
+                    </div>
+                    <div class="service-detail-row">
+                        <div class="detail-label">کمیسیون آژانس:</div>
+                        <div class="detail-value">{{ next_service.commission_amount|intcomma|default:"0" }} تومان</div>
+                    </div>
+                    <div class="service-detail-row">
+                        <div class="detail-label">توضیحات:</div>
+                        <div class="detail-value">{{ next_service.note|default:"---" }}</div>
+                    </div>
+
+                    <form method="post" action="{% url 'city_drivers:driver_update_status' next_service.id %}">
+                        {% csrf_token %}
+                        <div class="action-buttons">
+                            {% if next_service_accepted %}
+                                <button type="submit" name="action" value="start" class="action-btn btn-start">
+                                    ▶️ شروع سرویس
+                                </button>
+                            {% else %}
+                                <button type="submit" name="action" value="accept" class="action-btn btn-accept">
+                                    ✅ قبول سرویس
+                                </button>
+                            {% endif %}
+                        </div>
+                    </form>
+                {% else %}
+                    <div class="text-center py-4">
+                        <p class="mb-0">سرویسی برای نمایش جزئیات وجود ندارد</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// بارگذاری لیست نوبت رانندگان
+function loadQueueList() {
+    fetch('{% url "city_drivers:driver_api_queue" %}')
+        .then(response => response.json())
+        .then(data => {
+            // بروزرسانی تاریخ و تعداد
+            document.getElementById('queueDate').textContent = data.date;
+            document.getElementById('queueDate2').textContent = data.date;
+            document.getElementById('nissanCount').textContent = data.nissan_count + ' راننده';
+            document.getElementById('peikanCount').textContent = data.peikan_count + ' راننده';
+            
+            // لیست نیسان
+            const nissanQueueList = document.getElementById('nissanQueueList');
+            if (data.nissan_queue.length === 0) {
+                nissanQueueList.innerHTML = '<div class="text-center text-muted py-4">هیچ راننده نیسانی در صف نیست</div>';
+            } else {
+                let html = '<div class="row">';
+                data.nissan_queue.forEach(item => {
+                    html += `
+                        <div class="col-6 col-md-4 mb-3">
+                            <div class="queue-item" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                                <div class="queue-number">${item.number}</div>
+                                <div class="queue-name">${item.driver_name}</div>
+                                <div class="queue-phone">${item.driver_phone}</div>
+                                <div class="queue-time">ساعت: ${item.joined_at}</div>
+                            </div>
+                        </div>
+                    `;
+                });
+                html += '</div>';
+                nissanQueueList.innerHTML = html;
+            }
+            
+            // لیست پیکان
+            const peikanQueueList = document.getElementById('peikanQueueList');
+            if (data.peikan_queue.length === 0) {
+                peikanQueueList.innerHTML = '<div class="text-center text-muted py-4">هیچ راننده پیکانی در صف نیست</div>';
+            } else {
+                let html = '<div class="row">';
+                data.peikan_queue.forEach(item => {
+                    html += `
+                        <div class="col-6 col-md-4 mb-3">
+                            <div class="queue-item" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                                <div class="queue-number">${item.number}</div>
+                                <div class="queue-name">${item.driver_name}</div>
+                                <div class="queue-phone">${item.driver_phone}</div>
+                                <div class="queue-time">ساعت: ${item.joined_at}</div>
+                            </div>
+                        </div>
+                    `;
+                });
+                html += '</div>';
+                peikanQueueList.innerHTML = html;
+            }
+        })
+        .catch(error => {
+            console.error('Error loading queue:', error);
+            document.getElementById('nissanQueueList').innerHTML = '<div class="text-center text-danger py-4">خطا در بارگذاری لیست نوبت‌ها</div>';
+            document.getElementById('peikanQueueList').innerHTML = '<div class="text-center text-danger py-4">خطا در بارگذاری لیست نوبت‌ها</div>';
+        });
+}
+
+// بارگذاری اولیه
+loadQueueList();
+
+// بروزرسانی خودکار هر 30 ثانیه
+setInterval(loadQueueList, 30000);
+
+// نمودار درآمد روزانه
+const ctx = document.getElementById('incomeChart').getContext('2d');
+const incomeData = {{ daily_income_data|safe }};
+
+new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: incomeData.map(d => d.date),
+        datasets: [{
+            label: 'درآمد (تومان)',
+            data: incomeData.map(d => d.income),
+            borderColor: '#667eea',
+            backgroundColor: 'rgba(102, 126, 234, 0.1)',
+            fill: true,
+            tension: 0.4,
+            pointBackgroundColor: '#667eea',
+            pointBorderColor: '#fff',
+            pointBorderWidth: 2,
+            pointRadius: 5
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                display: false
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: {
+                    callback: function(value) {
+                        return value.toLocaleString('fa-IR');
+                    }
+                }
+            }
+        }
+    }
+});
+
+function filterServices(period) {
+    // به‌روزرسانی تب‌ها
+    document.querySelectorAll('.filter-tab').forEach(tab => {
+        tab.classList.remove('active');
+    });
+    event.target.classList.add('active');
+    
+    // ارسال درخواست برای فیلتر کردن
+    window.location.href = `{% url 'city_drivers:driver_dashboard' %}?period=${period}`;
+}
+
+function toggleServiceList() {
+    // این تابع می‌تواند برای باز/بسته کردن لیست استفاده شود
+    // در حال حاضر فقط برای نمایش کلیک‌پذیری کارت است
+}
+</script>
+{% endblock %}

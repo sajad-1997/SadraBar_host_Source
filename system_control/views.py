@@ -5,6 +5,7 @@ from django.utils import timezone
 
 from accounts.models import User, RolePermission
 from .decorators import superuser_required
+from .security_monitor import SecurityMonitor
 from .forms import (
     UserCreateForm, CustomRoleForm, SystemRuleForm, IssuanceQuotaForm,
 )
@@ -686,3 +687,43 @@ def role_wallet_detail(request, role_code):
         'owner_role': role_label(role_code),
         'transactions': wallet.transactions.select_related('created_by')[:100],
     })
+
+
+# =========================================================
+# ۶- نظارت امنیتی
+# =========================================================
+@superuser_required
+def security_dashboard(request):
+    """داشبورد نظارت امنیتی: رویدادهای امنیتی و تهدیدات"""
+    hours = int(request.GET.get('hours', 24))
+    
+    # Get security summary
+    summary = SecurityMonitor.get_security_summary(hours)
+    
+    # Get recent events
+    recent_events = SecurityMonitor.get_recent_security_events(hours)
+    
+    # Get critical and high severity events
+    critical_events = recent_events.filter(severity='critical')[:20]
+    high_events = recent_events.filter(severity='high')[:20]
+    
+    # Get login attempts statistics
+    from .security_monitor import LoginAttempt
+    from django.utils import timezone
+    from datetime import timedelta
+    
+    cutoff = timezone.now() - timedelta(hours=hours)
+    login_attempts = LoginAttempt.objects.filter(created_at__gte=cutoff)
+    failed_logins = login_attempts.filter(success=False).count()
+    successful_logins = login_attempts.filter(success=True).count()
+    
+    context = {
+        'summary': summary,
+        'recent_events': recent_events[:50],
+        'critical_events': critical_events,
+        'high_events': high_events,
+        'failed_logins': failed_logins,
+        'successful_logins': successful_logins,
+        'hours': hours,
+    }
+    return render(request, 'system_control/security_dashboard.html', context)

@@ -244,10 +244,9 @@
                     <td>{{ s.created_by }}</td>
                     <td>{{ s.reject_reason }}</td>
                     <td>
-                        <p class="text-center text-muted">در انتظار اصلاح</p>
-{#                        <a href="{% url 'issuance:crud:print' s.id %}" class="btn btn-sm btn-success">#}
-{#                            چاپ بارنامه#}
-{#                        </a>#}
+                        <p class="text-center text-muted mb-1">در انتظار اصلاح</p>
+                        {# مدیریت و مدیر کل بدون نیاز به تأیید، مستقیماً چاپ می‌گیرند #}
+                        <a href="{% url 'issuance:crud:print' s.id %}" class="btn btn-sm btn-success">چاپ بارنامه</a>
                     </td>
                 </tr>
             {% endfor %}
@@ -297,10 +296,9 @@
                     <span><b>ثبت کننده:</b> {{ s.created_by }}</span>
                 </div>
                 <div class="btn-group-card">
-                    <p class="text-center text-muted">در انتظار اصلاح</p>
-{#                        <a href="{% url 'issuance:crud:print' s.id %}" class="btn btn-sm btn-success">#}
-{#                            چاپ بارنامه#}
-{#                        </a>#}
+                    <p class="text-center text-muted mb-1">در انتظار اصلاح</p>
+                    {# مدیریت و مدیر کل بدون نیاز به تأیید، مستقیماً چاپ می‌گیرند #}
+                    <a href="{% url 'issuance:crud:print' s.id %}" class="btn btn-sm btn-success w-100">چاپ بارنامه</a>
                 </div>
             </div>
         {% empty %}

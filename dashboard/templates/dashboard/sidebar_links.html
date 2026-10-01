@@ -1,29 +1,138 @@
+{% comment %}
+  سایدبار مشترک پنل‌های عملیاتی (ادمین / مدیریت / کارمند)
+  استفاده:
+      <aside class="sidebar d-none d-lg-block">  ... {% include 'dashboard/sidebar_links.html' %} </aside>
+      <div  class="mobile-sidebar" id="mobileSidebar"> ... {% include 'dashboard/sidebar_links.html' %} </div>
+  نیاز به context: user ، permissions (خروجی get_user_permissions)
+{% endcomment %}
 <div class="sidebar-header">
-    <h5>پنل مدیریت</h5>
+    <h5>پنل عملیاتی</h5>
     <a href="{% url 'home' %}">صفحه اصلی</a>
-    <a href="{% url 'logout' %}">خروج از پنل عملیاتی</a>
 </div>
 <div class="sidebar-divider"></div>
 
-
+{% if permissions.can_view_reports %}
 <div class="sidebar-section">گزارش گیری</div>
-<a href="{% url 'report:report_dashboard' %}">گزارش بارنامه‌ها</a>
-<a href="#">گزارش بیمه</a>
+<nav class="sidebar-nav">
+    <a href="{% url 'report:report_dashboard' %}">
+        <span>📊</span>
+        گزارش بارنامه‌ها
+    </a>
+</nav>
 
 <div class="sidebar-divider"></div>
+{% endif %}
 
+{% if permissions.can_issuance_shipments or permissions.can_manage_shipments %}
 <div class="sidebar-section">عملیاتی</div>
-<a href="{% url 'issuance:crud:create_new' %}">صدور بارنامه</a>
-<a href="{% url 'issuance:manager:waiting_list' %}">تأیید / رد بارنامه</a>
-<a href="{% url 'issuance:search:search_shipment' %}">جستجوی بارنامه</a>
-<a href="{% url 'issuance:manager:status_list' %}">وضعیت بارنامه‌</a>
-
+<nav class="sidebar-nav">
+    {% if permissions.can_issuance_shipments %}
+    <a href="{% url 'issuance:crud:create_new' %}">
+        <span>📝</span>
+        صدور بارنامه
+    </a>
+    {% endif %}
+    {% if permissions.can_manage_shipments %}
+    <a href="{% url 'issuance:manager:waiting_list' %}">
+        <span>✅</span>
+        تأیید / رد بارنامه
+    </a>
+    <a href="{% url 'issuance:search:search_shipment' %}">
+        <span>🔍</span>
+        جستجوی بارنامه
+    </a>
+    <a href="{% url 'issuance:manager:status_list' %}">
+        <span>📋</span>
+        وضعیت بارنامه‌
+    </a>
+    {% endif %}
+</nav>
 
 <div class="sidebar-divider"></div>
+{% endif %}
 
+{% if permissions.can_manage_users or permissions.can_manage_customers or permissions.can_manage_drivers or permissions.can_access_driver_queue %}
 <div class="sidebar-section">مشاهده</div>
-<a href="{% url 'user_management:dashboard' %}">لیست کاربران</a>
-<a href="{% url 'customers:customer_list' %}">لیست مشتریان</a>
-<a href="{% url 'customers:add_customer' %}">افزودن مشتریان</a>
-<a href="{% url 'drivers:driver_list' %}">لیست رانندگان</a>
-<a href="{% url 'drivers:add_driver' %}">افزودن رانندگان</a>
+<nav class="sidebar-nav">
+    {% if permissions.can_manage_users %}
+    <a href="{% url 'user_management:dashboard' %}">
+        <span>👤</span>
+        لیست کاربران
+    </a>
+    {% endif %}
+    {% if permissions.can_manage_customers %}
+    <a href="{% url 'customers:customer_list' %}">
+        <span>👥</span>
+        لیست مشتریان
+    </a>
+    <a href="{% url 'customers:add_customer' %}">
+        <span>➕</span>
+        افزودن مشتریان
+    </a>
+    {% endif %}
+    {% if permissions.can_manage_drivers %}
+    <a href="{% url 'drivers:driver_list' %}">
+        <span>🚛</span>
+        لیست رانندگان
+    </a>
+    <a href="{% url 'drivers:add_driver' %}">
+        <span>➕</span>
+        افزودن رانندگان
+    </a>
+    {% endif %}
+    {% if permissions.can_access_driver_queue %}
+    <a href="{% url 'driver_queue:panel_dashboard' %}">
+        <span>🧾</span>
+        مدیریت نوبت رانندگان
+    </a>
+    {% endif %}
+</nav>
+
+<div class="sidebar-divider"></div>
+{% endif %}
+
+{% if permissions.can_urban_access_dashboard %}
+<div class="sidebar-section">رانندگان شهری</div>
+<nav class="sidebar-nav">
+    <a href="{% url 'city_drivers:dashboard' %}">
+        <span>🏙️</span>
+        داشبورد رانندگان شهری
+    </a>
+    {% if permissions.can_urban_view_customers %}
+    <a href="{% url 'city_drivers:urban_customer_list' %}">
+        <span>👥</span>
+        مشتریان شهری
+    </a>
+    {% endif %}
+    {% if permissions.can_urban_view_requests %}
+    <a href="{% url 'city_drivers:urban_request_list' %}">
+        <span>📮</span>
+        درخواست‌های سرویس شهری
+    </a>
+    {% endif %}
+    {% if permissions.can_urban_view_queue %}
+    <a href="{% url 'city_drivers:urban_queue' %}">
+        <span>🕐</span>
+        نوبت و حضور رانندگان
+    </a>
+    {% endif %}
+    {% if permissions.can_urban_view_locations %}
+    <a href="{% url 'city_drivers:urban_locations_map' %}">
+        <span>📍</span>
+        موقعیت رانندگان
+    </a>
+    {% endif %}
+    {% if permissions.can_urban_view_rates %}
+    <a href="{% url 'city_drivers:urban_rate_list' %}">
+        <span>💰</span>
+        نرخ‌نامه و محاسبه کرایه
+    </a>
+    {% endif %}
+    {% if permissions.can_urban_manage_settlements %}
+    <a href="{% url 'city_drivers:urban_debts_list' %}">
+        <span>🧮</span>
+        بدهی کمیسیون
+    </a>
+    {% endif %}
+</nav>
+{% endif %}

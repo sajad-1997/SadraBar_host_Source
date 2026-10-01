@@ -1,0 +1,100 @@
+{% extends 'city_drivers/base.html' %}{% load humanize %}
+
+{% block title %}نرخ‌نامه و محاسبه کرایه{% endblock %}
+
+{% block content %}
+    <div class="d-flex justify-content-between align-items-center flex-wrap mb-3">
+        <h4 class="fw-bold text-primary mb-0">💰 نرخ‌نامه و محاسبه کرایه</h4>
+        <div class="d-flex gap-2">
+            <a href="{% url 'city_drivers:urban_fare_calculator' %}" class="btn btn-outline-primary">ماشین‌حساب کرایه</a>
+            {% if urban_perms.can_urban_manage_rates %}
+                <a href="{% url 'city_drivers:urban_rate_create' %}" class="btn btn-primary">+ نرخ‌نامه جدید</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- محاسبه گر کرایه -->
+    <div class="urban-card urban-form">
+        <h6>🧮 محاسبه کرایه</h6>
+        <form method="get">
+            <div class="row g-2 align-items-end">
+                <div class="col-md-5">
+                    <label class="form-label">نرخ‌نامه</label>
+                    {{ calc_form.rate_card }}
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">مسافت (کیلومتر)</label>
+                    {{ calc_form.distance_km }}
+                </div>
+                <div class="col-md-3">
+                    <button type="submit" name="calc-submit" value="1" class="btn btn-primary w-100">محاسبه</button>
+                </div>
+            </div>
+        </form>
+        {% if fare_result %}
+            <div class="alert alert-info mt-3 mb-0">
+                <strong>{{ fare_result.rate.title }}</strong> — مسافت: {{ fare_result.distance }} کیلومتر<br>
+                کرایه: <strong>{{ fare_result.fare|intcomma }} تومان</strong> |
+                کمیسیون آژانس: <strong>{{ fare_result.commission|intcomma }} تومان</strong> |
+                سهم راننده: <strong>{{ fare_result.net|intcomma }} تومان</strong>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- لیست نرخ‌نامه‌ها -->
+    <div class="urban-card">
+        <h6>لیست نرخ‌نامه‌ها</h6>
+        <div class="table-responsive">
+            <table class="urban-table">
+                <thead>
+                <tr>
+                    <th>عنوان</th>
+                    <th>سرویس</th>
+                    <th>نوع خودرو</th>
+                    <th>کرایه پایه</th>
+                    <th>هر کیلومتر</th>
+                    <th>حداقل کرایه</th>
+                    <th>کمیسیون</th>
+                    <th>وضعیت</th>
+                    {% if urban_perms.can_urban_manage_rates %}<th>عملیات</th>{% endif %}
+                </tr>
+                </thead>
+                <tbody>
+                {% for rate in rate_cards %}
+                    <tr>
+                        <td>{{ rate.title }}</td>
+                        <td>{{ rate.service.title|default:"---" }}</td>
+                        <td>{{ rate.get_vehicle_type_display }}</td>
+                        <td>{{ rate.base_fare|intcomma }}</td>
+                        <td>{{ rate.per_km_fare|intcomma }}</td>
+                        <td>{{ rate.minimum_fare|intcomma }}</td>
+                        <td>{{ rate.commission_percent }}%</td>
+                        <td>
+                            {% if rate.is_active %}
+                                <span class="badge-soft green">فعال</span>
+                            {% else %}
+                                <span class="badge-soft gray">غیرفعال</span>
+                            {% endif %}
+                        </td>
+                        {% if urban_perms.can_urban_manage_rates %}
+                            <td>
+                                <div class="d-flex gap-1">
+                                    <a href="{% url 'city_drivers:urban_rate_edit' rate.pk %}" class="btn btn-sm btn-warning">ویرایش</a>
+                                    <form method="post" action="{% url 'city_drivers:urban_rate_toggle' rate.pk %}">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-sm btn-outline-secondary">
+                                            {% if rate.is_active %}غیرفعال{% else %}فعال{% endif %}
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        {% endif %}
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="9" class="text-center text-muted">نرخ‌نامه‌ای ثبت نشده است</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}

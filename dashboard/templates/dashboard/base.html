@@ -12,49 +12,11 @@
     <!-- فونت فارسی -->
     <link href="https://cdn.jsdelivr.net/npm/vazirmatn@33.003/index.css" rel="stylesheet">
 
+    <!-- Global Theme CSS -->
+    <link rel="stylesheet" href="{% static 'global/css/theme.css' %}">
+    
     <!-- استایل اصلی داشبورد -->
     <link rel="stylesheet" href="{% static 'dashboard/css/style.css' %}">
-    
-    <style>
-        @media (prefers-color-scheme: dark) {
-            body {
-                background-color: #181a1f;
-                color: #e4e4e4;
-            }
-            .navbar {
-                background: linear-gradient(90deg, #2a2d55, #3c3f72);
-            }
-            .main-content {
-                color: #e4e4e4;
-            }
-            .card {
-                background-color: #2b2e36;
-                border-color: #3d414a;
-            }
-            .table {
-                color: #e4e4e4;
-            }
-            .table thead th {
-                background-color: #2b2e36;
-                border-color: #3d414a;
-            }
-            .form-control {
-                background-color: #2b2e36;
-                border-color: #3d414a;
-                color: #e4e4e4;
-            }
-            .form-control:focus {
-                background-color: #2b2e36;
-                border-color: #8f94fb;
-                color: #e4e4e4;
-            }
-            .btn-light {
-                background-color: #2b2e36;
-                border-color: #3d414a;
-                color: #e4e4e4;
-            }
-        }
-    </style>
 </head>
 
 <body>
@@ -86,6 +48,9 @@
     </div>
 
 </div>
+
+<!-- Global Theme JS -->
+<script src="{% static 'global/js/theme.js' %}"></script>
 
 {% include "pwa/scripts.html" %}
 

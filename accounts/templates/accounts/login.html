@@ -1,12 +1,16 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <title>ورود</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- فونت فارسی -->
+    <link href="https://cdn.jsdelivr.net/npm/vazirmatn@33.003/index.css" rel="stylesheet">
+    
     <style>
-        /*@import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;600&display=swap');*/
-
+        /* Login page specific styles */
         * {
             margin: 0;
             padding: 0;
@@ -72,7 +76,6 @@
             width: 90px;
             height: 90px;
             margin: 0 auto 20px;
-            /*background: url('https://cdn-icons-png.flaticon.com/512/3135/3135715.png') no-repeat center;*/
             background-size: cover;
             border-radius: 50%;
             box-shadow: 0 0 15px rgba(56, 189, 248, 0.6);
@@ -179,31 +182,6 @@
             h2 { font-size: 1.3rem; }
         }
     </style>
-    <script>
-        function togglePassword() {
-            const passwordInput = document.getElementById('password');
-            const toggleButton = document.querySelector('.toggle-password');
-            
-            if (passwordInput.type === 'password') {
-                passwordInput.type = 'text';
-                toggleButton.textContent = '🙈';
-            } else {
-                passwordInput.type = 'password';
-                toggleButton.textContent = '👁️';
-            }
-        }
-
-        document.addEventListener('DOMContentLoaded', function() {
-            const loginForm = document.querySelector('form');
-            if (loginForm) {
-                loginForm.addEventListener('submit', function(e) {
-                    console.log('Form submitting...');
-                    console.log('Username:', document.querySelector('input[name="username"]').value);
-                    console.log('Password length:', document.querySelector('input[name="password"]').value.length);
-                });
-            }
-        });
-    </script>
 </head>
 <body>
     <div class="login-container">
@@ -242,5 +220,14 @@
         <a href="{% url 'password_reset' %}" class="forgot-password">فراموشی رمز عبور؟</a>
         <p class="footer-text">© سامانه مدیریت بارنامه صدرا بار خراسان | نسخه 1.0</p>
     </div>
+    
+    <!-- Global Theme JS -->
+    <script src="{% static 'global/js/theme.js' %}"></script>
+    <script>
+        // Use global togglePassword function
+        document.querySelector('.toggle-password').addEventListener('click', function() {
+            togglePassword('password', this);
+        });
+    </script>
 </body>
 </html>

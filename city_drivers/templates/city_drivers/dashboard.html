@@ -1,0 +1,210 @@
+{% extends 'city_drivers/base.html' %}{% load humanize %}
+
+{% block title %}داشبورد رانندگان شهری{% endblock %}
+
+{% block content %}
+    <div class="d-flex justify-content-between align-items-center flex-wrap mb-3">
+        <h4 class="fw-bold text-primary mb-0">🚕 داشبورد رانندگان شهری</h4>
+        <span class="badge bg-primary-subtle text-primary">امروز: {{ today_jalali }}</span>
+    </div>
+
+    <!-- کارت‌های آماری سرویس‌های روز جاری -->
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-md-3">
+            <div class="stat-card">
+                <div class="stat-value">{{ stats.all }}</div>
+                <div class="stat-label">کل سرویس‌های امروز</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="stat-card success">
+                <div class="stat-value">{{ stats.done }}</div>
+                <div class="stat-label">انجام شده</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="stat-card warning">
+                <div class="stat-value">{{ stats.active }}</div>
+                <div class="stat-label">در حال انجام</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="stat-card danger">
+                <div class="stat-value">{{ stats.pending }}</div>
+                <div class="stat-label">در انتظار بررسی</div>
+            </div>
+        </div>
+        <div class="col-12 col-md-6">
+            <div class="stat-card">
+                <div class="stat-value">{{ stats.income|intcomma }}</div>
+                <div class="stat-label">درآمد کرایه امروز (تومان)</div>
+            </div>
+        </div>
+        <div class="col-12 col-md-6">
+            <div class="stat-card success">
+                <div class="stat-value">{{ stats.commission|intcomma }}</div>
+                <div class="stat-label">کمیسیون آژانس امروز (تومان)</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <!-- لیست رانندگان حاضر و غایب -->
+        <div class="col-12 col-lg-6">
+            <div class="urban-card h-100">
+                <h6>✅ رانندگان حاضر و غایب امروز</h6>
+                
+                <!-- نیسان -->
+                <div class="mb-3">
+                    <strong class="text-primary d-block mb-2">🚚 نیسان</strong>
+                    <div class="row">
+                        <div class="col-6">
+                            <small class="text-success d-block mb-1">حاضر ({{ attendance_lists.present.nissan|length }})</small>
+                            {% for item in attendance_lists.present.nissan %}
+                                <div class="d-flex justify-content-between border-bottom py-1">
+                                    <span>{{ item.driver.name }}</span>
+                                    <small class="text-muted">{{ item.driver.phone|default:"---" }}</small>
+                                </div>
+                            {% empty %}
+                                <small class="text-muted">---</small>
+                            {% endfor %}
+                        </div>
+                        <div class="col-6">
+                            <small class="text-danger d-block mb-1">غایب ({{ attendance_lists.absent.nissan|length }})</small>
+                            {% for item in attendance_lists.absent.nissan %}
+                                <div class="d-flex justify-content-between border-bottom py-1">
+                                    <span>{{ item.driver.name }}</span>
+                                    <small class="text-muted">{{ item.driver.phone|default:"---" }}</small>
+                                </div>
+                            {% empty %}
+                                <small class="text-muted">---</small>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- پیکان -->
+                <div class="mb-3">
+                    <strong class="text-warning d-block mb-2">🚗 پیکان</strong>
+                    <div class="row">
+                        <div class="col-6">
+                            <small class="text-success d-block mb-1">حاضر ({{ attendance_lists.present.peikan|length }})</small>
+                            {% for item in attendance_lists.present.peikan %}
+                                <div class="d-flex justify-content-between border-bottom py-1">
+                                    <span>{{ item.driver.name }}</span>
+                                    <small class="text-muted">{{ item.driver.phone|default:"---" }}</small>
+                                </div>
+                            {% empty %}
+                                <small class="text-muted">---</small>
+                            {% endfor %}
+                        </div>
+                        <div class="col-6">
+                            <small class="text-danger d-block mb-1">غایب ({{ attendance_lists.absent.peikan|length }})</small>
+                            {% for item in attendance_lists.absent.peikan %}
+                                <div class="d-flex justify-content-between border-bottom py-1">
+                                    <span>{{ item.driver.name }}</span>
+                                    <small class="text-muted">{{ item.driver.phone|default:"---" }}</small>
+                                </div>
+                            {% empty %}
+                                <small class="text-muted">---</small>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                
+                {% if urban_perms.can_urban_view_queue %}
+                    <a href="{% url 'city_drivers:urban_queue' %}" class="btn btn-sm btn-outline-primary mt-3">مدیریت نوبت و حضور</a>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- ۵ سرویس آخر روز جاری -->
+        <div class="col-12 col-lg-6">
+            <div class="urban-card h-100">
+                <h6>🕐 ۵ سرویس آخر امروز</h6>
+                <table class="urban-table">
+                    <thead>
+                    <tr>
+                        <th>کد رهگیری</th>
+                        <th>مشتری</th>
+                        <th>راننده</th>
+                        <th>کرایه</th>
+                        <th>ساعت</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for sr in last_services %}
+                        <tr>
+                            <td>{{ sr.tracking_code }}</td>
+                            <td>{{ sr.customer.name }}</td>
+                            <td>{{ sr.assigned_driver.name|default:"---" }}</td>
+                            <td>{{ sr.fare_amount|intcomma|default:"---" }}</td>
+                            <td>{{ sr.created_at|time:"H:i" }}</td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="5" class="text-center text-muted">امروز سرویس انجام‌شده‌ای ثبت نشده است</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+                {% if urban_perms.can_urban_view_requests %}
+                    <a href="{% url 'city_drivers:urban_request_list' %}" class="btn btn-sm btn-outline-primary mt-3">مشاهده همه درخواست‌ها</a>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- نمودار رتبه‌بندی رانندگان امروز -->
+        <div class="col-12 col-lg-6">
+            <div class="urban-card h-100">
+                <h6>🏆 رتبه‌بندی رانندگان امروز (سرویس‌های انجام‌شده)</h6>
+                {% for row in ranking_rows %}
+                    <div class="rank-row">
+                        <span class="rank-name">{{ row.name }}</span>
+                        <div class="rank-bar-wrap">
+                            <div class="rank-bar" style="width: {{ row.percent }}%"></div>
+                        </div>
+                        <span class="rank-count">{{ row.total }}</span>
+                    </div>
+                {% empty %}
+                    <small class="text-muted">امروز سرویس تکمیل‌شده‌ای برای رتبه‌بندی وجود ندارد</small>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- لیست بدهکاران کمیسیون -->
+        <div class="col-12 col-lg-6">
+            <div class="urban-card h-100">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0">💳 بدهکاران کمیسیون پرداخت‌نشده</h6>
+                    <span class="badge bg-danger-subtle text-danger">جمع بدهی: {{ total_debt|intcomma }} تومان</span>
+                </div>
+                <table class="urban-table mt-3">
+                    <thead>
+                    <tr>
+                        <th>راننده</th>
+                        <th>مبلغ بدهی</th>
+                        <th>باقیمانده</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for debt in debtors %}
+                        <tr>
+                            <td>{{ debt.driver.name }}</td>
+                            <td>{{ debt.amount|intcomma }}</td>
+                            <td class="text-danger fw-bold">{{ debt.remaining|intcomma }}</td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="3" class="text-center text-muted">بدهی پرداخت‌نشده‌ای وجود ندارد</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+                {% if urban_perms.can_urban_manage_settlements %}
+                    <a href="{% url 'city_drivers:urban_debts_list' %}" class="btn btn-sm btn-outline-primary mt-3">مدیریت تسویه‌ها</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

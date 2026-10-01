@@ -3,39 +3,29 @@
 {% load humanize %}
 
 {% block extra_css %}
+<!-- فونت فارسی -->
+<link href="https://cdn.jsdelivr.net/npm/vazirmatn@33.003/index.css" rel="stylesheet">
+
+<!-- Global Theme CSS -->
+<link rel="stylesheet" href="{% static 'global/css/theme.css' %}">
+
 <!-- jQuery لازم برای تقویم شمسی (قبل از اسکریپت‌های base) -->
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 
 <style>
     /* ==================== ماژول گزارش و آمارگیری ==================== */
     .rp-page {
-        --rp-card-bg: #ffffff;
-        --rp-input-bg: #f8fafc;
-        --rp-border: rgba(15, 23, 42, 0.08);
-        --rp-text: #0f172a;
-        --rp-muted: #64748b;
-        --rp-accent: #0d6efd;
-        --rp-accent-2: #6366f1;
-        --rp-chip-bg: rgba(13, 110, 253, 0.1);
-        --rp-row-bg: rgba(15, 23, 42, 0.035);
-        --rp-scroll: rgba(100, 116, 139, 0.35);
+        --rp-card-bg: var(--global-card-bg);
+        --rp-input-bg: var(--global-input-bg);
+        --rp-border: var(--global-border);
+        --rp-text: var(--global-text);
+        --rp-muted: var(--global-muted);
+        --rp-accent: var(--global-accent);
+        --rp-accent-2: var(--global-accent-2);
+        --rp-chip-bg: var(--global-chip-bg);
+        --rp-row-bg: var(--global-row-bg);
+        --rp-scroll: var(--global-scroll);
         color: var(--rp-text);
-    }
-
-    /* ---------- حالت تاریک سیستم ---------- */
-    @media (prefers-color-scheme: dark) {
-        .rp-page {
-            --rp-card-bg: #1e2329;
-            --rp-input-bg: #262c35;
-            --rp-border: #2d343f;
-            --rp-text: #e4e4e4;
-            --rp-muted: #94a3b8;
-            --rp-accent: #8f94fb;
-            --rp-accent-2: #6366f1;
-            --rp-chip-bg: rgba(143, 148, 251, 0.16);
-            --rp-row-bg: rgba(255, 255, 255, 0.04);
-            --rp-scroll: rgba(148, 163, 184, 0.35);
-        }
     }
 
     .rp-page h2.rp-title {
@@ -103,6 +93,11 @@
             color: #e4e4e4;
             background-color: #1e2329;
         }
+    }
+
+    body.dark-mode .rp-filter .form-select option {
+        color: #e4e4e4;
+        background-color: #1e2329;
     }
 
     .rp-btn-primary {
@@ -349,6 +344,21 @@
             background: rgba(239, 68, 68, 0.2);
             color: #f87171;
         }
+    }
+
+    body.dark-mode .rp-badge-pending {
+        background: rgba(245, 158, 11, 0.2);
+        color: #fbbf24;
+    }
+
+    body.dark-mode .rp-badge-approved {
+        background: rgba(16, 185, 129, 0.2);
+        color: #34d399;
+    }
+
+    body.dark-mode .rp-badge-rejected {
+        background: rgba(239, 68, 68, 0.2);
+        color: #f87171;
     }
 
     .rp-issuer {
@@ -824,11 +834,7 @@
 <!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    // تطبیق نمودارها با تم سیستم (روشن / تاریک)
-    const rpIsDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-
-    Chart.defaults.color = rpIsDark ? '#cbd5e1' : '#475569';
-    Chart.defaults.borderColor = rpIsDark ? 'rgba(148, 163, 184, 0.15)' : 'rgba(100, 116, 139, 0.15)';
+    // تطبیق نمودارها با تم سیستم (روشن / تاریک) - اکنون توسط global theme مدیریت می‌شود
     Chart.defaults.font.family = "'Vazirmatn', Tahoma, sans-serif";
 
     // داده‌های نمودارها از بک‌اند
@@ -1177,5 +1183,8 @@
         }
     });
 </script>
+
+<!-- Global Theme JS -->
+<script src="{% static 'global/js/theme.js' %}"></script>
 
 {% endblock %}

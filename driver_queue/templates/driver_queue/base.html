@@ -7,6 +7,12 @@
     {% include "pwa/head.html" %}
     <title>{% block title %}نوبت‌دهی رانندگان{% endblock %}</title>
     
+    <!-- فونت فارسی -->
+    <link href="https://cdn.jsdelivr.net/npm/vazirmatn@33.003/index.css" rel="stylesheet">
+    
+    <!-- Global Theme CSS -->
+    <link rel="stylesheet" href="{% static 'global/css/theme.css' %}">
+    
     <!-- Persian Datepicker CSS -->
     <link rel="stylesheet" href="{% static 'issuance/css/persian-datepicker.css' %}">
     <style>
@@ -25,8 +31,8 @@
         body {
             margin: 0;
             font-family: Tahoma, "Vazirmatn", "Segoe UI", sans-serif;
-            background: var(--bg);
-            color: #0f172a
+            background: var(--global-bg);
+            color: var(--global-text)
         }
 
         .topbar {
@@ -36,6 +42,12 @@
             font-weight: bold
         }
 
+        @media (prefers-color-scheme: dark) {
+            .topbar {
+                background: #1e2329;
+            }
+        }
+
         .container {
             max-width: 720px;
             margin: 0 auto;
@@ -43,11 +55,13 @@
         }
 
         .card {
-            background: #fff;
+            background: var(--global-card-bg);
             border-radius: 14px;
             padding: 20px;
             margin-bottom: 16px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, .08)
+            box-shadow: 0 1px 3px rgba(0, 0, 0, .08);
+            border: 1px solid var(--global-border);
+            color: var(--global-text)
         }
 
         h1 {
@@ -100,11 +114,13 @@
         .field {
             width: 100%;
             padding: 12px;
-            border: 1px solid #cbd5e1;
+            border: 1px solid var(--global-border);
             border-radius: 10px;
             font-size: 15px;
             margin-top: 6px;
-            font-family: inherit
+            font-family: inherit;
+            background: var(--global-input-bg);
+            color: var(--global-text)
         }
 
         label {
@@ -250,6 +266,9 @@
 <!-- Persian Datepicker JS -->
 <script src="{% static 'issuance/persian-date.js' %}"></script>
 <script src="{% static 'issuance/persian-datepicker.js' %}"></script>
+
+<!-- Global Theme JS -->
+<script src="{% static 'global/js/theme.js' %}"></script>
 
 {% include "pwa/scripts.html" %}
 </body>

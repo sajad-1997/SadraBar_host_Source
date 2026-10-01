@@ -1,0 +1,188 @@
+{% extends "system_control/base.html" %}
+
+{% block title %}نظارت امنیتی{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <h2>داشبورد نظارت امنیتی</h2>
+            <p class="text-muted">نظارت بر رویدادهای امنیتی و تهدیدات سیستم</p>
+        </div>
+    </div>
+
+    <!-- Time Filter -->
+    <div class="row mb-3">
+        <div class="col-12">
+            <form method="get" class="form-inline">
+                <label class="ml-2">نمایش رویدادهای:</label>
+                <select name="hours" class="form-control ml-2">
+                    <option value="1" {% if hours == 1 %}selected{% endif %}>1 ساعت اخیر</option>
+                    <option value="6" {% if hours == 6 %}selected{% endif %}>6 ساعت اخیر</option>
+                    <option value="24" {% if hours == 24 %}selected{% endif %}>24 ساعت اخیر</option>
+                    <option value="72" {% if hours == 72 %}selected{% endif %}>3 روز اخیر</option>
+                    <option value="168" {% if hours == 168 %}selected{% endif %}>7 روز اخیر</option>
+                </select>
+                <button type="submit" class="btn btn-primary mr-2">بروزرسانی</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <h5 class="card-title">کل رویدادها</h5>
+                    <h2>{{ summary.total }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-danger text-white">
+                <div class="card-body">
+                    <h5 class="card-title">بحرانی</h5>
+                    <h2>{{ summary.critical }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <h5 class="card-title">بالا</h5>
+                    <h2>{{ summary.high }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <h5 class="card-title">لاگین ناموفق</h5>
+                    <h2>{{ failed_logins }}</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Critical Events -->
+    {% if critical_events %}
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0">رویدادهای بحرانی</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>زمان</th>
+                                    <th>نوع رویداد</th>
+                                    <th>کاربر</th>
+                                    <th>IP</th>
+                                    <th>جزئیات</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for event in critical_events %}
+                                <tr>
+                                    <td>{{ event.created_at|date:"Y-m-d H:i:s" }}</td>
+                                    <td>{{ event.get_event_type_display }}</td>
+                                    <td>{{ event.user.username|default:"ناشناس" }}</td>
+                                    <td>{{ event.ip_address|default:"-" }}</td>
+                                    <td>{{ event.details }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- High Severity Events -->
+    {% if high_events %}
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-warning">
+                <div class="card-header bg-warning text-white">
+                    <h5 class="mb-0">رویدادهای با شدت بالا</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>زمان</th>
+                                    <th>نوع رویداد</th>
+                                    <th>کاربر</th>
+                                    <th>IP</th>
+                                    <th>جزئیات</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for event in high_events %}
+                                <tr>
+                                    <td>{{ event.created_at|date:"Y-m-d H:i:s" }}</td>
+                                    <td>{{ event.get_event_type_display }}</td>
+                                    <td>{{ event.user.username|default:"ناشناس" }}</td>
+                                    <td>{{ event.ip_address|default:"-" }}</td>
+                                    <td>{{ event.details }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Recent Events -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">رویدادهای اخیر</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>زمان</th>
+                                    <th>نوع رویداد</th>
+                                    <th>شدت</th>
+                                    <th>کاربر</th>
+                                    <th>IP</th>
+                                    <th>مسیر</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for event in recent_events %}
+                                <tr>
+                                    <td>{{ event.created_at|date:"Y-m-d H:i:s" }}</td>
+                                    <td>{{ event.get_event_type_display }}</td>
+                                    <td>
+                                        <span class="badge badge-{% if event.severity == 'critical' %}danger{% elif event.severity == 'high' %}warning{% elif event.severity == 'medium' %}info{% else %}secondary{% endif %}">
+                                            {{ event.get_severity_display }}
+                                        </span>
+                                    </td>
+                                    <td>{{ event.user.username|default:"ناشناس" }}</td>
+                                    <td>{{ event.ip_address|default:"-" }}</td>
+                                    <td>{{ event.path|default:"-" }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

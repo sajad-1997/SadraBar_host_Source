@@ -1,0 +1,223 @@
+/* ===== ماژول رانندگان شهری ===== */
+body {
+    font-family: "Vazirmatn", Tahoma, sans-serif;
+    background-color: #f0f2f5;
+    margin: 0;
+}
+
+.urban-layout {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* ---------- نوار کناری ---------- */
+.urban-sidebar {
+    width: 250px;
+    min-width: 250px;
+    background: linear-gradient(180deg, #1e2329, #2d343f);
+    color: #e4e4e4;
+    padding: 16px 12px;
+}
+
+.urban-sidebar-header h6 {
+    color: #8f94fb;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+.urban-sidebar-header a {
+    display: block;
+    color: #b7bcc7;
+    font-size: 0.85rem;
+    text-decoration: none;
+    padding: 3px 0;
+}
+
+.urban-sidebar-header a:hover {
+    color: #fff;
+}
+
+.urban-sidebar-section {
+    font-size: 0.75rem;
+    color: #8b909b;
+    margin: 16px 6px 6px;
+    border-bottom: 1px solid #3a4048;
+    padding-bottom: 4px;
+}
+
+.urban-sidebar a.urban-nav-link {
+    display: block;
+    color: #d1d5db;
+    text-decoration: none;
+    padding: 9px 12px;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    margin-bottom: 3px;
+    transition: all 0.2s ease;
+}
+
+.urban-sidebar a.urban-nav-link:hover {
+    background: #3d444f;
+    color: #fff;
+}
+
+.urban-sidebar a.urban-nav-link.active {
+    background: linear-gradient(135deg, #6366f1, #8f94fb);
+    color: #fff;
+    font-weight: 600;
+}
+
+.urban-content {
+    flex: 1;
+    padding: 24px;
+    overflow-x: hidden;
+}
+
+@media (max-width: 768px) {
+    .urban-layout { flex-direction: column; }
+    .urban-sidebar { width: 100%; min-width: 0; }
+}
+
+/* ---------- کارت آماری ---------- */
+.stat-card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 18px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    text-align: center;
+    height: 100%;
+}
+
+.stat-card .stat-value {
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: #0d6efd;
+}
+
+.stat-card .stat-label {
+    font-size: 0.85rem;
+    color: #6b7280;
+    margin-top: 4px;
+}
+
+.stat-card.success .stat-value { color: #198754; }
+.stat-card.warning .stat-value { color: #f59e0b; }
+.stat-card.danger .stat-value { color: #dc3545; }
+
+/* ---------- کارت و جدول عمومی ---------- */
+.urban-card {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.urban-card h6 {
+    font-weight: 700;
+    color: #0d6efd;
+    margin-bottom: 14px;
+}
+
+.urban-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.88rem;
+}
+
+.urban-table th, .urban-table td {
+    padding: 8px 10px;
+    border-bottom: 1px solid #eef0f4;
+    text-align: right;
+    vertical-align: middle;
+}
+
+.urban-table thead th {
+    background: #f5f6fa;
+    color: #495057;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.badge-soft {
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.badge-soft.green { background: #d1f4e0; color: #0f7b43; }
+.badge-soft.red { background: #fde2e2; color: #b02a37; }
+.badge-soft.blue { background: #dcebfd; color: #0b5ed7; }
+.badge-soft.orange { background: #fdeecd; color: #b8860b; }
+.badge-soft.gray { background: #e9ecef; color: #495057; }
+
+/* ---------- نمودار رتبه‌بندی ---------- */
+.rank-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+}
+
+.rank-name {
+    width: 120px;
+    font-size: 0.85rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.rank-bar-wrap {
+    flex: 1;
+    background: #eef0f4;
+    border-radius: 10px;
+    height: 18px;
+    overflow: hidden;
+}
+
+.rank-bar {
+    height: 100%;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #6366f1, #8f94fb);
+}
+
+.rank-count {
+    width: 40px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #495057;
+    text-align: center;
+}
+
+/* ---------- فرم ---------- */
+.urban-form .form-label {
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: #495057;
+}
+
+.urban-form .form-control, .urban-form .form-select {
+    border-radius: 10px;
+}
+
+@media (prefers-color-scheme: dark) {
+    /* Dark mode styles now mostly handled by global theme CSS */
+    body { background-color: var(--global-bg); }
+    .urban-content { color: var(--global-text); }
+    .stat-card, .urban-card {
+        background: var(--global-card-bg);
+        border-color: var(--global-border);
+        color: var(--global-text);
+    }
+    .stat-card .stat-value { color: var(--global-accent); }
+    .urban-card h6 { color: var(--global-accent); }
+    .urban-table th, .urban-table td { border-bottom-color: var(--global-border); }
+    .urban-table thead th { background: var(--global-input-bg); color: var(--global-text); }
+    .rank-bar-wrap { background: var(--global-border); }
+    .rank-count { color: var(--global-muted); }
+    .urban-form .form-label { color: var(--global-muted); }
+    .badge-soft.gray { background: #3d444f; color: #d1d5db; }
+}

@@ -96,20 +96,60 @@
         .sidebar {
             background-color: var(--sidebar-bg);
             width: 250px;
+            flex-shrink: 0;
             padding: 1.5rem 1rem;
             box-shadow: 0 0 10px var(--shadow);
             transition: background-color 0.3s ease;
+            overflow-y: auto;
         }
 
-        .sidebar h4 {
+        .sidebar-header h5 {
             font-weight: 700;
             color: var(--link-hover);
-            margin-bottom: 1rem;
+            margin-bottom: 0.75rem;
             text-align: center;
         }
 
-        .sidebar a {
+        .sidebar-header a {
             display: block;
+            text-align: center;
+            font-size: 0.875rem;
+            color: var(--text-color);
+            opacity: 0.85;
+            text-decoration: none;
+        }
+
+        .sidebar-header a:hover {
+            color: var(--link-hover);
+            opacity: 1;
+        }
+
+        .sidebar-section {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--text-color);
+            opacity: 0.6;
+            margin: 1.25rem 0 0.5rem;
+        }
+
+        .sidebar-divider {
+            height: 1px;
+            background: var(--text-color);
+            opacity: 0.12;
+            margin: 1.25rem 0;
+        }
+
+        .sidebar-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+        }
+
+        .sidebar-nav a,
+        .sidebar > a {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
             padding: 0.7rem 1rem;
             border-radius: 10px;
             color: var(--text-color);
@@ -118,7 +158,11 @@
             font-weight: 500;
         }
 
-        .sidebar a:hover {
+        .sidebar-nav a span {
+            font-size: 1.15rem;
+        }
+
+        .sidebar-nav a:hover {
             background: var(--link-hover);
             color: #fff;
         }
@@ -224,25 +268,9 @@
 
 <!-- Dashboard Layout -->
 <div class="dashboard-container">
-    <!-- Sidebar -->
+    <!-- Sidebar (shared links from dashboard/sidebar_links.html) -->
     <div class="sidebar" id="sidebar">
-        <h4>منوی دسترسی</h4>
-        <a href="{% url 'issuance:crud:create_new' %}">📝 صدور بارنامه</a>
-        <a href="{% url 'issuance:search:search_shipment' %}">🔍 جستجوی بارنامه‌ها</a>
-        <a href="{% url 'issuance:manager:waiting_list' %}">🗂️ بررسی بارنامه‌ها</a>
-        <a href="{% url 'issuance:manager:status_list' %}">📊 وضعیت بارنامه‌ها</a>
-        <a href="{% url 'report:report_dashboard' %}">📊 گزارش بارنامه‌ها</a>
-{#        <a href="{% url 'duplicate_audit:duplicate_audit_list' %}">🛠 بارنامه‌های تکراری</a>#}
-        <a href="{% url 'customers:customer_list' %}">👥 لیست مشتریان</a>
-        <a href="{% url 'customers:add_customer' %}">👥 افزودن مشتریان</a>
-        <a href="{% url 'drivers:driver_list' %}">🚛 لیست رانندگان</a>
-        <a href="{% url 'drivers:add_driver' %}">🚛 افزودن رانندگان</a>
-        <a href="{% url 'driver_queue:panel_dashboard' %}">🧾 مدیریت نوبت رانندگان</a>
-        <a href="{% url 'user_management:dashboard' %}">🧾 مدیریت کاربران</a>
-{#        <a href="{% url 'issuance:manager:driver_location' %}">📍 موقعیت‌یابی رانندگان</a>#}
-        <a href="#">📍 موقعیت‌یابی رانندگان</a>
-{#        <a href="{% url 'issuance:crud:insurance_report' %}">💰 گزارش مبالغ بیمه</a>#}
-        <a href="#">💰 گزارش مبالغ بیمه</a>
+        {% include 'dashboard/sidebar_links.html' %}
     </div>
 
     <!-- Main Content -->
@@ -281,7 +309,7 @@
     // Hamburger menu toggle
     const hamburger = document.getElementById('hamburger');
     const sidebar = document.getElementById('sidebar');
-    
+
     if (hamburger) {
         hamburger.addEventListener('click', () => {
             sidebar.classList.toggle('active');

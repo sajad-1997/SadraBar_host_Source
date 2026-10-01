@@ -1,0 +1,422 @@
+{% load static %}<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}داشبورد راننده{% endblock %}</title>
+    
+    <!-- Bootstrap RTL -->
+    <link rel="stylesheet" href="{% static 'issuance/css/bootstrap.rtl.min.css' %}">
+    
+    <!-- فونت فارسی -->
+    <link href="https://cdn.jsdelivr.net/npm/vazirmatn@33.003/index.css" rel="stylesheet">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    
+    <style>
+        * {
+            font-family: 'Vazirmatn', sans-serif;
+        }
+        
+        body {
+            background: #f5f7fa;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .driver-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .driver-info h3 {
+            margin: 0;
+            font-size: 1.4rem;
+        }
+        
+        .driver-info p {
+            margin: 5px 0 0;
+            opacity: 0.9;
+        }
+        
+        .driver-stats {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .stat-badge {
+            background: rgba(255,255,255,0.2);
+            padding: 10px 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        
+        .stat-badge .label {
+            font-size: 0.85rem;
+            opacity: 0.9;
+        }
+        
+        .stat-badge .value {
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+        
+        .driver-content {
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+        
+        .card-header {
+            background: #f8f9fa;
+            padding: 15px 20px;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .card-header h5 {
+            margin: 0;
+            color: #333;
+        }
+        
+        .card-body {
+            padding: 20px;
+        }
+        
+        .service-card {
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .service-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.12);
+        }
+        
+        .filter-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .filter-tab {
+            padding: 8px 20px;
+            border: 1px solid #dee2e6;
+            border-radius: 20px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .filter-tab.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+        
+        .service-item {
+            padding: 15px;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .service-item:last-child {
+            border-bottom: none;
+        }
+        
+        .service-info h6 {
+            margin: 0 0 5px;
+            color: #333;
+        }
+        
+        .service-info p {
+            margin: 0;
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .service-status {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+        }
+        
+        .status-done {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status-in-progress {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .status-pending {
+            background: #e2e3e5;
+            color: #383d41;
+        }
+
+        .status-approved {
+            background: #cce5ff;
+            color: #004085;
+        }
+
+        .status-assigned {
+            background: #e2d9f3;
+            color: #4b2e83;
+        }
+
+        .status-canceled {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .status-rejected {
+            background: #f5c2c7;
+            color: #58151c;
+        }
+        
+        .current-service-card {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+        }
+        
+        .current-service-card .card-header {
+            background: rgba(255,255,255,0.1);
+            color: white;
+            border-bottom-color: rgba(255,255,255,0.2);
+        }
+        
+        .current-service-card .card-header h5 {
+            color: white;
+        }
+        
+        .service-detail-row {
+            display: flex;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .service-detail-row:last-child {
+            border-bottom: none;
+        }
+        
+        .detail-label {
+            width: 150px;
+            opacity: 0.9;
+        }
+        
+        .detail-value {
+            flex: 1;
+            font-weight: 500;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .action-btn {
+            padding: 10px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .btn-accept {
+            background: #11998e;
+            color: #ffffff;
+        }
+
+        .btn-accept:hover {
+            background: #0e837a;
+        }
+
+        .btn-arrive {
+            background: #667eea;
+            color: #ffffff;
+        }
+
+        .btn-arrive:hover {
+            background: #5568d3;
+        }
+
+        .btn-arrive-dest {
+            background: #764ba2;
+            color: #ffffff;
+        }
+
+        .btn-arrive-dest:hover {
+            background: #613a8b;
+        }
+
+        .btn-start {
+            background: #0d6efd;
+            color: #ffffff;
+        }
+
+        .btn-start:hover {
+            background: #0a58ca;
+        }
+        
+        .btn-unload {
+            background: #ffc107;
+            color: #333;
+        }
+        
+        .btn-unload:hover {
+            background: #e0a800;
+        }
+        
+        .logout-btn {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.3);
+            padding: 8px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .logout-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+        
+        .queue-item {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+        }
+        
+        .queue-item:hover {
+            transform: translateY(-3px);
+        }
+        
+        .queue-number {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+        
+        .queue-name {
+            font-size: 1rem;
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+        
+        .queue-phone {
+            font-size: 0.85rem;
+            opacity: 0.9;
+            margin-bottom: 3px;
+        }
+        
+        .queue-time {
+            font-size: 0.75rem;
+            opacity: 0.8;
+        }
+        
+        @media (max-width: 768px) {
+            .driver-header {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .driver-stats {
+                justify-content: center;
+            }
+            
+            .stat-badge {
+                padding: 8px 15px;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+            
+            .action-btn {
+                width: 100%;
+            }
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <div class="driver-header">
+        <div class="driver-info">
+            <h3>🚗 داشبورد راننده</h3>
+            <p>{{ driver.name }}</p>
+        </div>
+        
+        <div class="driver-stats">
+            <div class="stat-badge">
+                <div class="label">📅 تاریخ</div>
+                <div class="value">{{ today_jalali }}</div>
+            </div>
+            <div class="stat-badge">
+                <div class="label">🕐 ساعت (زنده)</div>
+                <div class="value" id="liveClock">{{ current_time }}</div>
+            </div>
+            <div class="stat-badge">
+                <div class="label">🏆 رتبه امروز</div>
+                <div class="value">{{ driver_rank }}</div>
+            </div>
+        </div>
+        
+        <form method="post" action="{% url 'city_drivers:driver_logout' %}">
+            {% csrf_token %}
+            <button type="submit" class="logout-btn">🚪 خروج</button>
+        </form>
+    </div>
+    
+    <div class="driver-content">
+        {% block content %}{% endblock %}
+    </div>
+    
+    <script src="{% static 'issuance/bootstrap.bundle.min.js' %}"></script>
+    <script>
+        // ساعت زنده داشبورد راننده (بروزرسانی هر ثانیه)
+        (function () {
+            var clockEl = document.getElementById('liveClock');
+            if (!clockEl) return;
+            function pad(n) { return (n < 10 ? '0' : '') + n; }
+            function tick() {
+                var now = new Date();
+                clockEl.textContent = pad(now.getHours()) + ':' +
+                    pad(now.getMinutes()) + ':' + pad(now.getSeconds());
+            }
+            tick();
+            setInterval(tick, 1000);
+        })();
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

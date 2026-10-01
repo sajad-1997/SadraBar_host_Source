@@ -1,0 +1,30 @@
+{% extends 'city_drivers/base.html' %}{% load humanize %}
+
+{% block title %}محاسبه کرایه{% endblock %}
+
+{% block content %}
+    <h4 class="fw-bold text-primary mb-3">🧮 محاسبه کرایه</h4>
+
+    <div class="urban-card urban-form" style="max-width: 560px;">
+        <form method="get">
+            <div class="mb-3">
+                <label class="form-label">نرخ‌نامه</label>
+                {{ calc_form.rate_card }}
+            </div>
+            <div class="mb-3">
+                <label class="form-label">مسافت (کیلومتر)</label>
+                {{ calc_form.distance_km }}
+            </div>
+            <button type="submit" name="calc-submit" value="1" class="btn btn-primary w-100">محاسبه</button>
+        </form>
+
+        {% if fare_result %}
+            <div class="alert alert-info mt-3 mb-0">
+                <strong>{{ fare_result.rate.title }}</strong> — مسافت: {{ fare_result.distance }} کیلومتر<br>
+                کرایه: <strong>{{ fare_result.fare|intcomma }} تومان</strong><br>
+                کمیسیون آژانس: <strong>{{ fare_result.commission|intcomma }} تومان</strong><br>
+                سهم راننده: <strong>{{ fare_result.net|intcomma }} تومان</strong>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}

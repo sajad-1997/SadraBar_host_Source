@@ -1,0 +1,91 @@
+{% extends 'city_drivers/base.html' %}{% load humanize %}
+
+{% block title %}گزارش روزانه مدیریت{% endblock %}
+
+{% block content %}
+    <h4 class="fw-bold text-primary mb-3">🗓 گزارش روزانه مدیریت - {{ date_jalali }}</h4>
+
+    <div class="urban-card">
+        <form method="get" class="row g-2 align-items-end">
+            <div class="col-auto">
+                <label class="form-label">تاریخ (شمسی)</label>
+                <input type="text" name="date" value="{{ date_param }}" class="form-control"
+                       placeholder="1404/06/27">
+            </div>
+            <div class="col-auto">
+                <button type="submit" class="btn btn-primary">نمایش گزارش</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-md-2"><div class="stat-card"><div class="stat-value">{{ totals.all }}</div><div class="stat-label">کل</div></div></div>
+        <div class="col-6 col-md-2"><div class="stat-card success"><div class="stat-value">{{ totals.done }}</div><div class="stat-label">انجام شده</div></div></div>
+        <div class="col-6 col-md-2"><div class="stat-card warning"><div class="stat-value">{{ totals.active }}</div><div class="stat-label">در جریان</div></div></div>
+        <div class="col-6 col-md-2"><div class="stat-card"><div class="stat-value">{{ totals.pending }}</div><div class="stat-label">در انتظار</div></div></div>
+        <div class="col-6 col-md-2"><div class="stat-card danger"><div class="stat-value">{{ totals.canceled }}</div><div class="stat-label">لغو/رد</div></div></div>
+        <div class="col-6 col-md-2"><div class="stat-card success"><div class="stat-value">{{ totals.income|intcomma }}</div><div class="stat-label">درآمد (تومان)</div></div></div>
+    </div>
+
+    <div class="urban-card">
+        <h6>سرویس‌های روز</h6>
+        <div class="table-responsive">
+            <table class="urban-table">
+                <thead>
+                <tr>
+                    <th>کد رهگیری</th>
+                    <th>مشتری</th>
+                    <th>مبدأ</th>
+                    <th>مقصد</th>
+                    <th>راننده</th>
+                    <th>وضعیت</th>
+                    <th>کرایه</th>
+                    <th>کمیسیون</th>
+                    <th>ساعت ثبت</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for sr in services %}
+                    <tr>
+                        <td>{{ sr.tracking_code }}</td>
+                        <td>{{ sr.customer.name }}</td>
+                        <td>{{ sr.origin_address|truncatechars:20 }}</td>
+                        <td>{{ sr.destination_address|truncatechars:20 }}</td>
+                        <td>{{ sr.assigned_driver.name|default:"---" }}</td>
+                        <td>{{ sr.get_status_display }}</td>
+                        <td>{{ sr.fare_amount|intcomma|default:"---" }}</td>
+                        <td>{{ sr.commission_amount|intcomma }}</td>
+                        <td>{{ sr.created_at|time:"H:i" }}</td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="9" class="text-center text-muted">سرویسی برای این تاریخ ثبت نشده است</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <p class="mt-2 mb-0"><strong>کمیسیون آژانس روز:</strong> {{ totals.commission|intcomma }} تومان</p>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-md-6">
+            <div class="urban-card">
+                <h6>حاضر امروز</h6>
+                {% for item in present_drivers %}
+                    <div class="border-bottom py-1">{{ item.driver.name }}</div>
+                {% empty %}
+                    <small class="text-muted">ثبتی وجود ندارد</small>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="urban-card">
+                <h6>غایب امروز</h6>
+                {% for item in absent_drivers %}
+                    <div class="border-bottom py-1">{{ item.driver.name }}</div>
+                {% empty %}
+                    <small class="text-muted">ثبتی وجود ندارد</small>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

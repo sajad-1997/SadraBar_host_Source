@@ -14,4 +14,5 @@ urlpatterns = [
     path('wallets/', views.wallets, name='wallets'),
     path('wallets/user/<int:user_id>/', views.wallet_detail, name='wallet_detail'),
     path('wallets/role/<str:role_code>/', views.role_wallet_detail, name='role_wallet_detail'),
+    path('security/', views.security_dashboard, name='security_dashboard'),
 ]

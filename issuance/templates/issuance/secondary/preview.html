@@ -24,7 +24,8 @@
 
     <!-- دکمه‌ها -->
     <div class="mb-4 text-center">
-        {% if bijak.approval_status == 'approved' %}
+        {% if bijak.approval_status == 'approved' or user.role in 'manager admin' %}
+            {# مدیریت و مدیر کل بدون نیاز به تأیید، مستقیماً چاپ می‌گیرند #}
             <a href="{% url 'issuance:crud:print' bijak.pk %}"
                class="btn btn-primary"
                target="_blank">

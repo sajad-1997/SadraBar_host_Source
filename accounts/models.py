@@ -113,6 +113,13 @@ class RolePermission(models.Model):
         verbose_name="اجازه چاپ بارنامه با مهر و امضای دیجیتال"
     )
 
+    # مجوز چاپ بارنامه بدون نیاز به تایید مدیریت
+    # (مدیریت و مدیر کل همیشه مجاز هستند؛ این مجوز برای نقش کارمند است)
+    can_print_without_approval = models.BooleanField(
+        default=False,
+        verbose_name="اجازه چاپ بارنامه بدون نیاز به تایید مدیریت"
+    )
+
     # مجوزهای پیامک و تایید دو مرحله‌ای
     can_send_sms_verification = models.BooleanField(default=False, verbose_name="دسترسی به ارسال پیامک تایید")
     can_verify_sms_code = models.BooleanField(default=False, verbose_name="دسترسی به تایید کد پیامکی")
@@ -125,6 +132,24 @@ class RolePermission(models.Model):
     can_view_queue_reports = models.BooleanField(default=False, verbose_name="دسترسی به گزارش‌های نوبت‌دهی")
     can_manage_queue_announcements = models.BooleanField(default=False, verbose_name="دسترسی به مدیریت اعلان‌های نوبت‌دهی")
     can_override_queue_rules = models.BooleanField(default=False, verbose_name="دسترسی به نادیده گرفتن قوانین نوبت‌دهی")
+
+    # مجوزهای ماژول رانندگان شهری
+    # (نقش ادمین همیشه دسترسی کامل دارد؛ این مجوزها برای نقش‌های مدیریت و کارمند
+    #  توسط ادمین/مدیریت فعال می‌شوند)
+    can_urban_access_dashboard = models.BooleanField(default=False, verbose_name="دسترسی به داشبورد رانندگان شهری")
+    can_urban_view_customers = models.BooleanField(default=False, verbose_name="مشاهده مشتریان شهری")
+    can_urban_add_customers = models.BooleanField(default=False, verbose_name="ثبت و ویرایش مشتریان شهری")
+    can_urban_view_requests = models.BooleanField(default=False, verbose_name="مشاهده درخواست‌های سرویس شهری")
+    can_urban_add_requests = models.BooleanField(default=False, verbose_name="ثبت درخواست سرویس شهری")
+    can_urban_edit_requests = models.BooleanField(default=False, verbose_name="ویرایش و تغییر وضعیت درخواست سرویس")
+    can_urban_assign_requests = models.BooleanField(default=False, verbose_name="تخصیص راننده به سرویس")
+    can_urban_view_queue = models.BooleanField(default=False, verbose_name="مشاهده نوبت و حضور رانندگان")
+    can_urban_manage_queue = models.BooleanField(default=False, verbose_name="مدیریت نوبت و حضور رانندگان")
+    can_urban_view_rates = models.BooleanField(default=False, verbose_name="مشاهده نرخ‌نامه و محاسبه کرایه")
+    can_urban_manage_rates = models.BooleanField(default=False, verbose_name="مدیریت نرخ‌نامه‌ها")
+    can_urban_view_locations = models.BooleanField(default=False, verbose_name="مشاهده موقعیت رانندگان")
+    can_urban_manage_settlements = models.BooleanField(default=False, verbose_name="تسویه بدهی کمیسیون رانندگان")
+    can_urban_view_reports = models.BooleanField(default=False, verbose_name="مشاهده گزارش‌های روزانه مدیریت")
 
     def __str__(self):
         return f"مجوزهای نقش {self.get_role_display()}"

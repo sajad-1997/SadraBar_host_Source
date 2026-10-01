@@ -66,11 +66,10 @@
 
     <!-- دکمه‌ها -->
     <div class="mb-4 text-center">
-        {% if bijak.approval_status == 'approved' %}
-            <a href="{% url 'issuance:crud:print' bijak.pk %}" class="btn btn-primary" target="_blank">
-                چاپ بارنامه
-            </a>
-        {% endif %}
+        {# مدیریت و مدیر کل بدون نیاز به تأیید، مستقیماً چاپ می‌گیرند #}
+        <a href="{% url 'issuance:crud:print' bijak.pk %}" class="btn btn-primary" target="_blank">
+            چاپ بارنامه
+        </a>
         <a href="{% url 'issuance:manager:waiting_list' %}" class="btn btn-secondary">
             بازگشت به لیست
         </a>

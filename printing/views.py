@@ -26,6 +26,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 
+from accounts.decorators import is_manager_or_admin
 from issuance.models import Bijak
 from otp_verification.services import send_otp_via_smsir
 
@@ -43,9 +44,17 @@ def _check_bijak_access(bijak: Bijak, user: Any) -> Tuple[bool, str]:
     """
     Check if user has access to bijak.
 
+    نقش «مدیریت» و «مدیر کل» (و ابرکاربر) بدون نیاز به مجوز/کد تأیید
+    به همه بارنامه‌ها دسترسی دارند و می‌توانند مستقیماً چاپ بگیرند.
+    سایر کاربران فقط به بارنامه‌های ساخته خودشان (با شماره موبایل راننده)
+    دسترسی دارند.
+
     Returns:
         Tuple of (has_access, error_message)
     """
+    if is_manager_or_admin(user):
+        return True, ''
+
     if bijak.created_by != user:
         return False, 'شما دسترسی به این بارنامه ندارید.'
 
@@ -65,6 +74,9 @@ def _process_otp_request(
 
     Uses select_for_update() for database-level locking instead of threading.Lock.
 
+    نقش «مدیریت» و «مدیر کل» بدون نیاز به کد تأیید (OTP) و پیامک،
+    مستقیماً اجازه چاپ می‌گیرند و سوابق چاپ آن‌ها ثبت می‌شود.
+
     Returns:
         Tuple of (success, response_data)
     """
@@ -72,6 +84,21 @@ def _process_otp_request(
     otp_record = WaybillPrintOTP.objects.select_for_update().get_or_create(
         bijak=bijak
     )[0]
+
+    # مدیریت و مدیر کل: چاپ مستقیم بدون نیاز به کد تأیید (OTP)
+    if is_manager_or_admin(user):
+        otp_record.print_count += 1
+        otp_record.last_print_by = user
+        otp_record.last_print_time = timezone.now()
+        otp_record.is_verified = True
+        otp_record.save(update_fields=[
+            'print_count', 'last_print_by',
+            'last_print_time', 'is_verified'
+        ])
+        return True, {
+            'need_verification': False,
+            'print_url': reverse('issuance:crud:print', args=[bijak.id])
+        }
 
     # If already printed before → immediate permission
     if otp_record.print_count > 0:
@@ -347,7 +374,7 @@ def api_verify_otp(request: Any) -> Response:
             status=status.HTTP_404_NOT_FOUND
         )
 
-    if bijak.created_by != request.user:
+    if bijak.created_by != request.user and not is_manager_or_admin(request.user):
         return Response(
             {'success': False, 'message': 'دسترسی ندارید.'},
             status=status.HTTP_403_FORBIDDEN
@@ -356,6 +383,29 @@ def api_verify_otp(request: Any) -> Response:
     try:
         # Database-level locking with select_for_update()
         with transaction.atomic():
+            # مدیریت و مدیر کل: بدون نیاز به کد تأیید، اجازه چاپ مستقیم
+            if is_manager_or_admin(request.user):
+                otp_record = WaybillPrintOTP.objects.select_for_update().get_or_create(
+                    bijak=bijak
+                )[0]
+                otp_record.print_count += 1
+                otp_record.last_print_by = request.user
+                otp_record.last_print_time = timezone.now()
+                otp_record.is_verified = True
+                otp_record.save(update_fields=[
+                    'print_count', 'last_print_by',
+                    'last_print_time', 'is_verified'
+                ])
+
+                if request.session.get('pending_otp_bijak_id'):
+                    del request.session['pending_otp_bijak_id']
+
+                return Response({
+                    'success': True,
+                    'message': 'اجازه چاپ مستقیم برای مدیریت صادر گردید.',
+                    'print_url': reverse('issuance:crud:print', args=[bijak.id])
+                })
+
             otp_record = WaybillPrintOTP.objects.select_for_update().get(
                 bijak=bijak
             )

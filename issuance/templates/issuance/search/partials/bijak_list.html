@@ -34,6 +34,10 @@
             <td>
                 {% if b.approval_status == 'pending' %}
                     <a href="{% url 'issuance:crud:preview' b.pk %}" class="btn btn-sm btn-info">مشاهده</a>
+                    {% if request.user.role == 'admin' or request.user.role == 'manager' %}
+                        {# مدیریت و مدیر کل بدون نیاز به تأیید، مستقیماً چاپ می‌گیرند #}
+                        <a href="{% url 'issuance:crud:print' b.pk %}" class="btn btn-sm btn-primary">چاپ</a>
+                    {% endif %}
                 {% elif b.approval_status == 'approved' %}
                     <a href="{% url 'issuance:crud:print' b.pk %}" class="btn btn-sm btn-primary">چاپ</a>
                     {% if b.cargo.weight_2 and b.cargo.weight_2 > 0 %}
@@ -49,6 +53,10 @@
                     <a href="{% url 'issuance:crud:edit_bijak' b.pk %}" class="btn btn-sm btn-warning">ویرایش</a>
                     <a href="{% url 'issuance:manager:manager_preview' b.pk %}" class="btn btn-sm btn-info">مشاهده</a>
                     <a href="{% url 'issuance:crud:preview' b.pk %}" class="btn btn-sm btn-info">مشاهده</a>
+                    {% if request.user.role == 'admin' or request.user.role == 'manager' %}
+                        {# مدیریت و مدیر کل بدون نیاز به تأیید، مستقیماً چاپ می‌گیرند #}
+                        <a href="{% url 'issuance:crud:print' b.pk %}" class="btn btn-sm btn-primary">چاپ</a>
+                    {% endif %}
                 {% endif %}
             </td>
         </tr>

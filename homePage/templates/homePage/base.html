@@ -6,6 +6,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     {% include "pwa/head.html" %}
     <title>{% block title %}صدرابار خراسان{% endblock %}</title>
+    
+    <!-- فونت فارسی -->
+    <link href="https://cdn.jsdelivr.net/npm/vazirmatn@33.003/index.css" rel="stylesheet">
+    
+    <!-- Global Theme CSS -->
+    <link rel="stylesheet" href="{% static 'global/css/theme.css' %}">
+    
     <!-- حذف این دو خط -->
     <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vazirmatn@33.0.2/theme-awesome/vazirmatn-font-face-core.css"> -->
     <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vazirmatn@33.0.2/theme-awesome/vazirmatn-font-face-extended.css"> -->
@@ -27,9 +34,9 @@
         }
 
         body {
-            font-family: 'IRANSansWeb', sans-serif; /* تغییر نام فونت */
-            background-color: var(--background-light);
-            color: var(--text-color-dark);
+            font-family: 'Vazirmatn', sans-serif; /* استفاده از فونت سراسری */
+            background-color: var(--global-bg);
+            color: var(--global-text);
             margin: 0;
             padding: 0;
             line-height: 1.6;
@@ -435,6 +442,9 @@
             nav.classList.toggle('active');
         }
     </script>
+    
+    <!-- Global Theme JS -->
+    <script src="{% static 'global/js/theme.js' %}"></script>
     
     {% include "pwa/scripts.html" %}
     

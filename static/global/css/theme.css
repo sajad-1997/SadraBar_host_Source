@@ -1,0 +1,391 @@
+/* ==================== Global Theme System ==================== */
+/* Based on report module's dark/light theme implementation */
+
+:root {
+    /* Light Theme (Default) */
+    --global-bg: #f5f6fa;
+    --global-text: #0f172a;
+    --global-card-bg: #ffffff;
+    --global-input-bg: #f8fafc;
+    --global-border: rgba(15, 23, 42, 0.08);
+    --global-muted: #64748b;
+    --global-accent: #0d6efd;
+    --global-accent-2: #6366f1;
+    --global-accent-hover: #8f94fb;
+    --global-chip-bg: rgba(13, 110, 253, 0.1);
+    --global-row-bg: rgba(15, 23, 42, 0.035);
+    --global-shadow: rgba(0, 0, 0, 0.05);
+    --global-shadow-dark: rgba(15, 23, 42, 0.06);
+    --global-scroll: rgba(100, 116, 139, 0.35);
+    
+    /* Status Colors */
+    --global-success: #198754;
+    --global-success-bg: #dcfce7;
+    --global-success-text: #14532d;
+    --global-danger: #dc3545;
+    --global-danger-bg: #fee2e2;
+    --global-danger-text: #7f1d1d;
+    --global-warning: #f59e0b;
+    --global-warning-bg: #fef3c7;
+    --global-warning-text: #78350f;
+    --global-info: #0ea5e9;
+    --global-info-bg: #e0f2fe;
+    --global-info-text: #0c4a6e;
+    
+    /* Navigation */
+    --global-navbar-bg: linear-gradient(90deg, #4e54c8, #8f94fb);
+    --global-sidebar-bg: #ffffff;
+    --global-link-hover: #4e54c8;
+}
+
+/* Dark Theme (System Preference) */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --global-bg: #181a1f;
+        --global-text: #e4e4e4;
+        --global-card-bg: #1e2329;
+        --global-input-bg: #262c35;
+        --global-border: #2d343f;
+        --global-muted: #94a3b8;
+        --global-accent: #8f94fb;
+        --global-accent-2: #6366f1;
+        --global-accent-hover: #a5b4fc;
+        --global-chip-bg: rgba(143, 148, 251, 0.16);
+        --global-row-bg: rgba(255, 255, 255, 0.04);
+        --global-shadow: rgba(0, 0, 0, 0.4);
+        --global-shadow-dark: rgba(15, 23, 42, 0.12);
+        --global-scroll: rgba(148, 163, 184, 0.35);
+        
+        /* Status Colors (Dark) */
+        --global-success: #34d399;
+        --global-success-bg: rgba(16, 185, 129, 0.2);
+        --global-success-text: #34d399;
+        --global-danger: #f87171;
+        --global-danger-bg: rgba(239, 68, 68, 0.2);
+        --global-danger-text: #f87171;
+        --global-warning: #fbbf24;
+        --global-warning-bg: rgba(245, 158, 11, 0.2);
+        --global-warning-text: #fbbf24;
+        --global-info: #38bdf8;
+        --global-info-bg: rgba(14, 165, 233, 0.2);
+        --global-info-text: #38bdf8;
+        
+        /* Navigation (Dark) */
+        --global-navbar-bg: linear-gradient(90deg, #2a2d55, #3c3f72);
+        --global-sidebar-bg: #22252b;
+        --global-link-hover: #8f94fb;
+    }
+}
+
+/* Manual Dark Mode Class (for toggle functionality) */
+body.dark-mode {
+    --global-bg: #181a1f;
+    --global-text: #e4e4e4;
+    --global-card-bg: #1e2329;
+    --global-input-bg: #262c35;
+    --global-border: #2d343f;
+    --global-muted: #94a3b8;
+    --global-accent: #8f94fb;
+    --global-accent-2: #6366f1;
+    --global-accent-hover: #a5b4fc;
+    --global-chip-bg: rgba(143, 148, 251, 0.16);
+    --global-row-bg: rgba(255, 255, 255, 0.04);
+    --global-shadow: rgba(0, 0, 0, 0.4);
+    --global-shadow-dark: rgba(15, 23, 42, 0.12);
+    --global-scroll: rgba(148, 163, 184, 0.35);
+    
+    --global-success: #34d399;
+    --global-success-bg: rgba(16, 185, 129, 0.2);
+    --global-success-text: #34d399;
+    --global-danger: #f87171;
+    --global-danger-bg: rgba(239, 68, 68, 0.2);
+    --global-danger-text: #f87171;
+    --global-warning: #fbbf24;
+    --global-warning-bg: rgba(245, 158, 11, 0.2);
+    --global-warning-text: #fbbf24;
+    --global-info: #38bdf8;
+    --global-info-bg: rgba(14, 165, 233, 0.2);
+    --global-info-text: #38bdf8;
+    
+    --global-navbar-bg: linear-gradient(90deg, #2a2d55, #3c3f72);
+    --global-sidebar-bg: #22252b;
+    --global-link-hover: #8f94fb;
+}
+
+/* ==================== Base Styles ==================== */
+body {
+    font-family: 'Vazirmatn', Tahoma, sans-serif;
+    background-color: var(--global-bg);
+    color: var(--global-text);
+    min-height: 100vh;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* ==================== Common Components ==================== */
+
+/* Cards */
+.card, .urban-card, .stat-card, .rp-card, .welcome-box {
+    background: var(--global-card-bg);
+    border: 1px solid var(--global-border);
+    border-radius: 16px;
+    box-shadow: 0 4px 15px var(--global-shadow);
+    color: var(--global-text);
+    transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Forms */
+.form-control, .form-select, .field {
+    background-color: var(--global-input-bg);
+    border: 1px solid var(--global-border);
+    border-radius: 10px;
+    color: var(--global-text);
+    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+}
+
+.form-control::placeholder, .field::placeholder {
+    color: var(--global-muted);
+    opacity: 0.7;
+}
+
+.form-control:focus, .form-select:focus, .field:focus {
+    background-color: var(--global-input-bg);
+    border-color: var(--global-accent);
+    color: var(--global-text);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.15);
+}
+
+.form-control option, .form-select option {
+    color: #0f172a;
+    background-color: #ffffff;
+}
+
+@media (prefers-color-scheme: dark) {
+    .form-control option, .form-select option {
+        color: #e4e4e4;
+        background-color: #1e2329;
+    }
+}
+
+body.dark-mode .form-control option, body.dark-mode .form-select option {
+    color: #e4e4e4;
+    background-color: #1e2329;
+}
+
+/* Tables */
+.table, .urban-table {
+    color: var(--global-text);
+}
+
+.table thead th, .urban-table thead th {
+    background-color: var(--global-input-bg);
+    border-color: var(--global-border);
+    color: var(--global-text);
+}
+
+.table td, .urban-table td {
+    border-bottom-color: var(--global-border);
+}
+
+/* Buttons */
+.btn-primary, .rp-btn-primary {
+    background: linear-gradient(135deg, var(--global-accent), var(--global-accent-2));
+    border: none;
+    color: #fff;
+    border-radius: 12px;
+    padding: 11px 16px;
+    font-weight: 700;
+    font-size: 0.92rem;
+    box-shadow: 0 4px 14px rgba(13, 110, 253, 0.3);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btn-primary:hover, .rp-btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(13, 110, 253, 0.4);
+    color: #fff;
+}
+
+.btn-light {
+    background-color: var(--global-card-bg);
+    border-color: var(--global-border);
+    color: var(--global-text);
+}
+
+.btn-danger {
+    background-color: var(--global-danger);
+    color: #fff;
+}
+
+/* Badges */
+.badge-soft {
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.badge-soft.green {
+    background: var(--global-success-bg);
+    color: var(--global-success-text);
+}
+
+.badge-soft.red {
+    background: var(--global-danger-bg);
+    color: var(--global-danger-text);
+}
+
+.badge-soft.blue {
+    background: var(--global-info-bg);
+    color: var(--global-info-text);
+}
+
+.badge-soft.orange {
+    background: var(--global-warning-bg);
+    color: var(--global-warning-text);
+}
+
+.badge-soft.gray {
+    background: #e9ecef;
+    color: #495057;
+}
+
+@media (prefers-color-scheme: dark) {
+    .badge-soft.gray {
+        background: #3d444f;
+        color: #d1d5db;
+    }
+}
+
+body.dark-mode .badge-soft.gray {
+    background: #3d444f;
+    color: #d1d5db;
+}
+
+/* Alerts */
+.alert {
+    padding: 12px 14px;
+    border-radius: 10px;
+    margin-bottom: 14px;
+    font-size: 14px;
+}
+
+.alert-success {
+    background: var(--global-success-bg);
+    color: var(--global-success-text);
+}
+
+.alert-error, .alert-danger {
+    background: var(--global-danger-bg);
+    color: var(--global-danger-text);
+}
+
+.alert-warning {
+    background: var(--global-warning-bg);
+    color: var(--global-warning-text);
+}
+
+.alert-info {
+    background: var(--global-info-bg);
+    color: var(--global-info-text);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--global-scroll);
+    border-radius: 6px;
+}
+
+/* ==================== Module-Specific Overrides ==================== */
+
+/* Dashboard Module */
+.dashboard-container {
+    display: flex;
+    min-height: calc(100vh - 64px);
+}
+
+.sidebar {
+    background-color: var(--global-sidebar-bg);
+    flex: 0 0 250px;
+    padding: 1.5rem 1rem;
+    box-shadow: 0 0 10px var(--global-shadow);
+    transition: all 0.3s ease;
+}
+
+.sidebar a {
+    color: var(--global-text);
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.sidebar a:hover {
+    background: var(--global-link-hover);
+    color: #fff;
+}
+
+/* City Drivers Module */
+.urban-sidebar {
+    background: linear-gradient(180deg, #1e2329, #2d343f);
+    color: #e4e4e4;
+}
+
+@media (prefers-color-scheme: dark) {
+    .urban-sidebar {
+        background: linear-gradient(180deg, #14181d, #1e2329);
+    }
+}
+
+body.dark-mode .urban-sidebar {
+    background: linear-gradient(180deg, #14181d, #1e2329);
+}
+
+/* Driver Queue Module */
+.topbar {
+    background: #0f172a;
+    color: #fff;
+    padding: 14px 0;
+    font-weight: bold;
+}
+
+@media (prefers-color-scheme: dark) {
+    .topbar {
+        background: #1e2329;
+    }
+}
+
+body.dark-mode .topbar {
+    background: #1e2329;
+}
+
+/* ==================== Responsive ==================== */
+@media (max-width: 992px) {
+    .dashboard-container {
+        flex-direction: column;
+    }
+    
+    .sidebar {
+        width: 100%;
+        text-align: center;
+        box-shadow: none;
+    }
+    
+    .sidebar a {
+        display: inline-block;
+        margin: 0.3rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .urban-layout {
+        flex-direction: column;
+    }
+    
+    .urban-sidebar {
+        width: 100%;
+        min-width: 0;
+    }
+}

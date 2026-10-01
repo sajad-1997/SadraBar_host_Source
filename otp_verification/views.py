@@ -1,6 +1,5 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from django.views.decorators.csrf import csrf_exempt  # برای تست، در تولید CSRF فعال است
 from django.views.decorators.http import require_http_methods
 from .forms import PhoneNumberForm, OTPVerificationForm
 from .utils import generate_otp, verify_otp

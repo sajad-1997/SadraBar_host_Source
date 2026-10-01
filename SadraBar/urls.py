@@ -32,6 +32,9 @@ urlpatterns = [
     path('manifest.webmanifest', pwa_views.manifest, name='pwa_manifest'),
     path('sw.js', pwa_views.service_worker, name='pwa_service_worker'),
     path('offline/', pwa_views.offline, name='pwa_offline'),
+    path('pwa/queued/', pwa_views.queued, name='pwa_queued'),
+    path('pwa/sync/ping/', pwa_views.sync_ping, name='pwa_sync_ping'),
+    path('pwa/sync/status/', pwa_views.sync_status, name='pwa_sync_status'),
     path('browserconfig.xml', pwa_views.browserconfig, name='pwa_browserconfig'),
     path('admin/', admin.site.urls),
     path('accounts/', include('accounts.urls')),
@@ -52,6 +55,7 @@ urlpatterns = [
     path('driver-queue/', include(('driver_queue.urls', 'driver_queue'), namespace='driver_queue')),
     path('user-management/', include(('user_management.urls', 'user_management'), namespace='user_management')),
     path('system-control/', include(('system_control.urls', 'system_control'), namespace='system_control')),
+    path('city-drivers/', include(('city_drivers.urls', 'city_drivers'), namespace='city_drivers')),
 
 ]
 

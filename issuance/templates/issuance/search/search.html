@@ -78,6 +78,8 @@
                         {% if request.user.role == 'admin' or request.user.role == 'manager' %}
                             <a href="{% url 'issuance:manager:manager_preview' b.pk %}"
                                class="btn btn-sm btn-info">مشاهده</a>
+                            {# مدیریت و مدیر کل بدون نیاز به تأیید، مستقیماً چاپ می‌گیرند #}
+                            <a href="{% url 'issuance:crud:print' b.pk %}" class="btn btn-sm btn-primary">چاپ</a>
                         {% elif request.user.role == 'employee' %}
                             <a href="{% url 'issuance:crud:preview' b.pk %}"
                                class="btn btn-sm btn-info">مشاهده</a>
@@ -94,6 +96,8 @@
                         {% if request.user.role == 'admin' or request.user.role == 'manager' %}
                             <a href="{% url 'issuance:manager:manager_preview' b.pk %}"
                                class="btn btn-sm btn-info">مشاهده</a>
+                            {# مدیریت و مدیر کل بدون نیاز به تأیید، مستقیماً چاپ می‌گیرند #}
+                            <a href="{% url 'issuance:crud:print' b.pk %}" class="btn btn-sm btn-primary">چاپ</a>
                         {% elif request.user.role == 'employee' %}
                             <a href="{% url 'issuance:crud:preview' b.pk %}"
                                class="btn btn-sm btn-info">مشاهده</a>
@@ -155,7 +159,7 @@
                         <a href="{% url 'issuance:crud:print_weight2' b.pk %}"
                            class="btn btn-sm btn-success w-100">چاپ با وزن دوم</a>
                     {% endif %}
-                    <a href="{% url 'issuance:manager:manager_preview' b.pk %}"
+                    <a href="{% url 'issuance:crud:preview' b.pk %}"
                        class="btn btn-sm btn-info w-100">مشاهده</a>
                     <a href="{% url 'issuance:crud:edit_bijak' b.pk %}" class="btn btn-sm btn-warning w-100">ویرایش</a>
                 </div>

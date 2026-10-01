@@ -1,0 +1,145 @@
+{% extends 'city_drivers/base.html' %}{% load humanize %}
+
+{% block title %}درخواست‌های سرویس شهری{% endblock %}
+
+{% block content %}
+    <div class="d-flex justify-content-between align-items-center flex-wrap mb-3">
+        <h4 class="fw-bold text-primary mb-0">📋 درخواست‌های سرویس مشتریان شهری</h4>
+        {% if urban_perms.can_urban_add_requests %}
+            <a href="{% url 'city_drivers:urban_request_create' %}" class="btn btn-primary">+ ثبت درخواست جدید</a>
+        {% endif %}
+    </div>
+
+    <div class="urban-card">
+        <form method="get">
+            <div class="row g-2">
+                <div class="col-md-3">
+                    <input type="text" name="tracking_code" value="{{ filters.tracking_code }}" class="form-control" placeholder="کد رهگیری">
+                </div>
+                <div class="col-md-3">
+                    <input type="text" name="customer" value="{{ filters.customer }}" class="form-control" placeholder="نام مشتری">
+                </div>
+                <div class="col-md-3">
+                    <select name="status" class="form-select">
+                        <option value="">همه وضعیت‌ها</option>
+                        {% for value, label in status_choices %}
+                            <option value="{{ value }}" {% if filters.status == value %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <select name="driver" class="form-select">
+                        <option value="">همه رانندگان</option>
+                        {% for d in drivers %}
+                            <option value="{{ d.pk }}" {% if filters.driver == d.pk|stringformat:"s" %}selected{% endif %}>{{ d.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="row g-2 mt-2">
+                <div class="col-6">
+                    <button type="submit" class="btn btn-primary w-100">اعمال فیلتر</button>
+                </div>
+                <div class="col-6">
+                    <a href="{% url 'city_drivers:urban_request_list' %}" class="btn btn-outline-secondary w-100">پاکسازی فیلتر</a>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <div class="urban-card">
+        <div class="table-responsive">
+            <table class="urban-table">
+                <thead>
+                <tr>
+                    <th>کد رهگیری</th>
+                    <th>مشتری</th>
+                    <th>مبدأ → مقصد</th>
+                    <th>سرویس</th>
+                    <th>راننده</th>
+                    <th>وضعیت</th>
+                    <th>کرایه</th>
+                    <th>کمیسیون</th>
+                    <th>تاریخ ثبت</th>
+                    <th>عملیات</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for sr in requests %}
+                    <tr>
+                        <td>{{ sr.tracking_code }}</td>
+                        <td>{{ sr.customer.name }}</td>
+                        <td>{{ sr.origin_address|truncatechars:15 }} → {{ sr.destination_address|truncatechars:15 }}</td>
+                        <td>{{ sr.service.title|default:"---" }}</td>
+                        <td>
+                            {% if sr.assigned_driver %}
+                                <span class="badge-soft blue">{{ sr.assigned_driver.name }}</span>
+                            {% else %}
+                                <span class="text-muted">---</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if sr.status == 'done' %}
+                                <span class="badge-soft green">{{ sr.get_status_display }}</span>
+                            {% elif sr.status == 'in_progress' or sr.status == 'assigned' %}
+                                <span class="badge-soft blue">{{ sr.get_status_display }}</span>
+                            {% elif sr.status == 'pending' or sr.status == 'approved' %}
+                                <span class="badge-soft orange">{{ sr.get_status_display }}</span>
+                            {% else %}
+                                <span class="badge-soft red">{{ sr.get_status_display }}</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ sr.fare_amount|intcomma|default:"---" }}</td>
+                        <td>{{ sr.commission_amount|intcomma }}</td>
+                        <td>{{ sr.jalali_created }}</td>
+                        <td>
+                            <div class="d-flex gap-1 flex-wrap">
+                                {% if urban_perms.can_urban_assign_requests %}
+                                    {% if sr.status == 'pending' or sr.status == 'approved' %}
+                                    <form method="post" action="{% url 'city_drivers:urban_request_assign' sr.pk %}" class="d-flex gap-1">
+                                        {% csrf_token %}
+                                        <select name="driver_id" class="form-select form-select-sm" style="max-width: 130px;" required>
+                                            <option value="">راننده…</option>
+                                            {% for d in drivers %}
+                                                <option value="{{ d.pk }}">{{ d.name }}</option>
+                                            {% endfor %}
+                                        </select>
+                                        <button type="submit" class="btn btn-sm btn-primary">تخصیص</button>
+                                    </form>
+                                    {% endif %}
+                                {% endif %}
+                                {% if urban_perms.can_urban_edit_requests %}
+                                    <a href="{% url 'city_drivers:urban_request_edit' sr.pk %}" class="btn btn-sm btn-warning">ویرایش</a>
+                                {% if sr.status == 'assigned' or sr.status == 'in_progress' %}
+                                        <form method="post" action="{% url 'city_drivers:urban_request_status' sr.pk %}">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="action" value="done">
+                                            <button type="submit" class="btn btn-sm btn-success">اتمام</button>
+                                        </form>
+                                    {% endif %}
+                                    {% if sr.status == 'pending' %}
+                                        <form method="post" action="{% url 'city_drivers:urban_request_status' sr.pk %}">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="action" value="approve">
+                                            <button type="submit" class="btn btn-sm btn-outline-success">تایید</button>
+                                        </form>
+                                    {% endif %}
+                                    {% if sr.status != 'done' and sr.status != 'canceled' and sr.status != 'rejected' %}
+                                        <form method="post" action="{% url 'city_drivers:urban_request_status' sr.pk %}">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="action" value="cancel">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger">لغو</button>
+                                        </form>
+                                    {% endif %}
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="10" class="text-center text-muted">درخواستی یافت نشد</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}

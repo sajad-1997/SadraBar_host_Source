@@ -7,6 +7,15 @@
     {% include "pwa/head.html" %}
     <title>{% block title %}مؤسسه حمل و نقل صدرابار خراسان{% endblock %}</title>
 
+    <!-- Bootstrap RTL -->
+    <link rel="stylesheet" href="{% static 'issuance/css/bootstrap.rtl.min.css' %}">
+    
+    <!-- فونت فارسی -->
+    <link href="https://cdn.jsdelivr.net/npm/vazirmatn@33.003/index.css" rel="stylesheet">
+
+    <!-- Global Theme CSS -->
+    <link rel="stylesheet" href="{% static 'global/css/theme.css' %}">
+
     <link rel="stylesheet" href="{% static 'issuance/css/main.css' %}">
     <!--{#    <link rel="stylesheet" href="{% static 'issuance/css/form_new.css' %}">#}-->
     <!--{#    <link rel="stylesheet" href="{% static 'issuance/css/new_style_old.css' %}">#}-->
@@ -17,9 +26,6 @@
 
     <!-- Select2 -->
     <link rel="stylesheet" href="{% static 'issuance/css/select2.min.css' %}">
-
-    <!-- Bootstrap RTL -->
-    <link rel="stylesheet" href="{% static 'issuance/css/bootstrap.rtl.min.css' %}">
 
     <!-- Persian Datepicker -->
     <link rel="stylesheet" href="{% static 'issuance/css/persian-datepicker.css' %}">
@@ -172,7 +178,7 @@
             }
         }
 
-        /* پشتیبانی از حالت تاریک */
+        /* پشتیبانی از حالت تاریک - اکنون توسط global theme مدیریت می‌شود */
         @media (prefers-color-scheme: dark) {
             #custom-main-header {
                 background: rgba(20, 24, 30, 0.96);
@@ -196,47 +202,6 @@
 
             #custom-main-header ul li a:hover {
                 color: #ffb347;
-            }
-
-            body {
-                background-color: #181a1f;
-                color: #e4e4e4;
-            }
-
-            .container {
-                color: #e4e4e4;
-            }
-
-            .card {
-                background-color: #2b2e36;
-                border-color: #3d414a;
-            }
-
-            .table {
-                color: #e4e4e4;
-            }
-
-            .table thead th {
-                background-color: #2b2e36;
-                border-color: #3d414a;
-            }
-
-            .form-control {
-                background-color: #2b2e36;
-                border-color: #3d414a;
-                color: #e4e4e4;
-            }
-
-            .form-control:focus {
-                background-color: #2b2e36;
-                border-color: #8f94fb;
-                color: #e4e4e4;
-            }
-
-            .btn-light {
-                background-color: #2b2e36;
-                border-color: #3d414a;
-                color: #e4e4e4;
             }
         }
     </style>
@@ -289,6 +254,9 @@
 
 <!-- Form Validation Utility -->
 <script src="{% static 'issuance/js/form_validation.js' %}"></script>
+
+<!-- Global Theme JS -->
+<script src="{% static 'global/js/theme.js' %}"></script>
 
 {% block extra_scripts %}{% endblock %}
 

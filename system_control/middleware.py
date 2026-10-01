@@ -1,6 +1,7 @@
 from django.shortcuts import render
 
 from .services import user_can_access_path
+from .security_monitor import SecurityMonitor
 
 
 class ModuleAccessMiddleware:
@@ -31,6 +32,16 @@ class ModuleAccessMiddleware:
                         # در صورت بروز خطا، دسترسی را نمی‌بندیم تا سیستم از کار نیفتد
                         allowed, reason = True, ''
                     if not allowed:
+                        # Log security event
+                        SecurityMonitor.log_event(
+                            'module_access_denied',
+                            user=user,
+                            ip_address=request.META.get('REMOTE_ADDR'),
+                            user_agent=request.META.get('HTTP_USER_AGENT', ''),
+                            path=path,
+                            severity='medium',
+                            details={'reason': reason}
+                        )
                         return render(
                             request, 'errors/403.html',
                             {'error_message': reason},

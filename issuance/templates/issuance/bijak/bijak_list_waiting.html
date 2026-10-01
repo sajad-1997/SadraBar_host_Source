@@ -93,6 +93,12 @@
                             {% endif %}
                         {% elif bijak.approval_status == 'rejected' %}
                             <a href="{% url 'issuance:crud:edit_bijak' bijak.id %}" class="btn btn-sm btn-warning">اصلاح</a>
+                            {% if user.role in 'manager admin' %}
+                                <a href="{% url 'issuance:crud:print' bijak.id %}" class="btn btn-sm btn-primary">چاپ</a>
+                            {% endif %}
+                        {% elif user.role in 'manager admin' %}
+                            {# مدیریت و مدیر کل بدون نیاز به تأیید، مستقیماً چاپ می‌گیرند #}
+                            <a href="{% url 'issuance:crud:print' bijak.id %}" class="btn btn-sm btn-primary">چاپ</a>
                         {% else %}
                             <span class="text-muted">ناموجود</span>
                         {% endif %}
@@ -147,6 +153,12 @@
                         {% endif %}
                     {% elif bijak.approval_status == 'rejected' %}
                         <a href="{% url 'issuance:crud:edit_bijak' bijak.id %}" class="btn btn-sm btn-warning w-100">اصلاح</a>
+                        {% if user.role in 'manager admin' %}
+                            <a href="{% url 'issuance:crud:print' bijak.id %}" class="btn btn-sm btn-primary w-100">چاپ</a>
+                        {% endif %}
+                    {% elif user.role in 'manager admin' %}
+                        {# مدیریت و مدیر کل بدون نیاز به تأیید، مستقیماً چاپ می‌گیرند #}
+                        <a href="{% url 'issuance:crud:print' bijak.id %}" class="btn btn-sm btn-primary w-100">چاپ</a>
                     {% else %}
                         <span class="text-muted w-100">ناموجود</span>
                     {% endif %}

@@ -16,12 +16,16 @@ STANDARD_ROLES = [ROLE_ADMIN, ROLE_MANAGER, ROLE_EMPLOYEE, ROLE_DRIVER, ROLE_CUS
 
 
 def get_user_permissions(user):
-    """دریافت مجوزهای کاربر بر اساس نقش"""
+    """دریافت مجوزهای کاربر بر اساس نقش مؤثر.
+
+    نقش‌های سفارشی (تعریف‌شده در ماژول کنترل سیستم) از نقش پایه خود
+    مجوز ارث می‌برند.
+    """
     if not user.is_authenticated:
         return None
     
     try:
-        user_role = getattr(user, 'role', None)
+        user_role = resolve_effective_role(getattr(user, 'role', None))
         if not user_role:
             return None
         return RolePermission.objects.filter(role=user_role).first()
@@ -37,6 +41,12 @@ def has_permission(user, permission_field):
     # مدیر کل سیستم به همه چیز دسترسی دارد
     user_role = getattr(user, 'role', None)
     if user.is_superuser or user_role == ROLE_ADMIN:
+        return True
+    
+    # نقش «مدیریت» برای مجوزهای چاپ بارنامه همیشه مجاز است
+    # (این دو مجوز طبق طراحی فقط برای نقش کارمند قابل تنظیم‌اند)
+    if resolve_effective_role(user_role) == ROLE_MANAGER and permission_field in (
+            'can_print_without_approval', 'can_use_digital_stamp'):
         return True
     
     permissions = get_user_permissions(user)
@@ -73,17 +83,65 @@ def can_use_digital_stamp(user):
     - کارمند (employee): فقط در صورت فعال بودن مجوز «can_use_digital_stamp»
       در نقش کارمند توسط مدیریت/ادمین
     - سایر نقش‌ها (راننده، مشتری، مهمان): غیرمجاز
+
+    نقش‌های سفارشی از نقش پایه خود ارث می‌برند.
     """
     if not getattr(user, 'is_authenticated', False):
         return False
 
-    user_role = getattr(user, 'role', None)
-
-    if user.is_superuser or user_role in (ROLE_ADMIN, ROLE_MANAGER):
+    if user.is_superuser:
         return True
 
-    if user_role == ROLE_EMPLOYEE:
+    effective_role = resolve_effective_role(getattr(user, 'role', None))
+
+    if effective_role in (ROLE_ADMIN, ROLE_MANAGER):
+        return True
+
+    if effective_role == ROLE_EMPLOYEE:
         return has_permission(user, 'can_use_digital_stamp')
+
+    return False
+
+
+def is_manager_or_admin(user):
+    """بررسی اینکه آیا کاربر «مدیریت» یا «مدیر کل» است.
+
+    ابرکاربر (superuser) و نقش‌های سفارشی مبتنی بر نقش مدیریت/مدیر کل
+    نیز شامل می‌شوند.
+    """
+    if not getattr(user, 'is_authenticated', False):
+        return False
+    if user.is_superuser:
+        return True
+    effective_role = resolve_effective_role(getattr(user, 'role', None))
+    return effective_role in (ROLE_ADMIN, ROLE_MANAGER)
+
+
+def can_print_without_approval(user):
+    """بررسی مجوز چاپ بارنامه بدون نیاز به تأیید مدیریت.
+
+    قوانین:
+    - مدیر کل (admin) و ابرکاربر: همیشه مجاز
+    - مدیریت (manager): همیشه مجاز
+    - کارمند (employee): فقط در صورت فعال بودن مجوز «can_print_without_approval»
+      در نقش کارمند توسط مدیریت/ادمین
+    - سایر نقش‌ها (راننده، مشتری، مهمان): غیرمجاز
+
+    نقش‌های سفارشی از نقش پایه خود ارث می‌برند.
+    """
+    if not getattr(user, 'is_authenticated', False):
+        return False
+
+    if user.is_superuser:
+        return True
+
+    effective_role = resolve_effective_role(getattr(user, 'role', None))
+
+    if effective_role in (ROLE_ADMIN, ROLE_MANAGER):
+        return True
+
+    if effective_role == ROLE_EMPLOYEE:
+        return has_permission(user, 'can_print_without_approval')
 
     return False
 

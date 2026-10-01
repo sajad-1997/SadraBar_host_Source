@@ -1,0 +1,67 @@
+{% extends 'city_drivers/base.html' %}
+
+{% block title %}{% if is_edit %}ویرایش نرخ‌نامه{% else %}نرخ‌نامه جدید{% endif %}{% endblock %}
+
+{% block content %}
+    <h4 class="fw-bold text-primary mb-3">
+        {% if is_edit %}✏️ ویرایش نرخ‌نامه: {{ rate_card.title }}{% else %}💰 ثبت نرخ‌نامه جدید{% endif %}
+    </h4>
+
+    <div class="urban-card urban-form">
+        <form method="post" novalidate>
+            {% csrf_token %}
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label">عنوان نرخ‌نامه *</label>
+                    {{ form.title }}
+                    {{ form.title.errors }}
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">سرویس مرتبط</label>
+                    {{ form.service }}
+                    {{ form.service.errors }}
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">نوع خودرو</label>
+                    {{ form.vehicle_type }}
+                    {{ form.vehicle_type.errors }}
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">کرایه پایه (تومان)</label>
+                    {{ form.base_fare }}
+                    {{ form.base_fare.errors }}
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">کرایه هر کیلومتر (تومان)</label>
+                    {{ form.per_km_fare }}
+                    {{ form.per_km_fare.errors }}
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">حداقل کرایه (تومان)</label>
+                    {{ form.minimum_fare }}
+                    {{ form.minimum_fare.errors }}
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">درصد کمیسیون آژانس</label>
+                    {{ form.commission_percent }}
+                    {{ form.commission_percent.errors }}
+                </div>
+                <div class="col-12">
+                    <label class="form-label">توضیحات</label>
+                    {{ form.description }}
+                    {{ form.description.errors }}
+                </div>
+                <div class="col-12">
+                    <div class="form-check">
+                        {{ form.is_active }}
+                        <label class="form-check-label">فعال</label>
+                    </div>
+                </div>
+            </div>
+            <div class="d-flex gap-2 mt-4">
+                <button type="submit" class="btn btn-primary">ذخیره</button>
+                <a href="{% url 'city_drivers:urban_rate_list' %}" class="btn btn-outline-secondary">بازگشت</a>
+            </div>
+        </form>
+    </div>
+{% endblock %}

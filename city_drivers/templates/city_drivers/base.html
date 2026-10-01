@@ -1,0 +1,72 @@
+{% load static %}<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}رانندگان شهری{% endblock %}</title>
+    
+    <!-- Bootstrap RTL -->
+    <link rel="stylesheet" href="{% static 'issuance/css/bootstrap.rtl.min.css' %}">
+    
+    <!-- فونت فارسی -->
+    <link href="https://cdn.jsdelivr.net/npm/vazirmatn@33.003/index.css" rel="stylesheet">
+    
+    <!-- Global Theme CSS -->
+    <link rel="stylesheet" href="{% static 'global/css/theme.css' %}">
+    
+    <link rel="stylesheet" href="{% static 'city_drivers/css/urban.css' %}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+<div class="urban-layout">
+    <aside class="urban-sidebar">
+        <div class="urban-sidebar-header">
+            <h6>🚕 رانندگان شهری</h6>
+            <a href="{% url 'home' %}">↩ صفحه اصلی</a>
+            <a href="{% url 'go_dashboard' %}">🚪 خروج</a>
+        </div>
+
+        <div class="urban-sidebar-section">اصلی</div>
+        <a class="urban-nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}"
+           href="{% url 'city_drivers:dashboard' %}">📊 داشبورد آژانس</a>
+        <a class="urban-nav-link {% if request.resolver_match.url_name == 'managers_daily_report' %}active{% endif %}"
+           href="{% url 'city_drivers:managers_daily_report' %}">🗓 گزارش روزانه مدیریت</a>
+
+        <div class="urban-sidebar-section">مشتریان و سرویس‌ها</div>
+        <a class="urban-nav-link {% if 'urban_customer' in request.resolver_match.url_name %}active{% endif %}"
+           href="{% url 'city_drivers:urban_customer_list' %}">👥 مشتریان شهری</a>
+        <a class="urban-nav-link {% if 'urban_request' in request.resolver_match.url_name %}active{% endif %}"
+           href="{% url 'city_drivers:urban_request_list' %}">📋 درخواست‌های سرویس</a>
+
+        <div class="urban-sidebar-section">رانندگان</div>
+        <a class="urban-nav-link {% if 'urban_queue' in request.resolver_match.url_name %}active{% endif %}"
+           href="{% url 'city_drivers:urban_queue' %}">🧾 نوبت و حضور رانندگان</a>
+        <a class="urban-nav-link {% if 'locations' in request.resolver_match.url_name %}active{% endif %}"
+           href="{% url 'city_drivers:urban_locations_map' %}">📍 موقعیت رانندگان</a>
+        <a class="urban-nav-link {% if 'urban_rate' in request.resolver_match.url_name or 'fare_calculator' in request.resolver_match.url_name %}active{% endif %}"
+           href="{% url 'city_drivers:urban_rate_list' %}">💰 نرخ‌نامه و محاسبه کرایه</a>
+
+        <div class="urban-sidebar-section">مالی</div>
+        <a class="urban-nav-link {% if 'urban_debt' in request.resolver_match.url_name %}active{% endif %}"
+           href="{% url 'city_drivers:urban_debts_list' %}">🧮 بدهی کمیسیون</a>
+    </aside>
+
+    <main class="urban-content">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert {% if message.tags == 'error' %}alert-danger{% elif message.tags == 'success' %}alert-success{% elif message.tags == 'warning' %}alert-warning{% else %}alert-info{% endif %} alert-dismissible fade show">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        {% block content %}{% endblock %}
+    </main>
+</div>
+<script src="{% static 'issuance/bootstrap.bundle.min.js' %}"></script>
+<!-- Global Theme JS -->
+<script src="{% static 'global/js/theme.js' %}"></script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>
